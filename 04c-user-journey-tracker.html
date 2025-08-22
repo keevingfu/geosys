@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户旅程追踪器 - User Journey Tracker</title>
+    <!-- 引入 ECharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        /* Global Design System - Creating a data-driven yet human-centered interface */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Journey-focused color palette - representing progression and insights */
+            --journey-primary: #5046E5;      /* Deep purple - main brand */
+            --journey-secondary: #7C3AED;    /* Violet - secondary actions */
+            --journey-success: #10B981;      /* Green - successful conversions */
+            --journey-warning: #F59E0B;      /* Amber - attention points */
+            --journey-danger: #EF4444;       /* Red - drop-off points */
+            --journey-info: #0EA5E9;         /* Sky blue - information */
+            
+            /* Neutral colors for data visualization */
+            --gray-900: #111827;
+            --gray-800: #1F2937;
+            --gray-700: #374151;
+            --gray-600: #4B5563;
+            --gray-500: #6B7280;
+            --gray-400: #9CA3AF;
+            --gray-300: #D1D5DB;
+            --gray-200: #E5E7EB;
+            --gray-100: #F3F4F6;
+            --gray-50: #F9FAFB;
+            --white: #FFFFFF;
+            
+            /* Gradient definitions for visual hierarchy */
+            --gradient-journey: linear-gradient(135deg, #5046E5 0%, #7C3AED 100%);
+            --gradient-success: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            --gradient-warning: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(180deg, #F9FAFB 0%, #F3F4F6 100%);
+            min-height: 100vh;
+            color: var(--gray-900);
+        }
+
+        /* Main Application Layout */
+        .tracker-container {
+            display: flex;
+            height: 100vh;
+            background: var(--gray-50);
+        }
+
+        /* Left Sidebar for Navigation and Filters */
+        .sidebar {
+            width: 260px;
+            background: white;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            background: var(--gradient-journey);
+            color: white;
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .app-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Time Range Selector */
+        .time-selector {
+            padding: 16px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .time-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .time-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+
+        .time-btn {
+            padding: 6px 8px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .time-btn.active {
+            background: var(--journey-primary);
+            color: white;
+            border-color: var(--journey-primary);
+        }
+
+        /* Filter Section */
+        .filter-section {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 10px;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .filter-item:hover {
+            background: var(--gray-50);
+        }
+
+        .filter-checkbox {
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+        }
+
+        .filter-label {
+            flex: 1;
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        .filter-count {
+            font-size: 12px;
+            color: var(--gray-400);
+            background: var(--gray-100);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            color: var(--gray-900);
+        }
+
+        .nav-tab.active {
+            color: var(--journey-primary);
+            border-bottom-color: var(--journey-primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--gray-700);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--gray-50);
+        }
+
+        .nav-btn.primary {
+            background: var(--journey-primary);
+            color: white;
+            border-color: var(--journey-primary);
+        }
+
+        /* Content Wrapper */
+        .content-wrapper {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: var(--gray-50);
+        }
+
+        /* Key Metrics Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-100);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .metric-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .metric-change {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .change-positive {
+            color: var(--journey-success);
+        }
+
+        .change-negative {
+            color: var(--journey-danger);
+        }
+
+        /* Journey Visualization Section */
+        .journey-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .section-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            padding: 6px 12px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .control-btn.active {
+            background: var(--journey-primary);
+            color: white;
+            border-color: var(--journey-primary);
+        }
+
+        /* Journey Path Visualization */
+        .journey-canvas {
+            height: 400px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        /* Touchpoint Cards */
+        .touchpoint-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .touchpoint-card {
+            background: var(--gray-50);
+            padding: 16px;
+            border-radius: 10px;
+            border-left: 4px solid var(--journey-primary);
+        }
+
+        .touchpoint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .touchpoint-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .touchpoint-badge {
+            padding: 2px 8px;
+            background: var(--journey-primary);
+            color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .touchpoint-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .touchpoint-metric {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .touchpoint-metric-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .touchpoint-metric-label {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        /* Conversion Funnel */
+        .funnel-container {
+            height: 350px;
+            margin-bottom: 24px;
+        }
+
+        /* User Persona Section */
+        .persona-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .persona-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .persona-card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .persona-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .persona-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-journey);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .persona-info {
+            flex: 1;
+        }
+
+        .persona-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .persona-desc {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+
+        .persona-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .trait-chip {
+            padding: 4px 10px;
+            background: var(--gray-100);
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+
+        .persona-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .persona-stat {
+            text-align: center;
+        }
+
+        .persona-stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .persona-stat-label {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        /* Attribution Model Section */
+        .attribution-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .model-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .model-option {
+            padding: 10px 16px;
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .model-option:hover {
+            background: var(--gray-100);
+        }
+
+        .model-option.selected {
+            background: var(--journey-primary);
+            color: white;
+            border-color: var(--journey-primary);
+        }
+
+        .attribution-chart {
+            height: 300px;
+        }
+
+        /* Personalization Config Panel */
+        .personalization-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .config-section {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .config-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .config-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 12px;
+        }
+
+        .config-options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .config-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+
+        .config-label {
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--gray-300);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--journey-primary);
+        }
+
+        .toggle-slider {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            left: 22px;
+        }
+
+        /* Floating Insight Panel */
+        .insight-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            bottom: 0;
+            width: 400px;
+            background: white;
+            box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .insight-panel.show {
+            right: 0;
+        }
+
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .panel-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: 8px;
+            color: var(--gray-500);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .panel-close:hover {
+            background: var(--gray-200);
+        }
+
+        .panel-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .insight-item {
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .insight-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .insight-desc {
+            font-size: 13px;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            background: var(--gradient-warning);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-icon {
+            font-size: 20px;
+        }
+
+        .alert-text {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .alert-action {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .alert-action:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--journey-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                z-index: 1001;
+                height: 100vh;
+                transition: left 0.3s;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .persona-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .touchpoint-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tracker-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="app-title">
+                    <div class="app-icon">🛤️</div>
+                    <span>用户旅程追踪器</span>
+                </div>
+            </div>
+
+            <!-- Time Range Selector -->
+            <div class="time-selector">
+                <div class="time-label">时间范围</div>
+                <div class="time-options">
+                    <button class="time-btn" onclick="setTimeRange('1d')">今天</button>
+                    <button class="time-btn active" onclick="setTimeRange('7d')">7天</button>
+                    <button class="time-btn" onclick="setTimeRange('30d')">30天</button>
+                    <button class="time-btn" onclick="setTimeRange('90d')">90天</button>
+                    <button class="time-btn" onclick="setTimeRange('6m')">6个月</button>
+                    <button class="time-btn" onclick="setTimeRange('1y')">1年</button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-section">
+                <!-- Source Channel Filter -->
+                <div class="filter-group">
+                    <div class="filter-title">流量来源</div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">搜索引擎</span>
+                        <span class="filter-count">2,456</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">社交媒体</span>
+                        <span class="filter-count">1,823</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">直接访问</span>
+                        <span class="filter-count">1,234</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox">
+                        <span class="filter-label">邮件营销</span>
+                        <span class="filter-count">567</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox">
+                        <span class="filter-label">付费广告</span>
+                        <span class="filter-count">892</span>
+                    </div>
+                </div>
+
+                <!-- User Segment Filter -->
+                <div class="filter-group">
+                    <div class="filter-title">用户分组</div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">新用户</span>
+                        <span class="filter-count">3,456</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">回访用户</span>
+                        <span class="filter-count">2,789</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox">
+                        <span class="filter-label">付费用户</span>
+                        <span class="filter-count">456</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox">
+                        <span class="filter-label">VIP用户</span>
+                        <span class="filter-count">123</span>
+                    </div>
+                </div>
+
+                <!-- Device Type Filter -->
+                <div class="filter-group">
+                    <div class="filter-title">设备类型</div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">桌面端</span>
+                        <span class="filter-count">4,123</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">移动端</span>
+                        <span class="filter-count">2,845</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox">
+                        <span class="filter-label">平板</span>
+                        <span class="filter-count">234</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navigation -->
+            <nav class="top-nav">
+                <div class="nav-tabs">
+                    <div class="nav-tab active" onclick="switchTab('journey')">旅程路径</div>
+                    <div class="nav-tab" onclick="switchTab('funnel')">转化漏斗</div>
+                    <div class="nav-tab" onclick="switchTab('touchpoint')">触点分析</div>
+                    <div class="nav-tab" onclick="switchTab('persona')">用户画像</div>
+                    <div class="nav-tab" onclick="switchTab('attribution')">归因分析</div>
+                    <div class="nav-tab" onclick="switchTab('personalization')">个性化配置</div>
+                </div>
+                <div class="nav-actions">
+                    <button class="nav-btn" onclick="refreshData()">
+                        <span>🔄</span>
+                        <span>刷新</span>
+                    </button>
+                    <button class="nav-btn" onclick="exportReport()">
+                        <span>📤</span>
+                        <span>导出</span>
+                    </button>
+                    <button class="nav-btn primary" onclick="showInsights()">
+                        <span>💡</span>
+                        <span>洞察</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Content Wrapper -->
+            <div class="content-wrapper">
+                <!-- Alert Banner for Important Insights -->
+                <div class="alert-banner">
+                    <span class="alert-icon">⚠️</span>
+                    <span class="alert-text">发现异常：过去24小时内，社交媒体渠道的转化率下降了35%，需要立即关注</span>
+                    <button class="alert-action" onclick="analyzeIssue()">分析原因</button>
+                </div>
+
+                <!-- Key Metrics Overview -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">总访问用户</span>
+                            <div class="metric-icon" style="background: rgba(80, 70, 229, 0.1); color: var(--journey-primary);">
+                                👥
+                            </div>
+                        </div>
+                        <div class="metric-value">23,456</div>
+                        <div class="metric-change change-positive">
+                            <span>↑</span>
+                            <span>比上期增长 12.3%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">平均转化率</span>
+                            <div class="metric-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--journey-success);">
+                                🎯
+                            </div>
+                        </div>
+                        <div class="metric-value">3.45%</div>
+                        <div class="metric-change change-positive">
+                            <span>↑</span>
+                            <span>提升 0.23%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">平均旅程长度</span>
+                            <div class="metric-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--journey-warning);">
+                                ⏱️
+                            </div>
+                        </div>
+                        <div class="metric-value">5.2 天</div>
+                        <div class="metric-change change-negative">
+                            <span>↓</span>
+                            <span>缩短 0.8 天</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">私域转化用户</span>
+                            <div class="metric-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--journey-danger);">
+                                🔐
+                            </div>
+                        </div>
+                        <div class="metric-value">1,234</div>
+                        <div class="metric-change change-positive">
+                            <span>↑</span>
+                            <span>新增 156 人</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">平均触点数</span>
+                            <div class="metric-icon" style="background: rgba(14, 165, 233, 0.1); color: var(--journey-info);">
+                                📍
+                            </div>
+                        </div>
+                        <div class="metric-value">7.8</div>
+                        <div class="metric-change change-positive">
+                            <span>↑</span>
+                            <span>增加 1.2 个</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Journey Path Visualization -->
+                <div class="journey-section">
+                    <div class="section-header">
+                        <h2 class="section-title">用户旅程可视化</h2>
+                        <div class="section-controls">
+                            <button class="control-btn active" onclick="setJourneyView('sankey')">桑基图</button>
+                            <button class="control-btn" onclick="setJourneyView('flow')">流程图</button>
+                            <button class="control-btn" onclick="setJourneyView('heatmap')">热力图</button>
+                        </div>
+                    </div>
+                    <div class="journey-canvas" id="journeyChart"></div>
+                    
+                    <!-- Touchpoint Performance Cards -->
+                    <div class="touchpoint-grid">
+                        <div class="touchpoint-card">
+                            <div class="touchpoint-header">
+                                <span class="touchpoint-name">首页访问</span>
+                                <span class="touchpoint-badge">入口</span>
+                            </div>
+                            <div class="touchpoint-metrics">
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">8,234</span>
+                                    <span class="touchpoint-metric-label">访问量</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">45%</span>
+                                    <span class="touchpoint-metric-label">跳出率</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">2.3分</span>
+                                    <span class="touchpoint-metric-label">平均停留</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">67%</span>
+                                    <span class="touchpoint-metric-label">继续率</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="touchpoint-card">
+                            <div class="touchpoint-header">
+                                <span class="touchpoint-name">产品页浏览</span>
+                                <span class="touchpoint-badge">关键</span>
+                            </div>
+                            <div class="touchpoint-metrics">
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">5,123</span>
+                                    <span class="touchpoint-metric-label">访问量</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">23%</span>
+                                    <span class="touchpoint-metric-label">跳出率</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">4.5分</span>
+                                    <span class="touchpoint-metric-label">平均停留</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">78%</span>
+                                    <span class="touchpoint-metric-label">继续率</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="touchpoint-card">
+                            <div class="touchpoint-header">
+                                <span class="touchpoint-name">注册转化</span>
+                                <span class="touchpoint-badge">转化</span>
+                            </div>
+                            <div class="touchpoint-metrics">
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">1,234</span>
+                                    <span class="touchpoint-metric-label">转化量</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">15%</span>
+                                    <span class="touchpoint-metric-label">转化率</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">1.2分</span>
+                                    <span class="touchpoint-metric-label">完成时间</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">89%</span>
+                                    <span class="touchpoint-metric-label">成功率</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conversion Funnel Analysis -->
+                <div class="journey-section">
+                    <div class="section-header">
+                        <h2 class="section-title">转化漏斗分析</h2>
+                        <div class="section-controls">
+                            <button class="control-btn" onclick="filterFunnel('all')">全部</button>
+                            <button class="control-btn" onclick="filterFunnel('new')">新用户</button>
+                            <button class="control-btn" onclick="filterFunnel('return')">回访用户</button>
+                        </div>
+                    </div>
+                    <div class="funnel-container" id="funnelChart"></div>
+                </div>
+
+                <!-- User Persona Cards -->
+                <div class="journey-section">
+                    <div class="section-header">
+                        <h2 class="section-title">用户画像分析</h2>
+                    </div>
+                    <div class="persona-grid">
+                        <div class="persona-card" onclick="viewPersonaDetail('explorer')">
+                            <div class="persona-header">
+                                <div class="persona-avatar">探</div>
+                                <div class="persona-info">
+                                    <div class="persona-name">探索者</div>
+                                    <div class="persona-desc">对新功能充满好奇，愿意尝试</div>
+                                </div>
+                            </div>
+                            <div class="persona-traits">
+                                <span class="trait-chip">技术爱好者</span>
+                                <span class="trait-chip">早期采用者</span>
+                                <span class="trait-chip">活跃分享</span>
+                                <span class="trait-chip">高互动率</span>
+                            </div>
+                            <div class="persona-stats">
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">35%</div>
+                                    <div class="persona-stat-label">用户占比</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">4.2%</div>
+                                    <div class="persona-stat-label">转化率</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">￥280</div>
+                                    <div class="persona-stat-label">平均价值</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="persona-card" onclick="viewPersonaDetail('researcher')">
+                            <div class="persona-header">
+                                <div class="persona-avatar" style="background: linear-gradient(135deg, #10B981, #059669);">研</div>
+                                <div class="persona-info">
+                                    <div class="persona-name">研究者</div>
+                                    <div class="persona-desc">深度对比，谨慎决策</div>
+                                </div>
+                            </div>
+                            <div class="persona-traits">
+                                <span class="trait-chip">详细对比</span>
+                                <span class="trait-chip">阅读文档</span>
+                                <span class="trait-chip">多次访问</span>
+                                <span class="trait-chip">慢决策</span>
+                            </div>
+                            <div class="persona-stats">
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">28%</div>
+                                    <div class="persona-stat-label">用户占比</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">6.8%</div>
+                                    <div class="persona-stat-label">转化率</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">￥520</div>
+                                    <div class="persona-stat-label">平均价值</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="persona-card" onclick="viewPersonaDetail('buyer')">
+                            <div class="persona-header">
+                                <div class="persona-avatar" style="background: linear-gradient(135deg, #F59E0B, #D97706);">购</div>
+                                <div class="persona-info">
+                                    <div class="persona-name">快速购买者</div>
+                                    <div class="persona-desc">明确需求，快速决策</div>
+                                </div>
+                            </div>
+                            <div class="persona-traits">
+                                <span class="trait-chip">目标明确</span>
+                                <span class="trait-chip">快速决策</span>
+                                <span class="trait-chip">重视效率</span>
+                                <span class="trait-chip">品牌忠诚</span>
+                            </div>
+                            <div class="persona-stats">
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">22%</div>
+                                    <div class="persona-stat-label">用户占比</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">12.3%</div>
+                                    <div class="persona-stat-label">转化率</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">￥890</div>
+                                    <div class="persona-stat-label">平均价值</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attribution Model Analysis -->
+                <div class="attribution-container">
+                    <div class="section-header">
+                        <h2 class="section-title">归因分析模型</h2>
+                    </div>
+                    <div class="model-selector">
+                        <div class="model-option selected" onclick="selectModel('last-click')">末次点击</div>
+                        <div class="model-option" onclick="selectModel('first-click')">首次点击</div>
+                        <div class="model-option" onclick="selectModel('linear')">线性归因</div>
+                        <div class="model-option" onclick="selectModel('time-decay')">时间衰减</div>
+                        <div class="model-option" onclick="selectModel('data-driven')">数据驱动</div>
+                    </div>
+                    <div class="attribution-chart" id="attributionChart"></div>
+                </div>
+
+                <!-- Personalization Configuration -->
+                <div class="personalization-panel">
+                    <div class="section-header">
+                        <h2 class="section-title">个性化推荐配置</h2>
+                    </div>
+                    
+                    <div class="config-section">
+                        <div class="config-title">内容个性化</div>
+                        <div class="config-options">
+                            <div class="config-option">
+                                <span class="config-label">基于浏览历史推荐</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">基于用户画像推荐</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">基于相似用户推荐</span>
+                                <div class="toggle-switch" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <div class="config-title">触达策略</div>
+                        <div class="config-options">
+                            <div class="config-option">
+                                <span class="config-label">智能触达时机</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">多渠道协同</span>
+                                <div class="toggle-switch" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">频次控制</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <div class="config-title">转化优化</div>
+                        <div class="config-options">
+                            <div class="config-option">
+                                <span class="config-label">动态定价策略</span>
+                                <div class="toggle-switch" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">个性化优惠券</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">智能客服引导</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Insights Panel -->
+    <div class="insight-panel" id="insightPanel">
+        <div class="panel-header">
+            <h3 class="panel-title">智能洞察</h3>
+            <button class="panel-close" onclick="hideInsights()">×</button>
+        </div>
+        <div class="panel-body">
+            <div class="insight-item">
+                <div class="insight-title">🔥 转化瓶颈发现</div>
+                <div class="insight-desc">
+                    从"产品页浏览"到"加入购物车"的转化率仅为12%，远低于行业平均水平(18%)。
+                    建议优化产品页面的CTA按钮位置和文案。
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-title">📈 高价值路径识别</div>
+                <div class="insight-desc">
+                    通过"搜索引擎→博客文章→产品页→注册"路径的用户，转化率高达8.5%，
+                    是平均转化率的2.5倍。建议加大内容营销投入。
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-title">👥 用户行为模式</div>
+                <div class="insight-desc">
+                    研究者类型用户通常需要7-9个触点才会转化，但他们的客单价是探索者的1.8倍。
+                    建议为这类用户提供更详细的产品对比和案例研究。
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-title">⏰ 最佳触达时机</div>
+                <div class="insight-desc">
+                    数据显示，在用户第3次访问后的24小时内发送个性化邮件，
+                    转化率可提升45%。建议启用智能触达系统。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize charts
+        let journeyChart, funnelChart, attributionChart;
+        let currentView = 'journey';
+        let currentTimeRange = '7d';
+
+        // Initialize the application when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadJourneyData();
+        });
+
+        // Initialize all chart instances
+        function initializeCharts() {
+            // Initialize Journey Visualization Chart
+            const journeyDom = document.getElementById('journeyChart');
+            journeyChart = echarts.init(journeyDom);
+            
+            // Create a Sankey diagram to show user flow between touchpoints
+            const journeyOption = {
+                tooltip: {
+                    trigger: 'item',
+                    triggerOn: 'mousemove'
+                },
+                series: [{
+                    type: 'sankey',
+                    layout: 'none',
+                    emphasis: {
+                        focus: 'adjacency'
+                    },
+                    data: [
+                        {name: '搜索引擎'},
+                        {name: '社交媒体'},
+                        {name: '直接访问'},
+                        {name: '邮件营销'},
+                        {name: '首页'},
+                        {name: '产品页'},
+                        {name: '博客'},
+                        {name: '价格页'},
+                        {name: '注册'},
+                        {name: '试用'},
+                        {name: '购买'},
+                        {name: '流失'}
+                    ],
+                    links: [
+                        {source: '搜索引擎', target: '首页', value: 5000},
+                        {source: '搜索引擎', target: '产品页', value: 2000},
+                        {source: '搜索引擎', target: '博客', value: 1500},
+                        {source: '社交媒体', target: '首页', value: 3000},
+                        {source: '社交媒体', target: '产品页', value: 1200},
+                        {source: '直接访问', target: '首页', value: 2500},
+                        {source: '邮件营销', target: '产品页', value: 800},
+                        {source: '首页', target: '产品页', value: 4000},
+                        {source: '首页', target: '博客', value: 2000},
+                        {source: '首页', target: '流失', value: 4500},
+                        {source: '产品页', target: '价格页', value: 3000},
+                        {source: '产品页', target: '注册', value: 1500},
+                        {source: '产品页', target: '流失', value: 3500},
+                        {source: '博客', target: '产品页', value: 2000},
+                        {source: '博客', target: '流失', value: 1500},
+                        {source: '价格页', target: '注册', value: 1200},
+                        {source: '价格页', target: '流失', value: 1800},
+                        {source: '注册', target: '试用', value: 2000},
+                        {source: '注册', target: '流失', value: 700},
+                        {source: '试用', target: '购买', value: 1500},
+                        {source: '试用', target: '流失', value: 500}
+                    ],
+                    lineStyle: {
+                        color: 'gradient',
+                        curveness: 0.5
+                    },
+                    itemStyle: {
+                        color: '#5046E5',
+                        borderColor: '#5046E5'
+                    },
+                    label: {
+                        color: 'rgba(0,0,0,0.7)',
+                        fontSize: 12
+                    }
+                }]
+            };
+            
+            journeyChart.setOption(journeyOption);
+
+            // Initialize Conversion Funnel Chart
+            const funnelDom = document.getElementById('funnelChart');
+            funnelChart = echarts.init(funnelDom);
+            
+            const funnelOption = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b} : {c} ({d}%)'
+                },
+                legend: {
+                    data: ['访问', '浏览', '点击', '注册', '试用', '购买'],
+                    bottom: 10
+                },
+                series: [{
+                    name: '转化漏斗',
+                    type: 'funnel',
+                    left: '10%',
+                    top: 60,
+                    bottom: 60,
+                    width: '80%',
+                    min: 0,
+                    max: 10000,
+                    minSize: '0%',
+                    maxSize: '100%',
+                    sort: 'descending',
+                    gap: 2,
+                    label: {
+                        show: true,
+                        position: 'inside',
+                        formatter: '{b}\n{c} 人\n转化率 {d}%'
+                    },
+                    labelLine: {
+                        length: 10,
+                        lineStyle: {
+                            width: 1,
+                            type: 'solid'
+                        }
+                    },
+                    itemStyle: {
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    },
+                    emphasis: {
+                        label: {
+                            fontSize: 20
+                        }
+                    },
+                    data: [
+                        {value: 10000, name: '访问', itemStyle: {color: '#5046E5'}},
+                        {value: 7500, name: '浏览', itemStyle: {color: '#7C3AED'}},
+                        {value: 5000, name: '点击', itemStyle: {color: '#8B5CF6'}},
+                        {value: 2500, name: '注册', itemStyle: {color: '#A78BFA'}},
+                        {value: 1500, name: '试用', itemStyle: {color: '#C4B5FD'}},
+                        {value: 800, name: '购买', itemStyle: {color: '#10B981'}}
+                    ]
+                }]
+            };
+            
+            funnelChart.setOption(funnelOption);
+
+            // Initialize Attribution Model Chart
+            const attributionDom = document.getElementById('attributionChart');
+            attributionChart = echarts.init(attributionDom);
+            
+            const attributionOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['归因价值'],
+                    bottom: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['搜索引擎', '社交媒体', '直接访问', '邮件营销', '付费广告', '内容营销', '推荐流量'],
+                    axisLabel: {
+                        interval: 0,
+                        rotate: 30
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '转化贡献值'
+                },
+                series: [{
+                    name: '归因价值',
+                    type: 'bar',
+                    data: [320, 280, 220, 180, 160, 140, 100],
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {offset: 0, color: '#5046E5'},
+                            {offset: 1, color: '#7C3AED'}
+                        ])
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {offset: 0, color: '#7C3AED'},
+                                {offset: 1, color: '#8B5CF6'}
+                            ])
+                        }
+                    }
+                }]
+            };
+            
+            attributionChart.setOption(attributionOption);
+
+            // Make charts responsive
+            window.addEventListener('resize', function() {
+                journeyChart.resize();
+                funnelChart.resize();
+                attributionChart.resize();
+            });
+        }
+
+        // Load journey data based on filters
+        function loadJourneyData() {
+            console.log('Loading journey data for time range:', currentTimeRange);
+            // In a real application, this would fetch data from an API
+        }
+
+        // Set time range filter
+        function setTimeRange(range) {
+            currentTimeRange = range;
+            
+            // Update button states
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reload data with new time range
+            loadJourneyData();
+        }
+
+        // Switch between main navigation tabs
+        function switchTab(tab) {
+            currentView = tab;
+            
+            // Update tab states
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            console.log('Switching to tab:', tab);
+            
+            // In a real application, this would show/hide different content sections
+            // and potentially load different data
+        }
+
+        // Toggle switch functionality
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+            
+            // Get the configuration label
+            const label = element.previousElementSibling.textContent;
+            const isActive = element.classList.contains('active');
+            
+            console.log(`Configuration "${label}" is now ${isActive ? 'enabled' : 'disabled'}`);
+            
+            // In a real application, this would update the personalization settings
+        }
+
+        // Show insights panel
+        function showInsights() {
+            document.getElementById('insightPanel').classList.add('show');
+        }
+
+        // Hide insights panel
+        function hideInsights() {
+            document.getElementById('insightPanel').classList.remove('show');
+        }
+
+        // Refresh data
+        function refreshData() {
+            console.log('Refreshing data...');
+            
+            // Show loading state
+            showNotification('正在刷新数据...', 'info');
+            
+            // Simulate data refresh
+            setTimeout(() => {
+                loadJourneyData();
+                showNotification('数据已更新', 'success');
+            }, 1500);
+        }
+
+        // Export report
+        function exportReport() {
+            console.log('Exporting journey report...');
+            showNotification('正在生成报告...', 'info');
+            
+            setTimeout(() => {
+                showNotification('报告已生成并下载', 'success');
+            }, 2000);
+        }
+
+        // Analyze issue from alert
+        function analyzeIssue() {
+            console.log('Analyzing conversion issue...');
+            showInsights();
+            showNotification('正在分析问题原因...', 'info');
+        }
+
+        // View persona detail
+        function viewPersonaDetail(personaType) {
+            console.log('Viewing persona detail:', personaType);
+            showNotification(`查看${personaType}用户画像详情`, 'info');
+        }
+
+        // Select attribution model
+        function selectModel(model) {
+            // Update button states
+            document.querySelectorAll('.model-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            console.log('Selected attribution model:', model);
+            
+            // Update chart data based on selected model
+            updateAttributionChart(model);
+        }
+
+        // Update attribution chart based on model
+        function updateAttributionChart(model) {
+            // Different data for different attribution models
+            const modelData = {
+                'last-click': [320, 280, 220, 180, 160, 140, 100],
+                'first-click': [420, 180, 320, 120, 200, 160, 80],
+                'linear': [250, 250, 250, 200, 180, 170, 150],
+                'time-decay': [280, 260, 240, 200, 170, 150, 120],
+                'data-driven': [350, 290, 210, 190, 170, 145, 95]
+            };
+            
+            attributionChart.setOption({
+                series: [{
+                    data: modelData[model] || modelData['last-click']
+                }]
+            });
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                animation: slideIn 0.3s;
+            `;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            notification.innerHTML = `
+                <span style="font-size: 20px;">${icons[type]}</span>
+                <span style="font-size: 14px; color: #374151;">${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

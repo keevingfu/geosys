@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Visibility Analytics - GEO Monitoring System</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f7f8fa;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            padding: 20px 30px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .date-range {
+            display: flex;
+            gap: 10px;
+            background: #f7f8fa;
+            padding: 5px;
+            border-radius: 6px;
+        }
+
+        .date-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .date-btn.active {
+            background: white;
+            color: #ff622d;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .export-btn {
+            padding: 10px 20px;
+            background: #ff622d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            background: #e5521f;
+        }
+
+        /* Main Metrics */
+        .main-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .metric-title {
+            font-size: 14px;
+            color: #6c757d;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .metric-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .metric-change.positive {
+            background: #e6f7e6;
+            color: #0f7938;
+        }
+
+        .metric-change.negative {
+            background: #ffeaea;
+            color: #d32f2f;
+        }
+
+        .metric-subtext {
+            font-size: 13px;
+            color: #6c757d;
+            margin-top: 8px;
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .chart {
+            height: 350px;
+        }
+
+        /* Grid Layouts */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .three-column {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px;
+            background: #f7f8fa;
+            font-weight: 600;
+            font-size: 13px;
+            color: #6c757d;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f3f5;
+            font-size: 14px;
+        }
+
+        .data-table tr:hover {
+            background: #f7f8fa;
+        }
+
+        .keyword-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #495057;
+        }
+
+        .position-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .position-badge.top3 {
+            background: #e6f7e6;
+            color: #0f7938;
+        }
+
+        .position-badge.top10 {
+            background: #fff4e6;
+            color: #ff8c00;
+        }
+
+        .position-badge.top20 {
+            background: #f0f4ff;
+            color: #4169e1;
+        }
+
+        .position-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .position-change.up {
+            color: #0f7938;
+        }
+
+        .position-change.down {
+            color: #d32f2f;
+        }
+
+        .position-change.stable {
+            color: #6c757d;
+        }
+
+        /* SERP Features */
+        .serp-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .serp-feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: #f7f8fa;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .serp-feature.active {
+            background: #e6f7e6;
+            color: #0f7938;
+        }
+
+        .serp-feature i {
+            font-size: 16px;
+        }
+
+        /* Progress Bars */
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff622d 0%, #ff8c00 100%);
+            transition: width 0.3s ease;
+        }
+
+        .progress-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            min-width: 45px;
+            text-align: right;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .two-column,
+            .three-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .main-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .chart {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>AI Platform Visibility Analytics</h1>
+            <div class="header-controls">
+                <div class="date-range">
+                    <button class="date-btn" onclick="updateDateRange('7d')">7 Days</button>
+                    <button class="date-btn active" onclick="updateDateRange('30d')">30 Days</button>
+                    <button class="date-btn" onclick="updateDateRange('90d')">90 Days</button>
+                    <button class="date-btn" onclick="updateDateRange('12m')">12 Months</button>
+                </div>
+                <button class="export-btn">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Metrics -->
+        <div class="main-metrics">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">
+                        <div class="metric-icon"><i class="fas fa-eye"></i></div>
+                        AI Visibility Index
+                    </div>
+                    <i class="fas fa-info-circle" style="color: #6c757d; font-size: 14px;"></i>
+                </div>
+                <div class="metric-value" id="avi-value">72.5%</div>
+                <span class="metric-change positive" id="avi-trend">
+                    <i class="fas fa-arrow-up"></i> 2.3%
+                </span>
+                <div class="metric-subtext">Weighted score across AI platforms</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">
+                        <div class="metric-icon"><i class="fas fa-percentage"></i></div>
+                        Coverage Rate
+                    </div>
+                </div>
+                <div class="metric-value" id="coverage-value">68.4%</div>
+                <span class="metric-change positive" id="coverage-trend">
+                    <i class="fas fa-arrow-up"></i> 1.8%
+                </span>
+                <div class="metric-subtext">Queries showing brand in AI answers</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">
+                        <div class="metric-icon"><i class="fas fa-chart-line"></i></div>
+                        Estimated Traffic
+                    </div>
+                </div>
+                <div class="metric-value">48.2K</div>
+                <span class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> 23.5%
+                </span>
+                <div class="metric-subtext">monthly visitors</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">
+                        <div class="metric-icon"><i class="fas fa-trophy"></i></div>
+                        Top 3 Positions
+                    </div>
+                </div>
+                <div class="metric-value">342</div>
+                <span class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> 28
+                </span>
+                <div class="metric-subtext">keywords ranking 1-3</div>
+            </div>
+        </div>
+
+        <!-- Visibility Trend Chart -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2 class="chart-title">Visibility Trend</h2>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #ff622d;"></span>
+                        <span>Your Domain</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #4169e1;"></span>
+                        <span>Competitor 1</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #00bcd4;"></span>
+                        <span>Competitor 2</span>
+                    </div>
+                </div>
+            </div>
+            <div id="visibilityChart" class="chart"></div>
+        </div>
+
+        <div class="three-column">
+            <!-- Position Distribution -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2 class="chart-title">Position Distribution</h2>
+                </div>
+                <div id="positionChart" class="chart"></div>
+            </div>
+
+            <!-- SERP Features -->
+            <div class="chart-container">
+                <h2 class="chart-title">SERP Features</h2>
+                <div class="serp-features">
+                    <div class="serp-feature active">
+                        <i class="fas fa-star"></i>
+                        <span>Featured Snippet (23)</span>
+                    </div>
+                    <div class="serp-feature active">
+                        <i class="fas fa-users"></i>
+                        <span>People Also Ask (145)</span>
+                    </div>
+                    <div class="serp-feature active">
+                        <i class="fas fa-images"></i>
+                        <span>Image Pack (67)</span>
+                    </div>
+                    <div class="serp-feature">
+                        <i class="fas fa-video"></i>
+                        <span>Video Results (12)</span>
+                    </div>
+                    <div class="serp-feature active">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Local Pack (34)</span>
+                    </div>
+                    <div class="serp-feature">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Shopping Results (0)</span>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <h3 style="font-size: 16px; margin-bottom: 15px;">Feature Coverage</h3>
+                    <div id="serpChart" class="chart" style="height: 200px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyword Rankings Table -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2 class="chart-title">Top Keyword Rankings</h2>
+                <button class="export-btn" style="font-size: 13px; padding: 8px 16px;">
+                    View All Keywords
+                </button>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Keyword</th>
+                        <th>Position</th>
+                        <th>Change</th>
+                        <th>Search Volume</th>
+                        <th>Traffic %</th>
+                        <th>SERP Features</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>project management software</strong></td>
+                        <td><span class="position-badge top3">2</span></td>
+                        <td><span class="position-change up"><i class="fas fa-arrow-up"></i> 3</span></td>
+                        <td>12,400</td>
+                        <td>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%;"></div>
+                                </div>
+                                <span class="progress-value">85%</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="keyword-badge">Featured Snippet</span>
+                            <span class="keyword-badge">PAA</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>task automation tools</strong></td>
+                        <td><span class="position-badge top3">3</span></td>
+                        <td><span class="position-change stable">— 0</span></td>
+                        <td>8,900</td>
+                        <td>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 72%;"></div>
+                                </div>
+                                <span class="progress-value">72%</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="keyword-badge">PAA</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>workflow optimization</strong></td>
+                        <td><span class="position-badge top10">5</span></td>
+                        <td><span class="position-change up"><i class="fas fa-arrow-up"></i> 2</span></td>
+                        <td>6,200</td>
+                        <td>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%;"></div>
+                                </div>
+                                <span class="progress-value">65%</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="keyword-badge">Image Pack</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>team collaboration platform</strong></td>
+                        <td><span class="position-badge top10">7</span></td>
+                        <td><span class="position-change down"><i class="fas fa-arrow-down"></i> 1</span></td>
+                        <td>5,400</td>
+                        <td>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 58%;"></div>
+                                </div>
+                                <span class="progress-value">58%</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="keyword-badge">PAA</span>
+                            <span class="keyword-badge">Local Pack</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>business process automation</strong></td>
+                        <td><span class="position-badge top20">12</span></td>
+                        <td><span class="position-change up"><i class="fas fa-arrow-up"></i> 5</span></td>
+                        <td>4,800</td>
+                        <td>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 42%;"></div>
+                                </div>
+                                <span class="progress-value">42%</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="keyword-badge">Video</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="two-column">
+            <!-- Top Pages by Visibility -->
+            <div class="chart-container">
+                <h2 class="chart-title">Top Pages by Visibility</h2>
+                <div id="pagesChart" class="chart" style="height: 300px;"></div>
+            </div>
+
+            <!-- Competitor Comparison -->
+            <div class="chart-container">
+                <h2 class="chart-title">Competitor Visibility Comparison</h2>
+                <div id="competitorChart" class="chart" style="height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize all charts and monitoring integration
+        let visibilityChart, positionChart, serpChart, pagesChart, competitorChart;
+        let platformData = null;
+
+        // Chart theme colors
+        const colors = {
+            primary: '#ff622d',
+            secondary: '#4169e1',
+            tertiary: '#00bcd4',
+            success: '#0f7938',
+            warning: '#ff8c00',
+            danger: '#d32f2f',
+            gray: '#6c757d'
+        };
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts regardless of geoMonitor availability
+            initializeCharts();
+            
+            // Setup monitoring if available
+            if (typeof geoMonitor !== 'undefined') {
+                setupAIMonitoring();
+            }
+        });
+        
+        function setupAIMonitoring() {
+            // Listen for AI visibility updates
+            geoMonitor.on('visibilityUpdated', (data) => {
+                platformData = data;
+                updateVisibilityMetrics(data);
+                updatePlatformCharts(data);
+            });
+            
+            // Get initial data
+            geoMonitor.fetchAIVisibility().then(data => {
+                platformData = data;
+                updateVisibilityMetrics(data);
+                updatePlatformCharts(data);
+            });
+        }
+        
+        function updateVisibilityMetrics(data) {
+            // Update AVI
+            document.getElementById('avi-value').textContent = data.avi.toFixed(1) + '%';
+            document.getElementById('coverage-value').textContent = data.coverageRate.toFixed(1) + '%';
+            
+            // Update other metrics if elements exist
+            if (document.getElementById('avg-position')) {
+                document.getElementById('avg-position').textContent = data.avgPosition.toFixed(1);
+            }
+            if (document.getElementById('share-of-voice')) {
+                document.getElementById('share-of-voice').textContent = data.shareOfVoice.toFixed(1) + '%';
+            }
+        }
+        
+        function updatePlatformCharts(data) {
+            if (!data.platformBreakdown) return;
+            
+            // Update visibility chart with real platform data
+            const platforms = Object.keys(data.platformBreakdown);
+            const aviScores = platforms.map(p => data.platformBreakdown[p].avi);
+            const coverageRates = platforms.map(p => data.platformBreakdown[p].coverage);
+            const positions = platforms.map(p => data.platformBreakdown[p].avgPos);
+            
+            if (visibilityChart) {
+                updateVisibilityChart(platforms, aviScores, coverageRates, positions);
+            }
+        }
+
+        function updateVisibilityChart(platforms, aviScores, coverageRates, positions) {
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['AVI Score', 'Coverage Rate'],
+                    bottom: 0
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    top: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: platforms
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Score / Rate (%)',
+                    min: 0,
+                    max: 100
+                },
+                series: [
+                    {
+                        name: 'AVI Score',
+                        type: 'bar',
+                        data: aviScores,
+                        itemStyle: {
+                            color: colors.primary
+                        }
+                    },
+                    {
+                        name: 'Coverage Rate',
+                        type: 'bar',
+                        data: coverageRates,
+                        itemStyle: {
+                            color: colors.secondary
+                        }
+                    }
+                ]
+            };
+            
+            visibilityChart.setOption(option);
+        }
+        
+        // Initialize charts on load
+        function initializeCharts() {
+            initVisibilityChart();
+            initPositionChart();
+            initSerpChart();
+            initPagesChart();
+            initCompetitorChart();
+        }
+
+        // Visibility Trend Chart
+        function initVisibilityChart() {
+            visibilityChart = echarts.init(document.getElementById('visibilityChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#e9ecef',
+                    borderWidth: 1,
+                    textStyle: { color: '#1a1a1a' }
+                },
+                grid: {
+                    top: 20,
+                    right: 20,
+                    bottom: 40,
+                    left: 60,
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: generateDateLabels(30),
+                    axisLine: { lineStyle: { color: '#e9ecef' } },
+                    axisLabel: { color: '#6c757d' }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Visibility %',
+                    nameLocation: 'middle',
+                    nameGap: 40,
+                    axisLine: { lineStyle: { color: '#e9ecef' } },
+                    axisLabel: { color: '#6c757d' },
+                    splitLine: { lineStyle: { color: '#f1f3f5' } }
+                },
+                series: [
+                    {
+                        name: 'Your Domain',
+                        type: 'line',
+                        smooth: true,
+                        data: generateVisibilityData(30, 65, 78),
+                        lineStyle: { color: colors.primary, width: 3 },
+                        itemStyle: { color: colors.primary },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(255, 98, 45, 0.3)' },
+                                { offset: 1, color: 'rgba(255, 98, 45, 0)' }
+                            ])
+                        }
+                    },
+                    {
+                        name: 'Competitor 1',
+                        type: 'line',
+                        smooth: true,
+                        data: generateVisibilityData(30, 55, 62),
+                        lineStyle: { color: colors.secondary, width: 2 },
+                        itemStyle: { color: colors.secondary }
+                    },
+                    {
+                        name: 'Competitor 2',
+                        type: 'line',
+                        smooth: true,
+                        data: generateVisibilityData(30, 45, 52),
+                        lineStyle: { color: colors.tertiary, width: 2 },
+                        itemStyle: { color: colors.tertiary }
+                    }
+                ]
+            };
+            
+            visibilityChart.setOption(option);
+        }
+
+        // Position Distribution Chart
+        function initPositionChart() {
+            positionChart = echarts.init(document.getElementById('positionChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' }
+                },
+                grid: {
+                    top: 20,
+                    right: 20,
+                    bottom: 40,
+                    left: 50,
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['1-3', '4-10', '11-20', '21-30', '31-50', '51-100'],
+                    axisLine: { lineStyle: { color: '#e9ecef' } },
+                    axisLabel: { color: '#6c757d' }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Keywords',
+                    axisLine: { lineStyle: { color: '#e9ecef' } },
+                    axisLabel: { color: '#6c757d' },
+                    splitLine: { lineStyle: { color: '#f1f3f5' } }
+                },
+                series: [{
+                    name: 'Keywords',
+                    type: 'bar',
+                    data: [342, 456, 523, 389, 412, 725],
+                    itemStyle: {
+                        color: function(params) {
+                            const colors = ['#0f7938', '#ff8c00', '#4169e1', '#00bcd4', '#9c27b0', '#6c757d'];
+                            return colors[params.dataIndex];
+                        },
+                        borderRadius: [4, 4, 0, 0]
+                    },
+                    label: {
+                        show: true,
+                        position: 'top',
+                        color: '#1a1a1a',
+                        fontWeight: 600
+                    }
+                }]
+            };
+            
+            positionChart.setOption(option);
+        }
+
+        // SERP Features Chart
+        function initSerpChart() {
+            serpChart = echarts.init(document.getElementById('serpChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} ({d}%)'
+                },
+                series: [{
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['50%', '50%'],
+                    avoidLabelOverlap: false,
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '16',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: { show: false },
+                    data: [
+                        { value: 23, name: 'Featured Snippet', itemStyle: { color: '#0f7938' } },
+                        { value: 145, name: 'People Also Ask', itemStyle: { color: '#ff622d' } },
+                        { value: 67, name: 'Image Pack', itemStyle: { color: '#4169e1' } },
+                        { value: 34, name: 'Local Pack', itemStyle: { color: '#00bcd4' } },
+                        { value: 12, name: 'Video Results', itemStyle: { color: '#9c27b0' } }
+                    ]
+                }]
+            };
+            
+            serpChart.setOption(option);
+        }
+
+        // Top Pages Chart
+        function initPagesChart() {
+            pagesChart = echarts.init(document.getElementById('pagesChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' }
+                },
+                grid: {
+                    top: 10,
+                    right: 20,
+                    bottom: 20,
+                    left: 20,
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: '#e9ecef' } },
+                    axisLabel: { color: '#6c757d' },
+                    splitLine: { lineStyle: { color: '#f1f3f5' } }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: [
+                        '/blog/workflow-tips',
+                        '/features/automation',
+                        '/pricing',
+                        '/product/overview',
+                        '/home'
+                    ].reverse(),
+                    axisLine: { lineStyle: { color: '#e9ecef' } },
+                    axisLabel: { color: '#6c757d' }
+                },
+                series: [{
+                    name: 'Visibility Score',
+                    type: 'bar',
+                    data: [45, 52, 68, 74, 89],
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: '#ff622d' },
+                            { offset: 1, color: '#ff8c00' }
+                        ]),
+                        borderRadius: [0, 4, 4, 0]
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: '#1a1a1a',
+                        fontWeight: 600,
+                        formatter: '{c}%'
+                    }
+                }]
+            };
+            
+            pagesChart.setOption(option);
+        }
+
+        // Competitor Comparison Chart
+        function initCompetitorChart() {
+            competitorChart = echarts.init(document.getElementById('competitorChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                radar: {
+                    indicator: [
+                        { name: 'Visibility', max: 100 },
+                        { name: 'Keywords', max: 5000 },
+                        { name: 'Top 3', max: 500 },
+                        { name: 'Traffic', max: 100000 },
+                        { name: 'SERP Features', max: 300 }
+                    ],
+                    splitArea: {
+                        areaStyle: {
+                            color: ['rgba(247, 248, 250, 0.8)', 'rgba(247, 248, 250, 0.6)',
+                                    'rgba(247, 248, 250, 0.4)', 'rgba(247, 248, 250, 0.2)']
+                        }
+                    },
+                    axisLine: { lineStyle: { color: '#e9ecef' } },
+                    splitLine: { lineStyle: { color: '#e9ecef' } }
+                },
+                series: [{
+                    type: 'radar',
+                    data: [
+                        {
+                            value: [78, 2847, 342, 48200, 281],
+                            name: 'Your Domain',
+                            itemStyle: { color: colors.primary },
+                            areaStyle: { color: 'rgba(255, 98, 45, 0.3)' }
+                        },
+                        {
+                            value: [62, 3124, 287, 52100, 198],
+                            name: 'Competitor 1',
+                            itemStyle: { color: colors.secondary },
+                            areaStyle: { color: 'rgba(65, 105, 225, 0.3)' }
+                        },
+                        {
+                            value: [52, 2236, 198, 35400, 156],
+                            name: 'Competitor 2',
+                            itemStyle: { color: colors.tertiary },
+                            areaStyle: { color: 'rgba(0, 188, 212, 0.3)' }
+                        }
+                    ]
+                }]
+            };
+            
+            competitorChart.setOption(option);
+        }
+
+        // Helper Functions
+        function generateDateLabels(days) {
+            const labels = [];
+            const today = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function generateVisibilityData(days, startValue, endValue) {
+            const data = [];
+            const increment = (endValue - startValue) / days;
+            for (let i = 0; i < days; i++) {
+                const value = startValue + (increment * i) + (Math.random() - 0.5) * 5;
+                data.push(Math.max(0, Math.min(100, value.toFixed(1))));
+            }
+            return data;
+        }
+
+        // Date Range Update
+        function updateDateRange(range) {
+            document.querySelectorAll('.date-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update charts based on selected range
+            // This would typically fetch new data from the server
+            console.log('Updating to range:', range);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            visibilityChart && visibilityChart.resize();
+            positionChart && positionChart.resize();
+            serpChart && serpChart.resize();
+            pagesChart && pagesChart.resize();
+            competitorChart && competitorChart.resize();
+        });
+    </script>
+</body>
+</html>

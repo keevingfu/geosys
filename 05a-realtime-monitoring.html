@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEO实时监控中心 - Real-time Monitoring Dashboard</title>
+    <!-- 引入 ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        /* 全局样式设置 - 定义设计系统的基础变量 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* 色彩系统 - 遵循统一的设计语言 */
+            --primary: #5E72E4;
+            --success: #2DCE89;
+            --warning: #FB6340;
+            --danger: #F5365C;
+            --info: #11CDEF;
+            --dark: #172B4D;
+            --secondary: #8898AA;
+            --light: #F4F5F7;
+            --white: #FFFFFF;
+            
+            /* 渐变色定义 */
+            --gradient-primary: linear-gradient(87deg, #5E72E4 0, #825EE4 100%);
+            --gradient-success: linear-gradient(87deg, #2DCE89 0, #2DCECC 100%);
+            --gradient-danger: linear-gradient(87deg, #F5365C 0, #F56036 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        /* 容器布局 - 采用响应式网格系统 */
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 页面头部样式 */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-time {
+            color: white;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(45, 206, 137, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(45, 206, 137, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(45, 206, 137, 0); }
+        }
+
+        /* KPI 卡片网格布局 */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .kpi-label {
+            color: var(--secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .kpi-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .kpi-change.positive {
+            color: var(--success);
+        }
+
+        .kpi-change.negative {
+            color: var(--danger);
+        }
+
+        /* 主内容区域布局 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* 图表容器样式 */
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #E9ECEF;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chart-btn {
+            padding: 6px 12px;
+            border: 1px solid #DEE2E6;
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chart-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .chart-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 图表渲染区域 */
+        .chart-body {
+            height: 300px;
+            position: relative;
+        }
+
+        /* 实时告警面板 */
+        .alert-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #E9ECEF;
+        }
+
+        .alert-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-count {
+            background: var(--danger);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .alert-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            padding: 12px;
+            border-left: 3px solid transparent;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            background: var(--light);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .alert-item:hover {
+            transform: translateX(5px);
+        }
+
+        .alert-item.critical {
+            border-left-color: var(--danger);
+            background: rgba(245, 54, 92, 0.1);
+        }
+
+        .alert-item.warning {
+            border-left-color: var(--warning);
+            background: rgba(251, 99, 64, 0.1);
+        }
+
+        .alert-item.info {
+            border-left-color: var(--info);
+            background: rgba(17, 205, 239, 0.1);
+        }
+
+        .alert-time {
+            font-size: 11px;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .alert-message {
+            font-size: 13px;
+            color: var(--dark);
+            line-height: 1.4;
+        }
+
+        /* 渠道状态网格 */
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .channel-card {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .channel-card:hover {
+            transform: scale(1.05);
+        }
+
+        .channel-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .channel-name {
+            font-size: 12px;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .channel-status {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .channel-status.online {
+            background: rgba(45, 206, 137, 0.2);
+            color: var(--success);
+        }
+
+        .channel-status.offline {
+            background: rgba(245, 54, 92, 0.2);
+            color: var(--danger);
+        }
+
+        .channel-status.pending {
+            background: rgba(251, 99, 64, 0.2);
+            color: var(--warning);
+        }
+
+        /* 系统资源监控 */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .resource-item {
+            text-align: center;
+        }
+
+        .resource-label {
+            font-size: 12px;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .resource-chart {
+            height: 100px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .resource-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .channel-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面头部 - 显示标题和系统状态 -->
+        <header class="header">
+            <h1>
+                <span>📊</span>
+                GEO实时监控中心
+            </h1>
+            <div class="header-time">
+                <div class="status-indicator"></div>
+                <span>系统运行正常</span>
+                <span>|</span>
+                <span id="currentTime">2025-01-15 14:30:45</span>
+            </div>
+        </header>
+
+        <!-- KPI指标卡片 - 展示核心业务指标 -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">AI引擎引用率</div>
+                <div class="kpi-value" id="aiCitationRate">78.5%</div>
+                <div class="kpi-change positive">
+                    <span>↑</span> 12.3% vs 昨日
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">内容发布成功率</div>
+                <div class="kpi-value" id="publishSuccess">95.2%</div>
+                <div class="kpi-change positive">
+                    <span>↑</span> 2.1% vs 昨日
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">平均响应时间</div>
+                <div class="kpi-value" id="avgResponse">234ms</div>
+                <div class="kpi-change positive">
+                    <span>↓</span> 15ms 优化
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">活跃渠道数</div>
+                <div class="kpi-value" id="activeChannels">18/24</div>
+                <div class="kpi-change negative">
+                    <span>↓</span> 2个离线
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">今日转化数</div>
+                <div class="kpi-value" id="todayConversions">1,247</div>
+                <div class="kpi-change positive">
+                    <span>↑</span> 156 vs 昨日同期
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">异常告警</div>
+                <div class="kpi-value" id="alertCount">3</div>
+                <div class="kpi-change negative">
+                    <span>↑</span> 2个新告警
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 左侧图表区域 -->
+            <div class="charts-section">
+                <!-- AI引擎引用率实时趋势图 -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">AI引擎引用率趋势</h3>
+                        <div class="chart-controls">
+                            <button class="chart-btn active" onclick="updateTimeRange('ai', '1h')">1小时</button>
+                            <button class="chart-btn" onclick="updateTimeRange('ai', '24h')">24小时</button>
+                            <button class="chart-btn" onclick="updateTimeRange('ai', '7d')">7天</button>
+                        </div>
+                    </div>
+                    <div class="chart-body" id="aiTrendChart"></div>
+                </div>
+
+                <!-- 渠道发布状态监控 -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">渠道发布状态</h3>
+                        <div class="chart-controls">
+                            <button class="chart-btn" onclick="refreshChannelStatus()">🔄 刷新</button>
+                        </div>
+                    </div>
+                    <div class="channel-grid">
+                        <div class="channel-card">
+                            <div class="channel-icon">📘</div>
+                            <div class="channel-name">LinkedIn</div>
+                            <div class="channel-status online">运行中</div>
+                        </div>
+                        <div class="channel-card">
+                            <div class="channel-icon">🐦</div>
+                            <div class="channel-name">Twitter/X</div>
+                            <div class="channel-status online">运行中</div>
+                        </div>
+                        <div class="channel-card">
+                            <div class="channel-icon">📺</div>
+                            <div class="channel-name">YouTube</div>
+                            <div class="channel-status online">运行中</div>
+                        </div>
+                        <div class="channel-card">
+                            <div class="channel-icon">👽</div>
+                            <div class="channel-name">Reddit</div>
+                            <div class="channel-status pending">发布中</div>
+                        </div>
+                        <div class="channel-card">
+                            <div class="channel-icon">📝</div>
+                            <div class="channel-name">Medium</div>
+                            <div class="channel-status online">运行中</div>
+                        </div>
+                        <div class="channel-card">
+                            <div class="channel-icon">💬</div>
+                            <div class="channel-name">Quora</div>
+                            <div class="channel-status offline">维护中</div>
+                        </div>
+                        <div class="channel-card">
+                            <div class="channel-icon">📱</div>
+                            <div class="channel-name">WhatsApp</div>
+                            <div class="channel-status online">运行中</div>
+                        </div>
+                        <div class="channel-card">
+                            <div class="channel-icon">🛍️</div>
+                            <div class="channel-name">Amazon</div>
+                            <div class="channel-status offline">离线</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 内容表现实时数据流 -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">内容表现实时流</h3>
+                        <div class="chart-controls">
+                            <span style="font-size: 12px; color: var(--secondary);">最近100条数据</span>
+                        </div>
+                    </div>
+                    <div class="chart-body" id="contentPerformanceChart"></div>
+                </div>
+            </div>
+
+            <!-- 右侧告警和监控面板 -->
+            <div class="sidebar">
+                <!-- 实时告警面板 -->
+                <div class="alert-panel">
+                    <div class="alert-header">
+                        <h3 class="alert-title">
+                            实时告警
+                            <span class="alert-count">3</span>
+                        </h3>
+                    </div>
+                    <div class="alert-list" id="alertList">
+                        <div class="alert-item critical">
+                            <div class="alert-time">14:28:32</div>
+                            <div class="alert-message">YouTube API 响应超时，连续3次失败</div>
+                        </div>
+                        <div class="alert-item warning">
+                            <div class="alert-time">14:25:17</div>
+                            <div class="alert-message">Reddit 发布队列积压超过阈值（当前: 45）</div>
+                        </div>
+                        <div class="alert-item info">
+                            <div class="alert-time">14:20:45</div>
+                            <div class="alert-message">AI引用率低于目标值（当前: 65%, 目标: 70%）</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 竞品监测 -->
+                <div class="chart-container" style="margin-top: 20px;">
+                    <div class="chart-header">
+                        <h3 class="chart-title">竞品内容监测</h3>
+                    </div>
+                    <div class="chart-body" id="competitorChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系统性能监控 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">系统资源监控</h3>
+                <div class="chart-controls">
+                    <span style="font-size: 12px; color: var(--secondary);">实时更新中...</span>
+                </div>
+            </div>
+            <div class="resource-grid">
+                <div class="resource-item">
+                    <div class="resource-label">CPU使用率</div>
+                    <div class="resource-chart" id="cpuChart"></div>
+                </div>
+                <div class="resource-item">
+                    <div class="resource-label">内存使用率</div>
+                    <div class="resource-chart" id="memoryChart"></div>
+                </div>
+                <div class="resource-item">
+                    <div class="resource-label">网络吞吐量</div>
+                    <div class="resource-chart" id="networkChart"></div>
+                </div>
+                <div class="resource-item">
+                    <div class="resource-label">API调用量</div>
+                    <div class="resource-chart" id="apiChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 全局配置和初始化 ==========
+        
+        // 图表主题配置 - 统一的视觉风格
+        const chartTheme = {
+            color: ['#5E72E4', '#2DCE89', '#FB6340', '#11CDEF', '#F5365C'],
+            backgroundColor: 'transparent',
+            textStyle: {
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+            }
+        };
+
+        // 初始化所有图表实例
+        let charts = {};
+
+        // ========== 实时时间更新 ==========
+        function updateCurrentTime() {
+            const now = new Date();
+            const formattedTime = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = formattedTime;
+        }
+        
+        // 每秒更新时间
+        setInterval(updateCurrentTime, 1000);
+
+        // ========== AI引擎引用率趋势图 ==========
+        function initAITrendChart() {
+            const chartDom = document.getElementById('aiTrendChart');
+            charts.aiTrend = echarts.init(chartDom);
+            
+            // 生成模拟数据 - 实际应用中应从API获取
+            const generateData = () => {
+                const data = [];
+                const now = new Date();
+                for (let i = 60; i >= 0; i--) {
+                    const time = new Date(now - i * 60000);
+                    data.push({
+                        time: time.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+                        value: 65 + Math.random() * 20 + Math.sin(i / 10) * 5
+                    });
+                }
+                return data;
+            };
+
+            const data = generateData();
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: '{b}<br/>引用率: {c}%'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: data.map(item => item.time),
+                    axisLine: {
+                        lineStyle: {
+                            color: '#E9ECEF'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#8898AA'
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value}%',
+                        color: '#8898AA'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: '#E9ECEF',
+                            type: 'dashed'
+                        }
+                    },
+                    axisLine: {
+                        show: false
+                    }
+                },
+                series: [{
+                    name: 'AI引用率',
+                    type: 'line',
+                    smooth: true,
+                    symbol: 'none',
+                    lineStyle: {
+                        width: 3,
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: '#5E72E4' },
+                            { offset: 1, color: '#825EE4' }
+                        ])
+                    },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(94, 114, 228, 0.3)' },
+                            { offset: 1, color: 'rgba(94, 114, 228, 0.05)' }
+                        ])
+                    },
+                    data: data.map(item => item.value.toFixed(1))
+                }]
+            };
+            
+            charts.aiTrend.setOption(option);
+        }
+
+        // ========== 内容表现实时数据流图表 ==========
+        function initContentPerformanceChart() {
+            const chartDom = document.getElementById('contentPerformanceChart');
+            charts.contentPerformance = echarts.init(chartDom);
+            
+            // 模拟实时数据流
+            const categories = ['浏览量', '互动率', '转化率', '分享数'];
+            const generateStreamData = () => {
+                return categories.map(cat => ({
+                    name: cat,
+                    value: Math.random() * 100
+                }));
+            };
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: categories,
+                    bottom: 0
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Reddit', 'LinkedIn', 'Twitter', 'YouTube', 'Medium', 'Quora']
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                series: categories.map((cat, index) => ({
+                    name: cat,
+                    type: 'bar',
+                    barWidth: '15%',
+                    data: [
+                        65 + Math.random() * 20,
+                        75 + Math.random() * 15,
+                        55 + Math.random() * 25,
+                        80 + Math.random() * 10,
+                        70 + Math.random() * 20,
+                        60 + Math.random() * 20
+                    ].map(v => v.toFixed(1)),
+                    itemStyle: {
+                        color: chartTheme.color[index]
+                    }
+                }))
+            };
+            
+            charts.contentPerformance.setOption(option);
+        }
+
+        // ========== 竞品监测雷达图 ==========
+        function initCompetitorChart() {
+            const chartDom = document.getElementById('competitorChart');
+            charts.competitor = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {},
+                radar: {
+                    indicator: [
+                        { name: '内容量', max: 100 },
+                        { name: '互动率', max: 100 },
+                        { name: 'AI引用', max: 100 },
+                        { name: '品牌提及', max: 100 },
+                        { name: '转化率', max: 100 }
+                    ],
+                    radius: '60%',
+                    splitArea: {
+                        areaStyle: {
+                            color: ['rgba(94, 114, 228, 0.05)', 'rgba(94, 114, 228, 0.1)']
+                        }
+                    }
+                },
+                series: [{
+                    type: 'radar',
+                    data: [
+                        {
+                            value: [85, 78, 92, 67, 88],
+                            name: '我们',
+                            lineStyle: {
+                                color: '#5E72E4',
+                                width: 2
+                            },
+                            areaStyle: {
+                                color: 'rgba(94, 114, 228, 0.3)'
+                            }
+                        },
+                        {
+                            value: [72, 85, 65, 82, 75],
+                            name: '竞品A',
+                            lineStyle: {
+                                color: '#2DCE89',
+                                width: 2
+                            },
+                            areaStyle: {
+                                color: 'rgba(45, 206, 137, 0.3)'
+                            }
+                        },
+                        {
+                            value: [68, 70, 78, 72, 70],
+                            name: '竞品B',
+                            lineStyle: {
+                                color: '#FB6340',
+                                width: 2
+                            },
+                            areaStyle: {
+                                color: 'rgba(251, 99, 64, 0.3)'
+                            }
+                        }
+                    ]
+                }]
+            };
+            
+            charts.competitor.setOption(option);
+        }
+
+        // ========== 系统资源监控仪表盘 ==========
+        function initResourceCharts() {
+            // CPU使用率仪表盘
+            const cpuChart = echarts.init(document.getElementById('cpuChart'));
+            const cpuOption = createGaugeOption('CPU', 45, '#5E72E4');
+            cpuChart.setOption(cpuOption);
+            charts.cpu = cpuChart;
+
+            // 内存使用率仪表盘
+            const memoryChart = echarts.init(document.getElementById('memoryChart'));
+            const memoryOption = createGaugeOption('内存', 62, '#2DCE89');
+            memoryChart.setOption(memoryOption);
+            charts.memory = memoryChart;
+
+            // 网络吞吐量仪表盘
+            const networkChart = echarts.init(document.getElementById('networkChart'));
+            const networkOption = createGaugeOption('网络', 78, '#11CDEF');
+            networkChart.setOption(networkOption);
+            charts.network = networkChart;
+
+            // API调用量仪表盘
+            const apiChart = echarts.init(document.getElementById('apiChart'));
+            const apiOption = createGaugeOption('API', 35, '#FB6340');
+            apiChart.setOption(apiOption);
+            charts.api = apiChart;
+        }
+
+        // 创建仪表盘配置的辅助函数
+        function createGaugeOption(name, value, color) {
+            return {
+                series: [{
+                    type: 'gauge',
+                    radius: '90%',
+                    startAngle: 180,
+                    endAngle: 0,
+                    min: 0,
+                    max: 100,
+                    splitNumber: 4,
+                    itemStyle: {
+                        color: color
+                    },
+                    progress: {
+                        show: true,
+                        width: 10
+                    },
+                    pointer: {
+                        show: false
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            width: 10,
+                            color: [[1, '#E9ECEF']]
+                        }
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: false
+                    },
+                    title: {
+                        show: false
+                    },
+                    detail: {
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        color: color,
+                        offsetCenter: [0, '30%'],
+                        formatter: '{value}%'
+                    },
+                    data: [{
+                        value: value
+                    }]
+                }]
+            };
+        }
+
+        // ========== 实时数据更新逻辑 ==========
+        function updateRealTimeData() {
+            // 更新KPI数值 - 模拟数据变化
+            const updateKPIValue = (elementId, baseValue, variance) => {
+                const element = document.getElementById(elementId);
+                const currentValue = parseFloat(element.textContent);
+                let newValue = baseValue + (Math.random() - 0.5) * variance;
+                
+                // 根据不同的KPI类型格式化显示
+                if (elementId === 'aiCitationRate' || elementId === 'publishSuccess') {
+                    newValue = Math.max(0, Math.min(100, newValue));
+                    element.textContent = newValue.toFixed(1) + '%';
+                } else if (elementId === 'avgResponse') {
+                    newValue = Math.max(100, newValue);
+                    element.textContent = Math.floor(newValue) + 'ms';
+                } else if (elementId === 'todayConversions') {
+                    element.textContent = Math.floor(newValue).toLocaleString();
+                }
+            };
+
+            // 定期更新各项KPI
+            updateKPIValue('aiCitationRate', 78.5, 5);
+            updateKPIValue('publishSuccess', 95.2, 3);
+            updateKPIValue('avgResponse', 234, 50);
+            updateKPIValue('todayConversions', 1247, 100);
+
+            // 更新AI趋势图 - 添加新数据点
+            if (charts.aiTrend) {
+                const option = charts.aiTrend.getOption();
+                const data = option.series[0].data;
+                const xData = option.xAxis[0].data;
+                
+                // 移除最旧的数据点，添加新数据点
+                data.shift();
+                xData.shift();
+                
+                const now = new Date();
+                const newValue = 65 + Math.random() * 20 + Math.sin(Date.now() / 10000) * 5;
+                data.push(newValue.toFixed(1));
+                xData.push(now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }));
+                
+                charts.aiTrend.setOption(option);
+            }
+
+            // 更新系统资源使用率
+            if (charts.cpu) {
+                updateGaugeValue(charts.cpu, 35, 65);
+                updateGaugeValue(charts.memory, 50, 75);
+                updateGaugeValue(charts.network, 60, 90);
+                updateGaugeValue(charts.api, 20, 50);
+            }
+        }
+
+        // 更新仪表盘数值的辅助函数
+        function updateGaugeValue(chart, min, max) {
+            const option = chart.getOption();
+            const newValue = min + Math.random() * (max - min);
+            option.series[0].data[0].value = newValue.toFixed(0);
+            chart.setOption(option);
+        }
+
+        // ========== 告警管理 ==========
+        function addNewAlert(type, message) {
+            const alertList = document.getElementById('alertList');
+            const alertItem = document.createElement('div');
+            alertItem.className = `alert-item ${type}`;
+            
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN');
+            
+            alertItem.innerHTML = `
+                <div class="alert-time">${timeStr}</div>
+                <div class="alert-message">${message}</div>
+            `;
+            
+            // 添加到列表顶部
+            alertList.insertBefore(alertItem, alertList.firstChild);
+            
+            // 限制显示数量
+            while (alertList.children.length > 10) {
+                alertList.removeChild(alertList.lastChild);
+            }
+            
+            // 更新告警计数
+            const alertCount = document.getElementById('alertCount');
+            alertCount.textContent = alertList.children.length;
+        }
+
+        // 模拟告警生成
+        function simulateAlerts() {
+            const alertTypes = ['critical', 'warning', 'info'];
+            const alertMessages = [
+                'API响应时间超过阈值',
+                '渠道连接异常',
+                '内容发布队列积压',
+                'AI引用率低于目标',
+                '系统内存使用率过高',
+                '竞品内容激增检测'
+            ];
+            
+            // 随机生成告警
+            if (Math.random() < 0.1) { // 10%概率生成新告警
+                const type = alertTypes[Math.floor(Math.random() * alertTypes.length)];
+                const message = alertMessages[Math.floor(Math.random() * alertMessages.length)];
+                addNewAlert(type, message);
+            }
+        }
+
+        // ========== 交互功能 ==========
+        
+        // 时间范围切换
+        function updateTimeRange(chartType, range) {
+            // 更新按钮状态
+            const buttons = event.target.parentElement.querySelectorAll('.chart-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 根据时间范围重新加载数据
+            console.log(`切换 ${chartType} 图表时间范围为: ${range}`);
+            // 实际应用中这里应该调用API获取对应时间范围的数据
+        }
+
+        // 刷新渠道状态
+        function refreshChannelStatus() {
+            const channels = document.querySelectorAll('.channel-card');
+            channels.forEach(channel => {
+                // 随机更新状态模拟
+                const statusElement = channel.querySelector('.channel-status');
+                const statuses = ['online', 'offline', 'pending'];
+                const statusTexts = {
+                    'online': '运行中',
+                    'offline': '离线',
+                    'pending': '发布中'
+                };
+                
+                if (Math.random() < 0.3) { // 30%概率改变状态
+                    const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                    statusElement.className = `channel-status ${newStatus}`;
+                    statusElement.textContent = statusTexts[newStatus];
+                }
+            });
+        }
+
+        // ========== 响应式处理 ==========
+        function handleResize() {
+            // 重新调整所有图表大小
+            Object.values(charts).forEach(chart => {
+                if (chart && !chart.isDisposed()) {
+                    chart.resize();
+                }
+            });
+        }
+
+        // ========== 初始化和启动 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化所有图表
+            initAITrendChart();
+            initContentPerformanceChart();
+            initCompetitorChart();
+            initResourceCharts();
+            
+            // 启动实时更新
+            setInterval(updateRealTimeData, 3000); // 每3秒更新数据
+            setInterval(simulateAlerts, 5000); // 每5秒检查告警
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', handleResize);
+            
+            // 初始化时间显示
+            updateCurrentTime();
+            
+            console.log('实时监控系统初始化完成');
+        });
+
+        // ========== 清理资源 ==========
+        window.addEventListener('beforeunload', function() {
+            // 销毁所有图表实例，释放资源
+            Object.values(charts).forEach(chart => {
+                if (chart && !chart.isDisposed()) {
+                    chart.dispose();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

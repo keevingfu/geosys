@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Questions Analytics - GEO Monitoring System</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="js/geo-monitoring.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f6fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .search-bar {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 40px 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: #f1f5f9;
+            border-color: #8b5cf6;
+            color: #8b5cf6;
+        }
+
+        /* Question Categories */
+        .categories-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .category-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            border-color: #8b5cf6;
+        }
+
+        .category-card.active {
+            border-color: #8b5cf6;
+            background: linear-gradient(to bottom, #f8f7ff, #ffffff);
+        }
+
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            background: #f1f5f9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #8b5cf6;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .category-count {
+            font-size: 24px;
+            font-weight: 700;
+            color: #8b5cf6;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .metric-title {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .metric-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .metric-change.positive {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .metric-change.negative {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .chart-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .chart {
+            height: 400px;
+        }
+
+        .chart-small {
+            height: 300px;
+        }
+
+        /* Questions Table */
+        .questions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .questions-table th {
+            text-align: left;
+            padding: 16px;
+            background: #f8fafc;
+            font-weight: 600;
+            font-size: 13px;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .questions-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+        }
+
+        .questions-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .question-text {
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .question-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .intent-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .intent-badge.informational {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .intent-badge.commercial {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .intent-badge.transactional {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .intent-badge.navigational {
+            background: #e9d5ff;
+            color: #6b21a8;
+        }
+
+        .difficulty-meter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .difficulty-bar {
+            display: flex;
+            gap: 2px;
+        }
+
+        .difficulty-segment {
+            width: 20px;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 2px;
+        }
+
+        .difficulty-segment.filled {
+            background: #8b5cf6;
+        }
+
+        .serp-features {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .serp-feature-tag {
+            padding: 3px 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #475569;
+        }
+
+        /* Question Groups */
+        .question-group {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .question-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .question-group-title {
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .question-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .question-item {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .question-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            padding: 8px 16px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #7c3aed;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.secondary {
+            background: #f8fafc;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .action-btn.secondary:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        /* Grid Layouts */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .three-column {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .two-column,
+            .three-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .search-bar {
+                width: 100%;
+            }
+
+            .categories-section {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <div class="header-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                AI Query & Questions Analytics
+            </h1>
+            <div class="header-controls">
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search questions...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <button class="filter-btn">
+                    <i class="fas fa-filter"></i>
+                    Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Question Categories -->
+        <div class="categories-section">
+            <div class="category-card active">
+                <div class="category-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="category-name">What</div>
+                <div class="category-count" id="what-count">2,847</div>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div class="category-name">How</div>
+                <div class="category-count" id="how-count">1,934</div>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-question"></i>
+                </div>
+                <div class="category-name">Why</div>
+                <div class="category-count" id="why-count">1,256</div>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="category-name">When</div>
+                <div class="category-count" id="when-count">892</div>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="category-name">Where</div>
+                <div class="category-count">634</div>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="category-name">Who</div>
+                <div class="category-count">457</div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">
+                        <i class="fas fa-comments"></i>
+                        Total Questions
+                    </div>
+                </div>
+                <div class="metric-value">8,020</div>
+                <span class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> 24.5%
+                </span>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">
+                        <i class="fas fa-star"></i>
+                        Featured Snippets
+                    </div>
+                </div>
+                <div class="metric-value">342</div>
+                <span class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> 18
+                </span>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">
+                        <i class="fas fa-users"></i>
+                        People Also Ask
+                    </div>
+                </div>
+                <div class="metric-value">1,567</div>
+                <span class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> 156
+                </span>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">
+                        <i class="fas fa-chart-line"></i>
+                        Avg. Search Volume
+                    </div>
+                </div>
+                <div class="metric-value">2.4K</div>
+                <span class="metric-change negative">
+                    <i class="fas fa-arrow-down"></i> 5.2%
+                </span>
+            </div>
+        </div>
+
+        <!-- Questions Trend Chart -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div>
+                    <h2 class="chart-title">Questions Trend Analysis</h2>
+                    <p class="chart-subtitle">Track the growth of question-based searches over time</p>
+                </div>
+            </div>
+            <div id="questionsTrendChart" class="chart"></div>
+        </div>
+
+        <!-- Top Questions Table -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div>
+                    <h2 class="chart-title">Top Questions & Opportunities</h2>
+                    <p class="chart-subtitle">High-value questions to target for content optimization</p>
+                </div>
+                <button class="action-btn">
+                    Export Questions
+                </button>
+            </div>
+            <table class="questions-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Question</th>
+                        <th>Search Intent</th>
+                        <th>Volume</th>
+                        <th>Difficulty</th>
+                        <th>SERP Features</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="question-text">What is workflow automation and how does it work?</div>
+                            <div class="question-meta">
+                                <span><i class="fas fa-chart-line"></i> Trending up</span>
+                                <span><i class="fas fa-globe"></i> Global</span>
+                            </div>
+                        </td>
+                        <td><span class="intent-badge informational">Informational</span></td>
+                        <td>8,400</td>
+                        <td>
+                            <div class="difficulty-meter">
+                                <div class="difficulty-bar">
+                                    <div class="difficulty-segment filled"></div>
+                                    <div class="difficulty-segment filled"></div>
+                                    <div class="difficulty-segment"></div>
+                                    <div class="difficulty-segment"></div>
+                                </div>
+                                <span>Medium</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="serp-features">
+                                <span class="serp-feature-tag">Featured Snippet</span>
+                                <span class="serp-feature-tag">PAA</span>
+                                <span class="serp-feature-tag">Video</span>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="action-btn secondary">Optimize</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="question-text">How to automate business processes step by step?</div>
+                            <div class="question-meta">
+                                <span><i class="fas fa-fire"></i> Hot topic</span>
+                                <span><i class="fas fa-users"></i> B2B focus</span>
+                            </div>
+                        </td>
+                        <td><span class="intent-badge commercial">Commercial</span></td>
+                        <td>6,200</td>
+                        <td>
+                            <div class="difficulty-meter">
+                                <div class="difficulty-bar">
+                                    <div class="difficulty-segment filled"></div>
+                                    <div class="difficulty-segment filled"></div>
+                                    <div class="difficulty-segment filled"></div>
+                                    <div class="difficulty-segment"></div>
+                                </div>
+                                <span>Hard</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="serp-features">
+                                <span class="serp-feature-tag">PAA</span>
+                                <span class="serp-feature-tag">How-to</span>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="action-btn secondary">Optimize</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="question-text">Why is automation important for small businesses?</div>
+                            <div class="question-meta">
+                                <span><i class="fas fa-arrow-up"></i> Rising</span>
+                                <span><i class="fas fa-briefcase"></i> SMB market</span>
+                            </div>
+                        </td>
+                        <td><span class="intent-badge informational">Informational</span></td>
+                        <td>4,800</td>
+                        <td>
+                            <div class="difficulty-meter">
+                                <div class="difficulty-bar">
+                                    <div class="difficulty-segment filled"></div>
+                                    <div class="difficulty-segment"></div>
+                                    <div class="difficulty-segment"></div>
+                                    <div class="difficulty-segment"></div>
+                                </div>
+                                <span>Easy</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="serp-features">
+                                <span class="serp-feature-tag">PAA</span>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="action-btn secondary">Optimize</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="question-text">When should a company invest in automation tools?</div>
+                            <div class="question-meta">
+                                <span><i class="fas fa-calendar"></i> Seasonal trend</span>
+                                <span><i class="fas fa-building"></i> Enterprise</span>
+                            </div>
+                        </td>
+                        <td><span class="intent-badge commercial">Commercial</span></td>
+                        <td>3,200</td>
+                        <td>
+                            <div class="difficulty-meter">
+                                <div class="difficulty-bar">
+                                    <div class="difficulty-segment filled"></div>
+                                    <div class="difficulty-segment filled"></div>
+                                    <div class="difficulty-segment"></div>
+                                    <div class="difficulty-segment"></div>
+                                </div>
+                                <span>Medium</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="serp-features">
+                                <span class="serp-feature-tag">Featured Snippet</span>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="action-btn secondary">Optimize</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="question-text">Where to find free automation tools for startups?</div>
+                            <div class="question-meta">
+                                <span><i class="fas fa-rocket"></i> Startup focused</span>
+                                <span><i class="fas fa-dollar-sign"></i> Budget conscious</span>
+                            </div>
+                        </td>
+                        <td><span class="intent-badge transactional">Transactional</span></td>
+                        <td>2,900</td>
+                        <td>
+                            <div class="difficulty-meter">
+                                <div class="difficulty-bar">
+                                    <div class="difficulty-segment filled"></div>
+                                    <div class="difficulty-segment filled"></div>
+                                    <div class="difficulty-segment filled"></div>
+                                    <div class="difficulty-segment filled"></div>
+                                </div>
+                                <span>Very Hard</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="serp-features">
+                                <span class="serp-feature-tag">Shopping</span>
+                                <span class="serp-feature-tag">Reviews</span>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="action-btn secondary">Optimize</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="two-column">
+            <!-- Question Intent Distribution -->
+            <div class="chart-container">
+                <h2 class="chart-title">Search Intent Distribution</h2>
+                <div id="intentChart" class="chart chart-small"></div>
+            </div>
+
+            <!-- Question Word Cloud -->
+            <div class="chart-container">
+                <h2 class="chart-title">Popular Question Topics</h2>
+                <div id="topicsChart" class="chart chart-small"></div>
+            </div>
+        </div>
+
+        <!-- People Also Ask Analysis -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div>
+                    <h2 class="chart-title">People Also Ask (PAA) Opportunities</h2>
+                    <p class="chart-subtitle">Related questions that appear in search results</p>
+                </div>
+            </div>
+            
+            <div class="question-group">
+                <div class="question-group-header">
+                    <div class="question-group-title">
+                        <i class="fas fa-layer-group"></i>
+                        Workflow Automation Basics
+                    </div>
+                    <span style="color: #64748b; font-size: 14px;">12 questions</span>
+                </div>
+                <div class="question-list">
+                    <div class="question-item">
+                        <div>
+                            <div style="font-weight: 500; margin-bottom: 4px;">What are the benefits of workflow automation?</div>
+                            <div style="font-size: 12px; color: #64748b;">
+                                <span style="margin-right: 16px;"><i class="fas fa-search"></i> 3,400 searches</span>
+                                <span><i class="fas fa-trophy"></i> Position 3</span>
+                            </div>
+                        </div>
+                        <button class="action-btn">Target</button>
+                    </div>
+                    <div class="question-item">
+                        <div>
+                            <div style="font-weight: 500; margin-bottom: 4px;">How much does automation software cost?</div>
+                            <div style="font-size: 12px; color: #64748b;">
+                                <span style="margin-right: 16px;"><i class="fas fa-search"></i> 2,800 searches</span>
+                                <span><i class="fas fa-exclamation-circle"></i> Not ranking</span>
+                            </div>
+                        </div>
+                        <button class="action-btn">Target</button>
+                    </div>
+                    <div class="question-item">
+                        <div>
+                            <div style="font-weight: 500; margin-bottom: 4px;">What processes can be automated?</div>
+                            <div style="font-size: 12px; color: #64748b;">
+                                <span style="margin-right: 16px;"><i class="fas fa-search"></i> 2,100 searches</span>
+                                <span><i class="fas fa-trophy"></i> Position 5</span>
+                            </div>
+                        </div>
+                        <button class="action-btn">Target</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-group-header">
+                    <div class="question-group-title">
+                        <i class="fas fa-cogs"></i>
+                        Implementation & Setup
+                    </div>
+                    <span style="color: #64748b; font-size: 14px;">8 questions</span>
+                </div>
+                <div class="question-list">
+                    <div class="question-item">
+                        <div>
+                            <div style="font-weight: 500; margin-bottom: 4px;">How long does it take to implement automation?</div>
+                            <div style="font-size: 12px; color: #64748b;">
+                                <span style="margin-right: 16px;"><i class="fas fa-search"></i> 1,900 searches</span>
+                                <span><i class="fas fa-exclamation-circle"></i> Not ranking</span>
+                            </div>
+                        </div>
+                        <button class="action-btn">Target</button>
+                    </div>
+                    <div class="question-item">
+                        <div>
+                            <div style="font-weight: 500; margin-bottom: 4px;">Do I need coding skills for automation?</div>
+                            <div style="font-size: 12px; color: #64748b;">
+                                <span style="margin-right: 16px;"><i class="fas fa-search"></i> 1,600 searches</span>
+                                <span><i class="fas fa-trophy"></i> Position 8</span>
+                            </div>
+                        </div>
+                        <button class="action-btn">Target</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Competitor Questions Analysis -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2 class="chart-title">Competitor Question Coverage</h2>
+            </div>
+            <div id="competitorChart" class="chart"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize all charts and monitoring
+        let questionsTrendChart, intentChart, topicsChart, competitorChart;
+        let questionsData = null;
+
+        // Chart colors
+        const colors = {
+            primary: '#8b5cf6',
+            secondary: '#6366f1',
+            success: '#10b981',
+            warning: '#f59e0b',
+            danger: '#ef4444',
+            info: '#3b82f6',
+            gray: '#64748b'
+        };
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof geoMonitor !== 'undefined') {
+                setupQuestionsMonitoring();
+            }
+            initializeAllCharts();
+        });
+        
+        function setupQuestionsMonitoring() {
+            // Listen for questions data updates
+            geoMonitor.on('dataUpdated', (data) => {
+                if (data.metrics.questions) {
+                    questionsData = data.metrics.questions;
+                    updateQuestionsMetrics(data.metrics.questions);
+                    updateQuestionsCharts(data.metrics.questions);
+                }
+            });
+            
+            // Get initial data
+            geoMonitor.fetchQuestionsData().then(data => {
+                questionsData = data;
+                updateQuestionsMetrics(data);
+                updateQuestionsCharts(data);
+            });
+        }
+        
+        function updateQuestionsMetrics(data) {
+            // Update category counts based on intent breakdown
+            if (data.intentBreakdown) {
+                document.getElementById('what-count').textContent = (data.intentBreakdown.informational || 2145).toLocaleString();
+                document.getElementById('how-count').textContent = (data.intentBreakdown.commercial || 987).toLocaleString();
+                document.getElementById('why-count').textContent = (data.intentBreakdown.navigational || 642).toLocaleString();
+                document.getElementById('when-count').textContent = (data.intentBreakdown.transactional || 352).toLocaleString();
+            }
+            
+            // Update total questions
+            if (data.totalQuestions) {
+                const totalElem = document.querySelector('.metric-value');
+                if (totalElem) {
+                    totalElem.textContent = data.totalQuestions.toLocaleString();
+                }
+            }
+        }
+        
+        function updateQuestionsCharts(data) {
+            // Update intent chart
+            if (intentChart && data.intentBreakdown) {
+                updateIntentChart(data.intentBreakdown);
+            }
+            
+            // Update emerging questions
+            if (data.emergingQuestions) {
+                updateEmergingQuestions(data.emergingQuestions);
+            }
+            
+            // Update topic categories
+            if (topicsChart && data.topCategories) {
+                updateTopicsChart(data.topCategories);
+            }
+        }
+        
+        function initializeAllCharts() {
+            initQuestionsTrendChart();
+            initIntentChart();
+            initTopicsChart();
+            initCompetitorChart();
+        }
+
+        // Questions Trend Chart
+        function initQuestionsTrendChart() {
+            questionsTrendChart = echarts.init(document.getElementById('questionsTrendChart'));
+            
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                legend: {
+                    data: ['Total Questions', 'Featured Snippets', 'PAA Questions', 'New Questions'],
+                    bottom: 0
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: months,
+                    axisLine: { lineStyle: { color: '#e2e8f0' } },
+                    axisLabel: { color: '#64748b' }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Questions Count',
+                        axisLine: { lineStyle: { color: '#e2e8f0' } },
+                        axisLabel: { color: '#64748b' },
+                        splitLine: { lineStyle: { color: '#f8fafc' } }
+                    },
+                    {
+                        type: 'value',
+                        name: 'Growth %',
+                        axisLine: { lineStyle: { color: '#e2e8f0' } },
+                        axisLabel: { 
+                            color: '#64748b',
+                            formatter: '{value}%'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: 'Total Questions',
+                        type: 'line',
+                        smooth: true,
+                        data: [5234, 5567, 5890, 6234, 6578, 6923, 7234, 7567, 7812, 7934, 8012, 8020],
+                        itemStyle: { color: colors.primary },
+                        lineStyle: { width: 3 },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(139, 92, 246, 0.3)' },
+                                { offset: 1, color: 'rgba(139, 92, 246, 0)' }
+                            ])
+                        }
+                    },
+                    {
+                        name: 'Featured Snippets',
+                        type: 'line',
+                        smooth: true,
+                        data: [234, 245, 267, 289, 298, 312, 324, 334, 339, 341, 342, 342],
+                        itemStyle: { color: colors.success },
+                        lineStyle: { width: 2 }
+                    },
+                    {
+                        name: 'PAA Questions',
+                        type: 'line',
+                        smooth: true,
+                        data: [890, 945, 1023, 1134, 1234, 1345, 1423, 1489, 1523, 1545, 1556, 1567],
+                        itemStyle: { color: colors.info },
+                        lineStyle: { width: 2 }
+                    },
+                    {
+                        name: 'New Questions',
+                        type: 'bar',
+                        yAxisIndex: 1,
+                        data: [12, 15, 18, 22, 20, 19, 16, 14, 13, 8, 5, 3],
+                        itemStyle: { color: colors.warning }
+                    }
+                ]
+            };
+            
+            questionsTrendChart.setOption(option);
+        }
+
+        // Search Intent Distribution Chart
+        function initIntentChart() {
+            intentChart = echarts.init(document.getElementById('intentChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} ({d}%)'
+                },
+                series: [{
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '16',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: [
+                        { value: 4523, name: 'Informational', itemStyle: { color: '#3b82f6' } },
+                        { value: 2134, name: 'Commercial', itemStyle: { color: '#f59e0b' } },
+                        { value: 987, name: 'Transactional', itemStyle: { color: '#10b981' } },
+                        { value: 376, name: 'Navigational', itemStyle: { color: '#8b5cf6' } }
+                    ]
+                }]
+            };
+            
+            intentChart.setOption(option);
+        }
+
+        // Topics Radar Chart
+        function initTopicsChart() {
+            topicsChart = echarts.init(document.getElementById('topicsChart'));
+            
+            const option = {
+                tooltip: {},
+                radar: {
+                    indicator: [
+                        { name: 'Setup', max: 100 },
+                        { name: 'Benefits', max: 100 },
+                        { name: 'Cost', max: 100 },
+                        { name: 'Features', max: 100 },
+                        { name: 'Integration', max: 100 },
+                        { name: 'Security', max: 100 }
+                    ],
+                    shape: 'polygon',
+                    splitArea: {
+                        areaStyle: {
+                            color: ['rgba(139, 92, 246, 0.05)', 'rgba(139, 92, 246, 0.1)']
+                        }
+                    },
+                    axisLine: { lineStyle: { color: '#e2e8f0' } },
+                    splitLine: { lineStyle: { color: '#e2e8f0' } }
+                },
+                series: [{
+                    type: 'radar',
+                    data: [
+                        {
+                            value: [85, 92, 78, 88, 72, 65],
+                            name: 'Question Coverage',
+                            itemStyle: { color: colors.primary },
+                            areaStyle: { opacity: 0.3 },
+                            lineStyle: { width: 2 }
+                        }
+                    ]
+                }]
+            };
+            
+            topicsChart.setOption(option);
+        }
+
+        // Competitor Questions Coverage Chart
+        function initCompetitorChart() {
+            competitorChart = echarts.init(document.getElementById('competitorChart'));
+            
+            const categories = ['What', 'How', 'Why', 'When', 'Where', 'Who'];
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' }
+                },
+                legend: {
+                    data: ['Your Site', 'Competitor A', 'Competitor B', 'Competitor C'],
+                    bottom: 0
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: categories,
+                    axisLine: { lineStyle: { color: '#e2e8f0' } },
+                    axisLabel: { color: '#64748b' }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Questions Covered',
+                    axisLine: { lineStyle: { color: '#e2e8f0' } },
+                    axisLabel: { color: '#64748b' },
+                    splitLine: { lineStyle: { color: '#f8fafc' } }
+                },
+                series: [
+                    {
+                        name: 'Your Site',
+                        type: 'bar',
+                        data: [1234, 890, 567, 345, 234, 123],
+                        itemStyle: { color: colors.primary }
+                    },
+                    {
+                        name: 'Competitor A',
+                        type: 'bar',
+                        data: [1567, 1234, 789, 456, 345, 234],
+                        itemStyle: { color: colors.secondary }
+                    },
+                    {
+                        name: 'Competitor B',
+                        type: 'bar',
+                        data: [987, 789, 456, 234, 189, 98],
+                        itemStyle: { color: colors.info }
+                    },
+                    {
+                        name: 'Competitor C',
+                        type: 'bar',
+                        data: [789, 567, 345, 189, 145, 78],
+                        itemStyle: { color: colors.warning }
+                    }
+                ]
+            };
+            
+            competitorChart.setOption(option);
+        }
+
+        // Category card click handler
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function updateIntentChart(intentData) {
+            const data = [
+                { value: intentData.informational || 0, name: 'Informational' },
+                { value: intentData.commercial || 0, name: 'Commercial' },
+                { value: intentData.navigational || 0, name: 'Navigational' },
+                { value: intentData.transactional || 0, name: 'Transactional' }
+            ];
+            
+            const option = {
+                series: [{
+                    data: data
+                }]
+            };
+            
+            intentChart.setOption(option);
+        }
+        
+        function updateTopicsChart(categories) {
+            const categoryNames = categories.map(c => c.category);
+            const questionCounts = categories.map(c => c.questions);
+            const coverageRates = categories.map(c => c.coverage);
+            
+            const option = {
+                xAxis: {
+                    data: categoryNames
+                },
+                series: [
+                    { name: 'Questions', data: questionCounts },
+                    { name: 'Coverage %', data: coverageRates }
+                ]
+            };
+            
+            topicsChart.setOption(option);
+        }
+        
+        function updateEmergingQuestions(questions) {
+            // Update the DOM with emerging questions
+            console.log('Emerging questions:', questions);
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            questionsTrendChart && questionsTrendChart.resize();
+            intentChart && intentChart.resize();
+            topicsChart && topicsChart.resize();
+            competitorChart && competitorChart.resize();
+        });
+    </script>
+</body>
+</html>

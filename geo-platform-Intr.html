@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEO内容资产库及项目监测平台 - Leap公司</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --danger-color: #f56565;
+            --dark-color: #2d3748;
+            --light-color: #f7fafc;
+            --gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .hero-quote {
+            font-size: 1.25rem;
+            font-style: italic;
+            margin-bottom: 3rem;
+            opacity: 0.85;
+            animation: fadeInUp 1s ease-out 0.4s;
+            animation-fill-mode: both;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.6s;
+            animation-fill-mode: both;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            cursor: pointer;
+            border: none;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav.scrolled {
+            background: white;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--dark-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Sections */
+        .section {
+            padding: 5rem 0;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--dark-color);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.25rem;
+            color: #718096;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Comparison Table */
+        .comparison-container {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .comparison-table th {
+            background: var(--gradient);
+            color: white;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .comparison-table td:first-child {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .feature-description {
+            color: #718096;
+            line-height: 1.8;
+        }
+
+        /* Workflow Section */
+        .workflow-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .workflow-step {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+            position: relative;
+        }
+
+        .workflow-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .workflow-number {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+
+        .workflow-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .workflow-description {
+            color: #718096;
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+
+        /* Value Cards */
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .value-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .value-card:hover {
+            transform: scale(1.05);
+        }
+
+        .value-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .value-label {
+            font-size: 1.1rem;
+            color: #718096;
+        }
+
+        /* Success Cases */
+        .case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .case-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .case-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .case-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .case-info {
+            margin-bottom: 1rem;
+        }
+
+        .case-info strong {
+            color: var(--dark-color);
+        }
+
+        .case-results {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .case-results li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .case-results li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: 700;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 3rem auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: var(--primary-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+            width: 50%;
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+            padding-right: 3rem;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+            padding-left: 3rem;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 0 4px var(--primary-color);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-marker {
+            right: -10px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-marker {
+            left: -10px;
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .timeline-phase {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Pricing Cards */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card.featured {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .pricing-card.featured::before {
+            content: '推荐';
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: var(--gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .pricing-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-price del {
+            font-size: 1.5rem;
+            color: #cbd5e0;
+            font-weight: 400;
+        }
+
+        .pricing-period {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: 700;
+        }
+
+        /* Contact Section */
+        .contact-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-item {
+            text-align: center;
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-value {
+            color: #718096;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .workflow-step:not(:last-child)::after {
+                display: none;
+            }
+
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-item {
+                width: 100%;
+                left: 0 !important;
+                padding-left: 4rem !important;
+                padding-right: 0 !important;
+                text-align: left !important;
+            }
+
+            .timeline-marker {
+                left: 20px !important;
+            }
+
+            .section {
+                padding: 3rem 0;
+            }
+        }
+
+        /* Scroll to Top Button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" id="navbar">
+        <div class="container">
+            <div class="nav-container">
+                <div class="logo">GEO Platform</div>
+                <ul class="nav-links">
+                    <li><a href="#home">首页</a></li>
+                    <li><a href="#about">关于GEO</a></li>
+                    <li><a href="#features">核心功能</a></li>
+                    <li><a href="#value">商业价值</a></li>
+                    <li><a href="#cases">成功案例</a></li>
+                    <li><a href="#contact">联系我们</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h1>GEO内容资产库及项目监测平台</h1>
+                <p class="hero-subtitle">Leap公司 - 开创AI搜索优化新时代</p>
+                <p class="hero-quote">"让每一份内容在AI时代被看见、被理解、被推荐"</p>
+                <div class="cta-buttons">
+                    <a href="#demo" class="btn btn-primary">预约演示</a>
+                    <a href="#features" class="btn btn-secondary">了解更多</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About GEO Section -->
+    <section class="section" id="about">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">什么是GEO？</h2>
+            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                Generative Engine Optimization - 专为AI搜索时代设计的内容优化技术
+            </p>
+            
+            <div class="comparison-container" data-aos="fade-up" data-aos-delay="200">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>维度</th>
+                            <th>传统SEO</th>
+                            <th>GEO生成引擎优化</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>优化对象</td>
+                            <td>Google、百度等搜索引擎</td>
+                            <td>ChatGPT、Claude、Gemini等AI</td>
+                        </tr>
+                        <tr>
+                            <td>用户行为</td>
+                            <td>关键词搜索→点击链接</td>
+                            <td>自然语言提问→直接获得答案</td>
+                        </tr>
+                        <tr>
+                            <td>优化重点</td>
+                            <td>关键词密度、外链</td>
+                            <td>内容质量、结构化、权威性</td>
+                        </tr>
+                        <tr>
+                            <td>效果呈现</td>
+                            <td>搜索结果排名</td>
+                            <td>AI回答中的引用和推荐</td>
+                        </tr>
+                        <tr>
+                            <td>流量来源</td>
+                            <td>搜索结果页面点击</td>
+                            <td>AI对话中的品牌提及</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- GEO Flow Chart -->
+            <div class="chart-container" style="margin-top: 3rem;" data-aos="fade-up" data-aos-delay="300">
+                <h3 style="text-align: center; margin-bottom: 2rem;">GEO工作原理</h3>
+                <div id="flowChart" class="chart"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features" style="background: #f8f9fa;">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">核心功能</h2>
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">AI内容优化引擎</h3>
+                    <p class="feature-description">
+                        深度分析内容结构，智能改写为AI友好格式，自动添加结构化标记，实时反馈优化效果
+                    </p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">智能分析仪表板</h3>
+                    <p class="feature-description">
+                        AI可见度评分、引用频率追踪、竞争对比分析、趋势预测，全方位监控内容表现
+                    </p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">🔗</div>
+                    <h3 class="feature-title">全渠道内容分发</h3>
+                    <p class="feature-description">
+                        一键发布到企业官网、知识库系统、API接口输出、第三方平台，实现内容价值最大化
+                    </p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">企业级安全保障</h3>
+                    <p class="feature-description">
+                        端到端加密传输、细粒度角色控制、完整审计日志、自动备份机制，保障数据安全
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workflow Section -->
+    <section class="section" id="workflow">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">业务应用流程</h2>
+            <div class="workflow-container">
+                <div class="workflow-step" data-aos="fade-up" data-aos-delay="100">
+                    <div class="workflow-number">1</div>
+                    <h3 class="workflow-title">内容导入</h3>
+                    <p class="workflow-description">支持Word、PDF、HTML、Markdown等格式</p>
+                </div>
+                <div class="workflow-step" data-aos="fade-up" data-aos-delay="200">
+                    <div class="workflow-number">2</div>
+                    <h3 class="workflow-title">智能优化</h3>
+                    <p class="workflow-description">自动分析并提供优化建议</p>
+                </div>
+                <div class="workflow-step" data-aos="fade-up" data-aos-delay="300">
+                    <div class="workflow-number">3</div>
+                    <h3 class="workflow-title">发布管理</h3>
+                    <p class="workflow-description">多渠道发布与版本控制</p>
+                </div>
+                <div class="workflow-step" data-aos="fade-up" data-aos-delay="400">
+                    <div class="workflow-number">4</div>
+                    <h3 class="workflow-title">效果监测</h3>
+                    <p class="workflow-description">实时数据分析与持续改进</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Value Section -->
+    <section class="section" id="value" style="background: #f8f9fa;">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">商业价值分析</h2>
+            
+            <!-- Performance Chart -->
+            <div class="chart-container" data-aos="fade-up" data-aos-delay="100">
+                <h3 style="text-align: center; margin-bottom: 2rem;">优化效果对比</h3>
+                <div id="performanceChart" class="chart"></div>
+            </div>
+
+            <div class="value-grid">
+                <div class="value-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="value-number">+54%</div>
+                    <div class="value-label">AI搜索可见度提升</div>
+                </div>
+                <div class="value-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="value-number">+62%</div>
+                    <div class="value-label">品牌提及率增长</div>
+                </div>
+                <div class="value-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="value-number">+73%</div>
+                    <div class="value-label">潜在客户询盘增加</div>
+                </div>
+                <div class="value-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="value-number">80%</div>
+                    <div class="value-label">内容优化人力节省</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Cases Section -->
+    <section class="section" id="cases">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">成功案例</h2>
+            <div class="case-grid">
+                <div class="case-card" data-aos="fade-up" data-aos-delay="100">
+                    <h3 class="case-title">科技公司A</h3>
+                    <div class="case-info">
+                        <p><strong>背景：</strong>B2B软件服务商，传统SEO效果递减</p>
+                        <p><strong>解决方案：</strong>使用GEO优化技术文档和产品介绍</p>
+                    </div>
+                    <ul class="case-results">
+                        <li>AI搜索可见度提升350%</li>
+                        <li>月度线索增长280%</li>
+                        <li>销售转化率提升45%</li>
+                    </ul>
+                </div>
+                <div class="case-card" data-aos="fade-up" data-aos-delay="200">
+                    <h3 class="case-title">电商品牌B</h3>
+                    <div class="case-info">
+                        <p><strong>背景：</strong>消费品牌，需要提升品牌认知</p>
+                        <p><strong>解决方案：</strong>优化产品描述和用户评价</p>
+                    </div>
+                    <ul class="case-results">
+                        <li>ChatGPT推荐率提升500%</li>
+                        <li>品牌搜索量增长200%</li>
+                        <li>用户购买意向提升60%</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ROI Chart -->
+            <div class="chart-container" style="margin-top: 3rem;" data-aos="fade-up" data-aos-delay="300">
+                <h3 style="text-align: center; margin-bottom: 2rem;">投资回报率分析</h3>
+                <div id="roiChart" class="chart"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Timeline -->
+    <section class="section" id="timeline" style="background: #f8f9fa;">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">实施路线图</h2>
+            <div class="timeline">
+                <div class="timeline-item" data-aos="fade-right">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 1：基础部署</div>
+                        <p>第1-2周：系统部署、账号配置、团队培训</p>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos="fade-left">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 2：优化实施</div>
+                        <p>第3-8周：内容批量优化、多渠道发布、初步数据分析</p>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos="fade-right">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 3：效果优化</div>
+                        <p>第9-12周：基于数据调整策略、扩展应用场景、建立最佳实践</p>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos="fade-left">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 4：规模化应用</div>
+                        <p>3个月后：全面内容覆盖、自动化流程、持续迭代优化</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Contact Section -->
+    <section class="section" id="contact" style="background: #f8f9fa;">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">联系我们</h2>
+            <div class="contact-container" data-aos="fade-up" data-aos-delay="100">
+                <div class="contact-grid">
+                    <div class="contact-item">
+                        <div class="contact-icon">🌐</div>
+                        <div class="contact-label">官网</div>
+                        <div class="contact-value">www.leapunion.com</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📧</div>
+                        <div class="contact-label">邮箱</div>
+                        <div class="contact-value">contact@leapunion.com</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📱</div>
+                        <div class="contact-label">电话</div>
+                        <div class="contact-value">139-1743-0851</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div class="contact-label">地址</div>
+                        <div class="contact-value">香港九龙旺角亚皆老街8号朗豪坊办公大楼</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="#demo" class="btn btn-primary">预约产品演示</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">GEO白皮书</a>
+                <a href="#">产品演示视频</a>
+                <a href="#">ROI计算器</a>
+                <a href="#">客户案例集</a>
+                <a href="#">GEO最佳实践指南</a>
+            </div>
+            <p>© 2025 Leap公司 | 开创GEO新时代</p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <div class="scroll-top" id="scrollTop">
+        <span>↑</span>
+    </div>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            // Scroll to top button
+            const scrollTop = document.getElementById('scrollTop');
+            if (window.scrollY > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll to top
+        document.getElementById('scrollTop').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Initialize Charts
+        // Flow Chart
+        const flowChart = echarts.init(document.getElementById('flowChart'));
+        const flowOption = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}'
+            },
+            series: [{
+                type: 'graph',
+                layout: 'force',
+                data: [
+                    {name: '用户向AI提问', x: 100, y: 200, itemStyle: {color: '#667eea'}},
+                    {name: 'AI搜索相关内容', x: 300, y: 200, itemStyle: {color: '#764ba2'}},
+                    {name: '内容是否GEO优化?', x: 500, y: 200, itemStyle: {color: '#f59e0b'}},
+                    {name: '被AI优先选择', x: 700, y: 100, itemStyle: {color: '#10b981'}},
+                    {name: '被忽略或排后', x: 700, y: 300, itemStyle: {color: '#ef4444'}},
+                    {name: '成为AI回答的信息源', x: 900, y: 100, itemStyle: {color: '#10b981'}},
+                    {name: '获得品牌曝光和流量', x: 1100, y: 100, itemStyle: {color: '#667eea'}}
+                ],
+                links: [
+                    {source: '用户向AI提问', target: 'AI搜索相关内容'},
+                    {source: 'AI搜索相关内容', target: '内容是否GEO优化?'},
+                    {source: '内容是否GEO优化?', target: '被AI优先选择', label: {show: true, formatter: '是'}},
+                    {source: '内容是否GEO优化?', target: '被忽略或排后', label: {show: true, formatter: '否'}},
+                    {source: '被AI优先选择', target: '成为AI回答的信息源'},
+                    {source: '成为AI回答的信息源', target: '获得品牌曝光和流量'}
+                ],
+                roam: true,
+                label: {
+                    show: true,
+                    position: 'bottom',
+                    formatter: '{b}'
+                },
+                force: {
+                    repulsion: 500,
+                    gravity: 0.1,
+                    edgeLength: 150
+                }
+            }]
+        };
+        flowChart.setOption(flowOption);
+
+        // Performance Chart
+        const performanceChart = echarts.init(document.getElementById('performanceChart'));
+        const performanceOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                },
+                formatter: function(params) {
+                    return params[0].name + '<br/>' +
+                           params[0].marker + ' 优化前：' + params[0].value + '%<br/>' +
+                           params[1].marker + ' 优化后：' + params[1].value + '%<br/>' +
+                           '提升：+' + (params[1].value - params[0].value) + '%';
+                }
+            },
+            legend: {
+                data: ['优化前', '优化后']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['AI搜索可见度', '品牌提及率', '潜在客户询盘', '内容转化率']
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    formatter: '{value}%'
+                }
+            },
+            series: [
+                {
+                    name: '优化前',
+                    type: 'bar',
+                    data: [15, 8, 100, 2.3],
+                    itemStyle: {
+                        color: '#cbd5e0'
+                    }
+                },
+                {
+                    name: '优化后',
+                    type: 'bar',
+                    data: [78, 45, 483, 8.7],
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {offset: 0, color: '#667eea'},
+                            {offset: 1, color: '#764ba2'}
+                        ])
+                    }
+                }
+            ]
+        };
+        performanceChart.setOption(performanceOption);
+
+        // ROI Chart
+        const roiChart = echarts.init(document.getElementById('roiChart'));
+        const roiOption = {
+            tooltip: {
+                trigger: 'axis',
+                formatter: function(params) {
+                    return params[0].name + '<br/>' +
+                           '投资回报：' + params[0].value + '%';
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['第1月', '第2月', '第3月', '第4月', '第5月', '第6月']
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    formatter: '{value}%'
+                }
+            },
+            series: [{
+                name: 'ROI',
+                type: 'line',
+                smooth: true,
+                data: [50, 120, 200, 320, 450, 580],
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {offset: 0, color: 'rgba(102, 126, 234, 0.3)'},
+                        {offset: 1, color: 'rgba(102, 126, 234, 0.05)'}
+                    ])
+                },
+                itemStyle: {
+                    color: '#667eea'
+                },
+                lineStyle: {
+                    width: 3
+                }
+            }]
+        };
+        roiChart.setOption(roiOption);
+
+        // Responsive charts
+        window.addEventListener('resize', function() {
+            flowChart.resize();
+            performanceChart.resize();
+            roiChart.resize();
+        });
+    </script>
+</body>
+</html>

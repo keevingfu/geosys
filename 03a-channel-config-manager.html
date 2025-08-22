@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>渠道配置管理器 - Channel Configuration Manager</title>
+    <style>
+        /* 全局设计系统 - 建立专业的企业级界面 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* 主色调系统 - 传达安全和可靠性 */
+            --primary: #4F46E5;      /* 靛蓝色 - 专业可信 */
+            --secondary: #7C3AED;    /* 紫色 - 创新 */
+            --success: #10B981;      /* 绿色 - 正常运行 */
+            --warning: #F59E0B;      /* 橙色 - 需要注意 */
+            --danger: #EF4444;       /* 红色 - 错误警告 */
+            --info: #3B82F6;         /* 蓝色 - 信息提示 */
+            
+            /* 中性色阶 */
+            --gray-900: #111827;
+            --gray-800: #1F2937;
+            --gray-700: #374151;
+            --gray-600: #4B5563;
+            --gray-500: #6B7280;
+            --gray-400: #9CA3AF;
+            --gray-300: #D1D5DB;
+            --gray-200: #E5E7EB;
+            --gray-100: #F3F4F6;
+            --gray-50: #F9FAFB;
+            --white: #FFFFFF;
+            
+            /* 渐变色定义 */
+            --gradient-primary: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            --gradient-dark: linear-gradient(135deg, #1F2937 0%, #111827 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        /* 布局容器 - 提供结构化的内容组织 */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边导航栏 - 清晰的信息架构 */
+        .sidebar {
+            width: 280px;
+            background: var(--gradient-dark);
+            color: white;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* 渠道列表样式 */
+        .channel-list {
+            margin-bottom: 32px;
+        }
+
+        .channel-group-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-400);
+            margin-bottom: 12px;
+        }
+
+        .channel-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .channel-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .channel-item.active {
+            background: var(--primary);
+        }
+
+        .channel-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .channel-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .channel-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .channel-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .channel-status.connected {
+            background: var(--success);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .channel-status.error {
+            background: var(--danger);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+
+        .channel-status.pending {
+            background: var(--warning);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        /* 页面头部 */
+        .page-header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* 按钮系统 */
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        /* 标签页系统 */
+        .tabs {
+            display: flex;
+            gap: 32px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .tab {
+            padding: 12px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-500);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: var(--gray-700);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* 配置面板网格 */
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        /* 卡片组件 */
+        .config-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .config-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .card-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* 表单控件 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-input.secure {
+            font-family: monospace;
+            background: var(--gray-50);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-group .form-input {
+            flex: 1;
+        }
+
+        /* API凭证显示控制 */
+        .credential-field {
+            position: relative;
+        }
+
+        .credential-mask {
+            filter: blur(4px);
+            user-select: none;
+        }
+
+        .toggle-visibility {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray-500);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* 限制规则展示 */
+        .rules-list {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .rule-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .rule-item:last-child {
+            border-bottom: none;
+        }
+
+        .rule-label {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        .rule-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+
+        /* 健康度指示器 */
+        .health-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .health-score {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .health-score.excellent {
+            color: var(--success);
+        }
+
+        .health-score.good {
+            color: var(--info);
+        }
+
+        .health-score.fair {
+            color: var(--warning);
+        }
+
+        .health-score.poor {
+            color: var(--danger);
+        }
+
+        .health-details {
+            flex: 1;
+        }
+
+        .health-label {
+            font-size: 12px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .health-status {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+
+        /* 模板编辑器 */
+        .template-editor {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 200px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .template-variables {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .variable-chip {
+            padding: 4px 8px;
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: monospace;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .variable-chip:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 权限管理表格 */
+        .permissions-table {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: var(--gray-50);
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 100px;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-600);
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 100px;
+            padding: 16px;
+            border-bottom: 1px solid var(--gray-100);
+            align-items: center;
+        }
+
+        .table-row:hover {
+            background: var(--gray-50);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* 复选框样式 */
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* 政策更新时间线 */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gray-200);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -28px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--primary);
+        }
+
+        .timeline-content {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+        }
+
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .timeline-description {
+            font-size: 14px;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                transform: translateX(-100%);
+                z-index: 1000;
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-header,
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+
+        /* 加载和动画效果 */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 - 渠道导航 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span style="font-size: 28px;">🔧</span>
+                <h2 class="sidebar-title">渠道配置中心</h2>
+            </div>
+
+            <!-- 渠道分组列表 -->
+            <div class="channel-list">
+                <div class="channel-group-title">社交媒体渠道</div>
+                
+                <div class="channel-item active" onclick="selectChannel('linkedin')">
+                    <div class="channel-info">
+                        <div class="channel-icon" style="background: #0077B5;">in</div>
+                        <span class="channel-name">LinkedIn</span>
+                    </div>
+                    <div class="channel-status connected"></div>
+                </div>
+
+                <div class="channel-item" onclick="selectChannel('twitter')">
+                    <div class="channel-info">
+                        <div class="channel-icon" style="background: #1DA1F2;">𝕏</div>
+                        <span class="channel-name">Twitter/X</span>
+                    </div>
+                    <div class="channel-status connected"></div>
+                </div>
+
+                <div class="channel-item" onclick="selectChannel('youtube')">
+                    <div class="channel-info">
+                        <div class="channel-icon" style="background: #FF0000;">▶</div>
+                        <span class="channel-name">YouTube</span>
+                    </div>
+                    <div class="channel-status connected"></div>
+                </div>
+
+                <div class="channel-item" onclick="selectChannel('reddit')">
+                    <div class="channel-info">
+                        <div class="channel-icon" style="background: #FF4500;">®</div>
+                        <span class="channel-name">Reddit</span>
+                    </div>
+                    <div class="channel-status pending"></div>
+                </div>
+            </div>
+
+            <div class="channel-list">
+                <div class="channel-group-title">内容平台</div>
+                
+                <div class="channel-item" onclick="selectChannel('medium')">
+                    <div class="channel-info">
+                        <div class="channel-icon" style="background: #000000;">M</div>
+                        <span class="channel-name">Medium</span>
+                    </div>
+                    <div class="channel-status connected"></div>
+                </div>
+
+                <div class="channel-item" onclick="selectChannel('quora')">
+                    <div class="channel-info">
+                        <div class="channel-icon" style="background: #B92B27;">Q</div>
+                        <span class="channel-name">Quora</span>
+                    </div>
+                    <div class="channel-status error"></div>
+                </div>
+            </div>
+
+            <div class="channel-list">
+                <div class="channel-group-title">消息平台</div>
+                
+                <div class="channel-item" onclick="selectChannel('whatsapp')">
+                    <div class="channel-info">
+                        <div class="channel-icon" style="background: #25D366;">💬</div>
+                        <span class="channel-name">WhatsApp</span>
+                    </div>
+                    <div class="channel-status connected"></div>
+                </div>
+
+                <div class="channel-item" onclick="selectChannel('email')">
+                    <div class="channel-info">
+                        <div class="channel-icon" style="background: #EA4335;">✉</div>
+                        <span class="channel-name">Email/EDM</span>
+                    </div>
+                    <div class="channel-status connected"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <div class="header-top">
+                    <h1 class="page-title">LinkedIn 配置管理</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" onclick="testConnection()">
+                            <span>🔗</span> 测试连接
+                        </button>
+                        <button class="btn btn-primary" onclick="saveConfiguration()">
+                            <span>💾</span> 保存配置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 标签页导航 -->
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('api')">API配置</div>
+                    <div class="tab" onclick="switchTab('rules')">发布规则</div>
+                    <div class="tab" onclick="switchTab('templates')">内容模板</div>
+                    <div class="tab" onclick="switchTab('permissions')">权限管理</div>
+                    <div class="tab" onclick="switchTab('policies')">政策更新</div>
+                    <div class="tab" onclick="switchTab('health')">健康监控</div>
+                </div>
+            </div>
+
+            <!-- API配置面板 -->
+            <div id="apiPanel" class="tab-panel">
+                <div class="config-grid">
+                    <!-- API凭证配置 -->
+                    <div class="config-card">
+                        <div class="card-header">
+                            <h3 class="card-title">API凭证</h3>
+                            <span class="card-badge badge-success">已验证</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Client ID</label>
+                            <div class="credential-field">
+                                <input type="text" class="form-input secure" 
+                                       value="86vh3kz7yw8xyz" id="clientId" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Client Secret</label>
+                            <div class="credential-field">
+                                <input type="password" class="form-input secure credential-mask" 
+                                       value="WExQbkzFtPXGfRxNjY3OTA" id="clientSecret">
+                                <button class="toggle-visibility" onclick="toggleVisibility('clientSecret')">
+                                    👁️
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Access Token</label>
+                            <div class="input-group">
+                                <input type="password" class="form-input secure credential-mask" 
+                                       value="AQVFkn8dPfGksl3mNxPqL9Wz" id="accessToken">
+                                <button class="btn btn-secondary" onclick="refreshToken()">
+                                    刷新
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Token过期时间</label>
+                            <input type="text" class="form-input" 
+                                   value="2025-02-15 14:30:00" readonly>
+                        </div>
+                    </div>
+
+                    <!-- API限制和配额 -->
+                    <div class="config-card">
+                        <div class="card-header">
+                            <h3 class="card-title">API配额使用情况</h3>
+                            <span class="card-badge badge-warning">75% 已使用</span>
+                        </div>
+
+                        <div class="rules-list">
+                            <div class="rule-item">
+                                <span class="rule-label">每日请求限制</span>
+                                <span class="rule-value">7,500 / 10,000</span>
+                            </div>
+                            <div class="rule-item">
+                                <span class="rule-label">每小时请求限制</span>
+                                <span class="rule-value">245 / 500</span>
+                            </div>
+                            <div class="rule-item">
+                                <span class="rule-label">并发连接数</span>
+                                <span class="rule-value">8 / 10</span>
+                            </div>
+                            <div class="rule-item">
+                                <span class="rule-label">重置时间</span>
+                                <span class="rule-value">00:00 UTC</span>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 16px;">
+                            <div style="background: var(--gray-200); border-radius: 4px; height: 8px; overflow: hidden;">
+                                <div style="width: 75%; height: 100%; background: var(--warning);"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Webhook配置 -->
+                    <div class="config-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Webhook配置</h3>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Webhook URL</label>
+                            <input type="url" class="form-input" 
+                                   value="https://api.geo-system.com/webhooks/linkedin"
+                                   placeholder="https://your-domain.com/webhook">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Secret Key</label>
+                            <input type="password" class="form-input secure" 
+                                   value="webhook_secret_key_xyz">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">事件订阅</label>
+                            <div style="display: grid; gap: 8px;">
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" class="checkbox" checked>
+                                    <span style="font-size: 14px;">发布成功</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" class="checkbox" checked>
+                                    <span style="font-size: 14px;">发布失败</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" class="checkbox">
+                                    <span style="font-size: 14px;">互动通知</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 发布规则面板 -->
+            <div id="rulesPanel" class="tab-panel" style="display: none;">
+                <div class="config-grid">
+                    <!-- 内容限制规则 -->
+                    <div class="config-card">
+                        <div class="card-header">
+                            <h3 class="card-title">内容限制</h3>
+                        </div>
+
+                        <div class="rules-list">
+                            <div class="rule-item">
+                                <span class="rule-label">文本长度限制</span>
+                                <span class="rule-value">3,000 字符</span>
+                            </div>
+                            <div class="rule-item">
+                                <span class="rule-label">标题长度限制</span>
+                                <span class="rule-value">200 字符</span>
+                            </div>
+                            <div class="rule-item">
+                                <span class="rule-label">链接数量限制</span>
+                                <span class="rule-value">最多 5 个</span>
+                            </div>
+                            <div class="rule-item">
+                                <span class="rule-label">图片大小限制</span>
+                                <span class="rule-value">最大 10MB</span>
+                            </div>
+                            <div class="rule-item">
+                                <span class="rule-label">视频长度限制</span>
+                                <span class="rule-value">最长 10 分钟</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 发布时间规则 -->
+                    <div class="config-card">
+                        <div class="card-header">
+                            <h3 class="card-title">发布时间优化</h3>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">最佳发布时段</label>
+                            <div class="rules-list">
+                                <div class="rule-item">
+                                    <span class="rule-label">周一至周五</span>
+                                    <span class="rule-value">10:00-11:00 EST</span>
+                                </div>
+                                <div class="rule-item">
+                                    <span class="rule-label">周二至周四</span>
+                                    <span class="rule-value">14:00-15:00 EST</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">发布频率限制</label>
+                            <input type="number" class="form-input" value="3" min="1" max="10">
+                            <span style="font-size: 12px; color: var(--gray-500); margin-top: 4px; display: block;">
+                                每天最多发布次数
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 内容审核规则 -->
+                    <div class="config-card">
+                        <div class="card-header">
+                            <h3 class="card-title">内容审核</h3>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">敏感词过滤</label>
+                            <textarea class="form-input" rows="3" 
+                                      placeholder="输入需要过滤的敏感词，用逗号分隔">竞品名称, 内部机密, 未公开信息</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">必需包含元素</label>
+                            <div style="display: grid; gap: 8px;">
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" class="checkbox" checked>
+                                    <span style="font-size: 14px;">品牌标识</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" class="checkbox" checked>
+                                    <span style="font-size: 14px;">合规声明</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" class="checkbox">
+                                    <span style="font-size: 14px;">联系方式</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模板管理面板 -->
+            <div id="templatesPanel" class="tab-panel" style="display: none;">
+                <div class="config-card">
+                    <div class="card-header">
+                        <h3 class="card-title">LinkedIn发布模板</h3>
+                        <button class="btn btn-primary" onclick="createTemplate()">
+                            新建模板
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">选择模板</label>
+                        <select class="form-input" onchange="loadTemplate()">
+                            <option>产品更新通知</option>
+                            <option>行业洞察分享</option>
+                            <option>公司新闻发布</option>
+                            <option>招聘信息</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">模板内容</label>
+                        <div class="template-editor" contenteditable="true">
+🚀 [产品名称] 重大更新！
+
+我们很高兴地宣布 {product_name} 的最新版本已经发布，带来了以下激动人心的新功能：
+
+✨ {feature_1}
+✨ {feature_2}
+✨ {feature_3}
+
+这次更新将帮助您 {benefit_statement}。
+
+👉 了解更多详情：{link}
+
+#ProductUpdate #Innovation #{industry_tag}
+                        </div>
+                        <div class="template-variables">
+                            <span class="variable-chip" onclick="insertVariable('{product_name}')">{product_name}</span>
+                            <span class="variable-chip" onclick="insertVariable('{feature_1}')">{feature_1}</span>
+                            <span class="variable-chip" onclick="insertVariable('{feature_2}')">{feature_2}</span>
+                            <span class="variable-chip" onclick="insertVariable('{feature_3}')">{feature_3}</span>
+                            <span class="variable-chip" onclick="insertVariable('{benefit_statement}')">{benefit_statement}</span>
+                            <span class="variable-chip" onclick="insertVariable('{link}')">{link}</span>
+                            <span class="variable-chip" onclick="insertVariable('{industry_tag}')">{industry_tag}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 权限管理面板 -->
+            <div id="permissionsPanel" class="tab-panel" style="display: none;">
+                <div class="config-card">
+                    <div class="card-header">
+                        <h3 class="card-title">用户权限管理</h3>
+                        <button class="btn btn-primary" onclick="addUser()">
+                            添加用户
+                        </button>
+                    </div>
+
+                    <div class="permissions-table">
+                        <div class="table-header">
+                            <span>用户</span>
+                            <span>查看</span>
+                            <span>编辑</span>
+                            <span>发布</span>
+                            <span>操作</span>
+                        </div>
+
+                        <div class="table-row">
+                            <div class="user-info">
+                                <div class="user-avatar">JD</div>
+                                <div>
+                                    <div style="font-weight: 500;">John Doe</div>
+                                    <div style="font-size: 12px; color: var(--gray-500);">管理员</div>
+                                </div>
+                            </div>
+                            <input type="checkbox" class="checkbox" checked disabled>
+                            <input type="checkbox" class="checkbox" checked disabled>
+                            <input type="checkbox" class="checkbox" checked disabled>
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+                                编辑
+                            </button>
+                        </div>
+
+                        <div class="table-row">
+                            <div class="user-info">
+                                <div class="user-avatar" style="background: var(--success);">AS</div>
+                                <div>
+                                    <div style="font-weight: 500;">Alice Smith</div>
+                                    <div style="font-size: 12px; color: var(--gray-500);">编辑者</div>
+                                </div>
+                            </div>
+                            <input type="checkbox" class="checkbox" checked>
+                            <input type="checkbox" class="checkbox" checked>
+                            <input type="checkbox" class="checkbox">
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+                                编辑
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 政策更新面板 -->
+            <div id="policiesPanel" class="tab-panel" style="display: none;">
+                <div class="config-card">
+                    <div class="card-header">
+                        <h3 class="card-title">平台政策更新历史</h3>
+                    </div>
+
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">2025年1月10日</div>
+                                <div class="timeline-title">API速率限制调整</div>
+                                <div class="timeline-description">
+                                    LinkedIn将API调用限制从每小时1000次降低到500次，建议优化批量操作逻辑。
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">2024年12月15日</div>
+                                <div class="timeline-title">视频内容新规</div>
+                                <div class="timeline-description">
+                                    支持原生视频上传，最大文件大小提升至5GB，时长限制延长至15分钟。
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">2024年11月20日</div>
+                                <div class="timeline-title">算法推荐更新</div>
+                                <div class="timeline-description">
+                                    优先推荐包含原创见解和数据支撑的内容，纯转发内容权重降低。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 健康监控面板 -->
+            <div id="healthPanel" class="tab-panel" style="display: none;">
+                <div class="config-card">
+                    <div class="card-header">
+                        <h3 class="card-title">渠道健康度监控</h3>
+                    </div>
+
+                    <div class="health-indicator">
+                        <div class="health-score excellent">95</div>
+                        <div class="health-details">
+                            <div class="health-label">整体健康度</div>
+                            <div class="health-status">运行状态良好</div>
+                        </div>
+                    </div>
+
+                    <div class="rules-list">
+                        <div class="rule-item">
+                            <span class="rule-label">API响应时间</span>
+                            <span class="rule-value" style="color: var(--success);">234ms ✓</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-label">成功率</span>
+                            <span class="rule-value" style="color: var(--success);">99.8% ✓</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-label">最后成功发布</span>
+                            <span class="rule-value">2分钟前</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-label">待处理队列</span>
+                            <span class="rule-value">3 条消息</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-label">错误率</span>
+                            <span class="rule-value" style="color: var(--success);">0.2% ✓</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ========== 全局状态管理 ==========
+        // 这里我们创建一个中央状态存储，管理所有渠道的配置数据
+        // 这种模式让我们能够轻松地在不同视图间切换而不丢失数据
+        const channelManager = {
+            currentChannel: 'linkedin',
+            currentTab: 'api',
+            channels: {
+                linkedin: {
+                    name: 'LinkedIn',
+                    status: 'connected',
+                    api: {
+                        clientId: '86vh3kz7yw8xyz',
+                        clientSecret: 'WExQbkzFtPXGfRxNjY3OTA',
+                        accessToken: 'AQVFkn8dPfGksl3mNxPqL9Wz',
+                        tokenExpiry: '2025-02-15 14:30:00'
+                    },
+                    health: 95
+                },
+                twitter: {
+                    name: 'Twitter/X',
+                    status: 'connected',
+                    health: 88
+                },
+                youtube: {
+                    name: 'YouTube',
+                    status: 'connected',
+                    health: 92
+                },
+                reddit: {
+                    name: 'Reddit',
+                    status: 'pending',
+                    health: 75
+                },
+                quora: {
+                    name: 'Quora',
+                    status: 'error',
+                    health: 45
+                }
+            }
+        };
+
+        // ========== 渠道选择和切换 ==========
+        // 当用户点击侧边栏的渠道时，我们需要更新整个界面
+        // 这包括更新标题、加载对应的配置、刷新健康度指标等
+        function selectChannel(channelId) {
+            // 更新当前选中的渠道
+            channelManager.currentChannel = channelId;
+            
+            // 更新侧边栏的视觉状态
+            document.querySelectorAll('.channel-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // 更新页面标题
+            const channel = channelManager.channels[channelId];
+            document.querySelector('.page-title').textContent = `${channel.name} 配置管理`;
+            
+            // 加载该渠道的配置数据
+            loadChannelConfiguration(channelId);
+            
+            console.log(`切换到渠道: ${channel.name}`);
+        }
+
+        // ========== 标签页切换逻辑 ==========
+        // 每个标签页代表不同的配置维度
+        // 我们使用显示/隐藏的方式来切换，保持DOM中的数据不变
+        function switchTab(tabName) {
+            // 更新标签的视觉状态
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 隐藏所有面板
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.style.display = 'none';
+            });
+            
+            // 显示选中的面板
+            const panelId = tabName + 'Panel';
+            const panel = document.getElementById(panelId);
+            if (panel) {
+                panel.style.display = 'block';
+            }
+            
+            channelManager.currentTab = tabName;
+            console.log(`切换到标签: ${tabName}`);
+        }
+
+        // ========== API凭证安全管理 ==========
+        // 凭证的显示和隐藏是安全性的重要部分
+        // 我们需要确保敏感信息默认是隐藏的，只在需要时显示
+        function toggleVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            const button = event.target;
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                field.classList.remove('credential-mask');
+                button.textContent = '🙈';
+            } else {
+                field.type = 'password';
+                field.classList.add('credential-mask');
+                button.textContent = '👁️';
+            }
+        }
+
+        // ========== Token刷新机制 ==========
+        // 许多API使用OAuth，需要定期刷新访问令牌
+        // 这个函数模拟了刷新过程，实际应用中会调用真实的API
+        async function refreshToken() {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            // 显示加载状态
+            button.innerHTML = '<span class="loading-spinner"></span>';
+            button.disabled = true;
+            
+            // 模拟API调用延迟
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // 更新token（实际应用中这里会是API返回的新token）
+            const newToken = generateRandomToken();
+            document.getElementById('accessToken').value = newToken;
+            
+            // 更新过期时间
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 30);
+            
+            // 恢复按钮状态
+            button.textContent = originalText;
+            button.disabled = false;
+            
+            alert('Token刷新成功！新的有效期为30天。');
+        }
+
+        // ========== 连接测试功能 ==========
+        // 测试API连接是否正常，这对于故障排查非常重要
+        async function testConnection() {
+            const button = event.target;
+            const originalContent = button.innerHTML;
+            
+            // 显示测试中状态
+            button.innerHTML = '<span class="loading-spinner"></span> 测试中...';
+            button.disabled = true;
+            
+            // 模拟连接测试
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // 随机决定测试结果（实际应用中基于真实的API响应）
+            const success = Math.random() > 0.2;
+            
+            if (success) {
+                button.innerHTML = '✅ 连接成功';
+                button.classList.add('btn-success');
+                
+                // 3秒后恢复原始状态
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                    button.classList.remove('btn-success');
+                    button.disabled = false;
+                }, 3000);
+            } else {
+                button.innerHTML = '❌ 连接失败';
+                button.classList.add('btn-danger');
+                alert('连接失败：API凭证无效或网络错误。请检查配置。');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                    button.classList.remove('btn-danger');
+                    button.disabled = false;
+                }, 3000);
+            }
+        }
+
+        // ========== 配置保存逻辑 ==========
+        // 收集所有表单数据并保存到后端
+        function saveConfiguration() {
+            // 收集当前标签页的所有配置
+            const config = {
+                channel: channelManager.currentChannel,
+                tab: channelManager.currentTab,
+                timestamp: new Date().toISOString()
+            };
+            
+            // 根据当前标签页收集相应的数据
+            switch (channelManager.currentTab) {
+                case 'api':
+                    config.api = {
+                        clientId: document.getElementById('clientId').value,
+                        clientSecret: document.getElementById('clientSecret').value,
+                        accessToken: document.getElementById('accessToken').value
+                    };
+                    break;
+                case 'rules':
+                    // 收集规则配置
+                    break;
+                case 'templates':
+                    // 收集模板配置
+                    break;
+            }
+            
+            console.log('保存配置:', config);
+            
+            // 显示保存成功提示
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '✅ 已保存';
+            button.classList.add('btn-success');
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.classList.remove('btn-success');
+            }, 2000);
+        }
+
+        // ========== 模板管理功能 ==========
+        // 模板让用户能够快速创建符合渠道规范的内容
+        function insertVariable(variable) {
+            // 获取模板编辑器
+            const editor = document.querySelector('.template-editor');
+            
+            // 在光标位置插入变量
+            const selection = window.getSelection();
+            const range = selection.getRangeAt(0);
+            const textNode = document.createTextNode(variable);
+            range.insertNode(textNode);
+            
+            // 移动光标到插入内容之后
+            range.setStartAfter(textNode);
+            range.setEndAfter(textNode);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            // 高亮显示刚插入的变量
+            const span = document.createElement('span');
+            span.style.background = 'rgba(79, 70, 229, 0.1)';
+            span.style.color = 'var(--primary)';
+            span.style.padding = '2px 4px';
+            span.style.borderRadius = '2px';
+            textNode.parentNode.insertBefore(span, textNode);
+            span.appendChild(textNode);
+        }
+
+        // ========== 辅助函数 ==========
+        // 生成随机的token字符串，用于演示
+        function generateRandomToken() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let token = '';
+            for (let i = 0; i < 24; i++) {
+                token += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return token;
+        }
+
+        // 加载渠道配置数据
+        function loadChannelConfiguration(channelId) {
+            // 实际应用中，这里会从后端API获取配置
+            const channel = channelManager.channels[channelId];
+            
+            // 更新健康度显示
+            if (document.querySelector('.health-score')) {
+                document.querySelector('.health-score').textContent = channel.health || 0;
+            }
+            
+            // 更新状态标志
+            updateChannelStatus(channel.status);
+        }
+
+        // 更新渠道状态显示
+        function updateChannelStatus(status) {
+            // 根据状态更新UI的各个部分
+            const statusColors = {
+                connected: 'var(--success)',
+                pending: 'var(--warning)',
+                error: 'var(--danger)'
+            };
+            
+            // 这里可以更新页面上的各种状态指示器
+        }
+
+        // ========== 初始化 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('渠道配置管理器初始化完成');
+            
+            // 加载默认渠道的配置
+            loadChannelConfiguration('linkedin');
+            
+            // 设置自动保存（可选）
+            setInterval(() => {
+                // 自动保存草稿配置到本地存储
+                localStorage.setItem('channelConfig', JSON.stringify(channelManager));
+            }, 30000); // 每30秒自动保存
+        });
+    </script>
+</body>
+</html>

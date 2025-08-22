@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资产库管理中心 - Asset Library Management</title>
+    <!-- 引入 ECharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        /* 全局设计系统 - 专业的企业级内容管理界面 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* 专业内容管理配色方案 */
+            --primary: #5B21B6;        /* 深紫色 - 创意与专业 */
+            --primary-light: #7C3AED;  /* 亮紫色 */
+            --primary-dark: #4C1D95;   /* 暗紫色 */
+            --secondary: #0891B2;       /* 青色 - 清新 */
+            --success: #059669;         /* 绿色 - 成功 */
+            --warning: #D97706;         /* 橙色 - 警告 */
+            --danger: #DC2626;          /* 红色 - 危险 */
+            --info: #0284C7;            /* 蓝色 - 信息 */
+            
+            /* 中性色阶 */
+            --gray-900: #111827;
+            --gray-800: #1F2937;
+            --gray-700: #374151;
+            --gray-600: #4B5563;
+            --gray-500: #6B7280;
+            --gray-400: #9CA3AF;
+            --gray-300: #D1D5DB;
+            --gray-200: #E5E7EB;
+            --gray-100: #F3F4F6;
+            --gray-50: #F9FAFB;
+            --white: #FFFFFF;
+            
+            /* 资产类型配色 */
+            --asset-faq: #8B5CF6;
+            --asset-howto: #3B82F6;
+            --asset-compare: #10B981;
+            --asset-tldr: #F59E0B;
+            --asset-data: #06B6D4;
+            --asset-review: #EC4899;
+            --asset-discussion: #6366F1;
+            --asset-ama: #84CC16;
+            --asset-video: #EF4444;
+            --asset-task: #14B8A6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        /* 主容器布局 */
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 左侧边栏 - 导航和筛选 */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        /* 快速创建按钮 */
+        .create-btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .create-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(91, 33, 182, 0.3);
+        }
+
+        /* 筛选区域 */
+        .filter-section {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .filter-group {
+            margin-bottom: 24px;
+        }
+
+        .filter-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .filter-item:hover {
+            background: var(--gray-50);
+        }
+
+        .filter-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .filter-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .filter-count {
+            padding: 2px 8px;
+            background: var(--gray-100);
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+
+        .filter-item.active .filter-count {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* 标签云 */
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag-chip {
+            padding: 4px 10px;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag-chip:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .tag-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 顶部工具栏 */
+        .toolbar {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-bar {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 33, 182, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+
+        .view-toggles {
+            display: flex;
+            background: var(--gray-100);
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .view-btn {
+            padding: 6px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: white;
+            color: var(--gray-900);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .toolbar-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--gray-700);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-300);
+        }
+
+        /* 统计条 */
+        .stats-bar {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            gap: 32px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        /* 内容网格视图 */
+        .content-area {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: var(--gray-50);
+        }
+
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        /* 资产卡片 */
+        .asset-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .asset-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .asset-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .asset-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .badge-faq {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--asset-faq);
+        }
+
+        .badge-howto {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--asset-howto);
+        }
+
+        .badge-compare {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--asset-compare);
+        }
+
+        .badge-tldr {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--asset-tldr);
+        }
+
+        .asset-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .asset-meta {
+            font-size: 12px;
+            color: var(--gray-500);
+            display: flex;
+            gap: 12px;
+        }
+
+        .asset-content {
+            padding: 16px;
+        }
+
+        .asset-preview {
+            font-size: 14px;
+            color: var(--gray-600);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .asset-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .asset-tag {
+            padding: 2px 8px;
+            background: var(--gray-100);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--gray-600);
+        }
+
+        /* 质量评分 */
+        .quality-score {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+
+        .score-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .score-high {
+            background: linear-gradient(135deg, var(--success) 0%, #10B981 100%);
+        }
+
+        .score-medium {
+            background: linear-gradient(135deg, var(--warning) 0%, #F59E0B 100%);
+        }
+
+        .score-low {
+            background: linear-gradient(135deg, var(--danger) 0%, #EF4444 100%);
+        }
+
+        .score-info {
+            flex: 1;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-bottom: 2px;
+        }
+
+        .score-desc {
+            font-size: 13px;
+            color: var(--gray-700);
+        }
+
+        /* 资产操作栏 */
+        .asset-actions {
+            padding: 12px 16px;
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 10px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .version-info {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        /* 创建/编辑模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: 8px;
+            color: var(--gray-500);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* 资产类型选择器 */
+        .asset-type-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .type-option {
+            padding: 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .type-option:hover {
+            border-color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .type-option.selected {
+            border-color: var(--primary);
+            background: rgba(91, 33, 182, 0.05);
+        }
+
+        .type-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .type-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .type-desc {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        /* 表单元素 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 33, 182, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* 富文本编辑器模拟 */
+        .editor-toolbar {
+            display: flex;
+            gap: 4px;
+            padding: 8px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-300);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .editor-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            color: var(--gray-600);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .editor-btn:hover {
+            background: white;
+            color: var(--gray-900);
+        }
+
+        .editor-content {
+            min-height: 200px;
+            padding: 12px;
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 0 0 8px 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            outline: none;
+        }
+
+        /* 标签输入 */
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            min-height: 44px;
+            align-items: center;
+        }
+
+        .tag-input-chip {
+            padding: 4px 8px 4px 10px;
+            background: var(--primary);
+            color: white;
+            border-radius: 6px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .tag-remove:hover {
+            opacity: 1;
+        }
+
+        .tag-input-field {
+            flex: 1;
+            min-width: 100px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        /* 模态框底部 */
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-info {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(91, 33, 182, 0.3);
+        }
+
+        /* 右侧面板 - 资产详情 */
+        .detail-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            bottom: 0;
+            width: 400px;
+            background: white;
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-panel.show {
+            right: 0;
+        }
+
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* 关系图谱 */
+        .relationship-chart {
+            height: 300px;
+            margin-bottom: 24px;
+        }
+
+        /* 版本历史 */
+        .version-timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .version-timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gray-200);
+        }
+
+        .version-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .version-marker {
+            position: absolute;
+            left: -16px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--primary);
+        }
+
+        .version-content {
+            background: var(--gray-50);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .version-date {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-bottom: 4px;
+        }
+
+        .version-desc {
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        /* 批量操作栏 */
+        .bulk-actions {
+            position: fixed;
+            bottom: -80px;
+            left: 280px;
+            right: 0;
+            background: white;
+            border-top: 2px solid var(--primary);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: bottom 0.3s;
+            z-index: 998;
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .bulk-actions.show {
+            bottom: 0;
+        }
+
+        .bulk-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bulk-count {
+            padding: 4px 12px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .bulk-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* 导入导出弹窗 */
+        .import-zone {
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: var(--gray-50);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .import-zone:hover {
+            border-color: var(--primary);
+            background: rgba(91, 33, 182, 0.02);
+        }
+
+        .import-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(91, 33, 182, 0.05);
+        }
+
+        .import-icon {
+            font-size: 48px;
+            color: var(--gray-400);
+            margin-bottom: 16px;
+        }
+
+        .import-text {
+            font-size: 16px;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .import-hint {
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+
+        /* 加载状态 */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                z-index: 1001;
+                height: 100vh;
+                transition: left 0.3s;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .assets-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .bulk-actions {
+                left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .assets-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 20px;
+            }
+            
+            .asset-type-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <div class="logo-icon">📚</div>
+                    <div class="logo-text">资产库管理中心</div>
+                </div>
+                <button class="create-btn-primary" onclick="openCreateModal()">
+                    <span>✨</span>
+                    <span>创建新资产</span>
+                </button>
+            </div>
+
+            <div class="filter-section">
+                <!-- 资产类型筛选 -->
+                <div class="filter-group">
+                    <div class="filter-title">资产类型</div>
+                    <div class="filter-item active" onclick="filterByType('all')">
+                        <span class="filter-label">
+                            <span>📋</span>
+                            <span>全部资产</span>
+                        </span>
+                        <span class="filter-count">1,234</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByType('faq')">
+                        <span class="filter-label">
+                            <span>❓</span>
+                            <span>FAQ卡</span>
+                        </span>
+                        <span class="filter-count">256</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByType('howto')">
+                        <span class="filter-label">
+                            <span>📖</span>
+                            <span>步骤卡</span>
+                        </span>
+                        <span class="filter-count">189</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByType('compare')">
+                        <span class="filter-label">
+                            <span>⚖️</span>
+                            <span>对比卡</span>
+                        </span>
+                        <span class="filter-count">145</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByType('tldr')">
+                        <span class="filter-label">
+                            <span>📝</span>
+                            <span>TL;DR卡</span>
+                        </span>
+                        <span class="filter-count">178</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByType('data')">
+                        <span class="filter-label">
+                            <span>📊</span>
+                            <span>数据卡</span>
+                        </span>
+                        <span class="filter-count">134</span>
+                    </div>
+                </div>
+
+                <!-- 质量评分筛选 -->
+                <div class="filter-group">
+                    <div class="filter-title">质量评分</div>
+                    <div class="filter-item" onclick="filterByQuality('high')">
+                        <span class="filter-label">
+                            <span>⭐</span>
+                            <span>优秀 (85-100)</span>
+                        </span>
+                        <span class="filter-count">423</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByQuality('medium')">
+                        <span class="filter-label">
+                            <span>⭐</span>
+                            <span>良好 (60-84)</span>
+                        </span>
+                        <span class="filter-count">567</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByQuality('low')">
+                        <span class="filter-label">
+                            <span>⭐</span>
+                            <span>待优化 (<60)</span>
+                        </span>
+                        <span class="filter-count">244</span>
+                    </div>
+                </div>
+
+                <!-- 热门标签 -->
+                <div class="filter-group">
+                    <div class="filter-title">热门标签</div>
+                    <div class="tag-cloud">
+                        <span class="tag-chip" onclick="toggleTag(this)">产品功能</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">价格方案</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">使用教程</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">集成指南</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">最佳实践</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">常见问题</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">安全合规</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">API文档</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 顶部工具栏 -->
+            <div class="toolbar">
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" placeholder="搜索资产标题、内容或标签..." oninput="searchAssets(this.value)">
+                </div>
+
+                <div class="view-toggles">
+                    <button class="view-btn active" onclick="switchView('grid')">
+                        <span>⊞</span>
+                    </button>
+                    <button class="view-btn" onclick="switchView('list')">
+                        <span>☰</span>
+                    </button>
+                </div>
+
+                <div class="toolbar-actions">
+                    <button class="toolbar-btn" onclick="openImportModal()">
+                        <span>📥</span>
+                        <span>批量导入</span>
+                    </button>
+                    <button class="toolbar-btn" onclick="exportAssets()">
+                        <span>📤</span>
+                        <span>导出</span>
+                    </button>
+                    <button class="toolbar-btn" onclick="refreshAssets()">
+                        <span>🔄</span>
+                        <span>刷新</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 统计条 -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-icon" style="background: rgba(91, 33, 182, 0.1); color: var(--primary);">
+                        📚
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">1,234</div>
+                        <div class="stat-label">总资产数</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                        ✅
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">89.2%</div>
+                        <div class="stat-label">平均质量评分</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                        🔄
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">45</div>
+                        <div class="stat-label">今日更新</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                        ⚠️
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">待审核</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="content-area">
+                <div class="assets-grid" id="assetsGrid">
+                    <!-- FAQ卡示例 -->
+                    <div class="asset-card" onclick="showAssetDetail(this)">
+                        <div class="asset-header">
+                            <span class="asset-type-badge badge-faq">
+                                <span>❓</span>
+                                <span>FAQ卡</span>
+                            </span>
+                            <div class="asset-title">How does the product handle data privacy?</div>
+                            <div class="asset-meta">
+                                <span>更新于 2小时前</span>
+                                <span>•</span>
+                                <span>v2.3</span>
+                            </div>
+                        </div>
+                        <div class="asset-content">
+                            <div class="asset-preview">
+                                Our product implements end-to-end encryption for all user data. We follow GDPR compliance standards and undergo regular security audits. User data is never shared with third parties without explicit consent...
+                            </div>
+                            <div class="asset-tags">
+                                <span class="asset-tag">隐私保护</span>
+                                <span class="asset-tag">GDPR</span>
+                                <span class="asset-tag">加密技术</span>
+                                <span class="asset-tag">合规性</span>
+                            </div>
+                            <div class="quality-score">
+                                <div class="score-circle score-high">92</div>
+                                <div class="score-info">
+                                    <div class="score-label">内容质量评分</div>
+                                    <div class="score-desc">结构清晰，信息完整</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="asset-actions">
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="editAsset(event, 1)">编辑</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 1)">复制</button>
+                                <button class="action-btn" onclick="viewHistory(event, 1)">历史</button>
+                            </div>
+                            <div class="version-info">
+                                <span>5个关联资产</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- How-to卡示例 -->
+                    <div class="asset-card" onclick="showAssetDetail(this)">
+                        <div class="asset-header">
+                            <span class="asset-type-badge badge-howto">
+                                <span>📖</span>
+                                <span>步骤卡</span>
+                            </span>
+                            <div class="asset-title">如何设置双因素认证</div>
+                            <div class="asset-meta">
+                                <span>更新于 5小时前</span>
+                                <span>•</span>
+                                <span>v1.2</span>
+                            </div>
+                        </div>
+                        <div class="asset-content">
+                            <div class="asset-preview">
+                                1. 进入设置页面 → 安全选项
+                                2. 点击"启用双因素认证"
+                                3. 选择验证方式（短信或验证器应用）
+                                4. 按照提示完成验证流程...
+                            </div>
+                            <div class="asset-tags">
+                                <span class="asset-tag">安全设置</span>
+                                <span class="asset-tag">用户指南</span>
+                                <span class="asset-tag">2FA</span>
+                            </div>
+                            <div class="quality-score">
+                                <div class="score-circle score-high">88</div>
+                                <div class="score-info">
+                                    <div class="score-label">内容质量评分</div>
+                                    <div class="score-desc">步骤详细，易于理解</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="asset-actions">
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="editAsset(event, 2)">编辑</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 2)">复制</button>
+                                <button class="action-btn" onclick="viewHistory(event, 2)">历史</button>
+                            </div>
+                            <div class="version-info">
+                                <span>3个关联资产</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 对比卡示例 -->
+                    <div class="asset-card" onclick="showAssetDetail(this)">
+                        <div class="asset-header">
+                            <span class="asset-type-badge badge-compare">
+                                <span>⚖️</span>
+                                <span>对比卡</span>
+                            </span>
+                            <div class="asset-title">产品版本功能对比</div>
+                            <div class="asset-meta">
+                                <span>更新于 1天前</span>
+                                <span>•</span>
+                                <span>v3.0</span>
+                            </div>
+                        </div>
+                        <div class="asset-content">
+                            <div class="asset-preview">
+                                基础版 vs 专业版 vs 企业版
+                                • 用户数量：10 vs 100 vs 无限
+                                • API调用：1000/月 vs 10000/月 vs 无限
+                                • 技术支持：邮件 vs 24/7在线 vs 专属客户经理...
+                            </div>
+                            <div class="asset-tags">
+                                <span class="asset-tag">定价方案</span>
+                                <span class="asset-tag">功能对比</span>
+                                <span class="asset-tag">产品版本</span>
+                            </div>
+                            <div class="quality-score">
+                                <div class="score-circle score-medium">75</div>
+                                <div class="score-info">
+                                    <div class="score-label">内容质量评分</div>
+                                    <div class="score-desc">建议添加更多细节</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="asset-actions">
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="editAsset(event, 3)">编辑</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 3)">复制</button>
+                                <button class="action-btn" onclick="viewHistory(event, 3)">历史</button>
+                            </div>
+                            <div class="version-info">
+                                <span>8个关联资产</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TL;DR卡示例 -->
+                    <div class="asset-card" onclick="showAssetDetail(this)">
+                        <div class="asset-header">
+                            <span class="asset-type-badge badge-tldr">
+                                <span>📝</span>
+                                <span>TL;DR卡</span>
+                            </span>
+                            <div class="asset-title">Q4产品更新要点</div>
+                            <div class="asset-meta">
+                                <span>更新于 3天前</span>
+                                <span>•</span>
+                                <span>v1.0</span>
+                            </div>
+                        </div>
+                        <div class="asset-content">
+                            <div class="asset-preview">
+                                🚀 新功能：AI智能助手上线
+                                ⚡ 性能提升：响应速度提升40%
+                                🔧 修复：解决了15个已知问题
+                                📊 数据：用户增长率达到25%
+                            </div>
+                            <div class="asset-tags">
+                                <span class="asset-tag">产品更新</span>
+                                <span class="asset-tag">季度总结</span>
+                                <span class="asset-tag">新功能</span>
+                            </div>
+                            <div class="quality-score">
+                                <div class="score-circle score-high">85</div>
+                                <div class="score-info">
+                                    <div class="score-label">内容质量评分</div>
+                                    <div class="score-desc">简洁明了，重点突出</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="asset-actions">
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="editAsset(event, 4)">编辑</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 4)">复制</button>
+                                <button class="action-btn" onclick="viewHistory(event, 4)">历史</button>
+                            </div>
+                            <div class="version-info">
+                                <span>2个关联资产</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建/编辑模态框 -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">创建新资产</h2>
+                <button class="modal-close" onclick="closeModal('createModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- 资产类型选择 -->
+                <div class="form-group">
+                    <label class="form-label">选择资产类型</label>
+                    <div class="asset-type-selector">
+                        <div class="type-option selected" onclick="selectAssetType(this, 'faq')">
+                            <div class="type-icon">❓</div>
+                            <div class="type-name">FAQ卡</div>
+                            <div class="type-desc">问答形式</div>
+                        </div>
+                        <div class="type-option" onclick="selectAssetType(this, 'howto')">
+                            <div class="type-icon">📖</div>
+                            <div class="type-name">步骤卡</div>
+                            <div class="type-desc">操作指南</div>
+                        </div>
+                        <div class="type-option" onclick="selectAssetType(this, 'compare')">
+                            <div class="type-icon">⚖️</div>
+                            <div class="type-name">对比卡</div>
+                            <div class="type-desc">功能对比</div>
+                        </div>
+                        <div class="type-option" onclick="selectAssetType(this, 'tldr')">
+                            <div class="type-icon">📝</div>
+                            <div class="type-name">TL;DR卡</div>
+                            <div class="type-desc">快速概览</div>
+                        </div>
+                        <div class="type-option" onclick="selectAssetType(this, 'data')">
+                            <div class="type-icon">📊</div>
+                            <div class="type-name">数据卡</div>
+                            <div class="type-desc">数据展示</div>
+                        </div>
+                        <div class="type-option" onclick="selectAssetType(this, 'review')">
+                            <div class="type-icon">⭐</div>
+                            <div class="type-name">评测卡</div>
+                            <div class="type-desc">用户评价</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 基本信息 -->
+                <div class="form-group">
+                    <label class="form-label">标题 <span style="color: var(--danger);">*</span></label>
+                    <input type="text" class="form-input" placeholder="输入资产标题..." id="assetTitle">
+                </div>
+
+                <!-- 内容编辑器 -->
+                <div class="form-group">
+                    <label class="form-label">内容 <span style="color: var(--danger);">*</span></label>
+                    <div class="editor-toolbar">
+                        <button class="editor-btn" title="加粗">B</button>
+                        <button class="editor-btn" title="斜体">I</button>
+                        <button class="editor-btn" title="下划线">U</button>
+                        <button class="editor-btn" title="链接">🔗</button>
+                        <button class="editor-btn" title="列表">•</button>
+                        <button class="editor-btn" title="数字列表">1.</button>
+                        <button class="editor-btn" title="引用">❝</button>
+                        <button class="editor-btn" title="代码">{ }</button>
+                    </div>
+                    <div class="editor-content" contenteditable="true" id="assetContent">
+                        开始输入内容...
+                    </div>
+                </div>
+
+                <!-- 标签管理 -->
+                <div class="form-group">
+                    <label class="form-label">标签</label>
+                    <div class="tag-input-container" id="tagContainer">
+                        <div class="tag-input-chip">
+                            产品功能
+                            <span class="tag-remove" onclick="removeTag(this)">×</span>
+                        </div>
+                        <input type="text" class="tag-input-field" placeholder="输入标签后按回车..." onkeydown="handleTagInput(event)">
+                    </div>
+                </div>
+
+                <!-- 关联资产 -->
+                <div class="form-group">
+                    <label class="form-label">关联资产</label>
+                    <input type="text" class="form-input" placeholder="搜索并选择相关资产...">
+                </div>
+
+                <!-- 高级设置 -->
+                <div class="form-group">
+                    <label class="form-label">适用渠道</label>
+                    <div class="tag-cloud">
+                        <span class="tag-chip active">Reddit</span>
+                        <span class="tag-chip active">LinkedIn</span>
+                        <span class="tag-chip">Twitter</span>
+                        <span class="tag-chip">YouTube</span>
+                        <span class="tag-chip">官网FAQ</span>
+                        <span class="tag-chip">邮件营销</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-info">
+                    <span>创建后将自动进行质量评分</span>
+                </div>
+                <div class="footer-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('createModal')">取消</button>
+                    <button class="btn btn-primary" onclick="saveAsset()">创建资产</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量导入模态框 -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">批量导入资产</h2>
+                <button class="modal-close" onclick="closeModal('importModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-zone" id="importZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <div class="import-icon">📁</div>
+                    <div class="import-text">拖拽文件到此处或点击选择</div>
+                    <div class="import-hint">支持 CSV、Excel、JSON 格式，最大 10MB</div>
+                    <input type="file" id="fileInput" style="display: none;" accept=".csv,.xlsx,.json" onchange="handleFileSelect(event)">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-info">
+                    <a href="#" style="color: var(--primary);">下载导入模板</a>
+                </div>
+                <div class="footer-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('importModal')">取消</button>
+                    <button class="btn btn-primary" onclick="startImport()">开始导入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧详情面板 -->
+    <div class="detail-panel" id="detailPanel">
+        <div class="panel-header">
+            <h3 class="panel-title">资产详情</h3>
+            <button class="modal-close" onclick="closeDetailPanel()">×</button>
+        </div>
+        <div class="panel-body">
+            <!-- 关系图谱 -->
+            <div class="form-group">
+                <label class="form-label">资产关系图谱</label>
+                <div class="relationship-chart" id="relationshipChart"></div>
+            </div>
+
+            <!-- 版本历史 -->
+            <div class="form-group">
+                <label class="form-label">版本历史</label>
+                <div class="version-timeline">
+                    <div class="version-item">
+                        <div class="version-marker"></div>
+                        <div class="version-content">
+                            <div class="version-date">2025-01-10 15:30</div>
+                            <div class="version-desc">更新了隐私政策相关内容</div>
+                        </div>
+                    </div>
+                    <div class="version-item">
+                        <div class="version-marker"></div>
+                        <div class="version-content">
+                            <div class="version-date">2025-01-08 10:15</div>
+                            <div class="version-desc">添加了GDPR合规说明</div>
+                        </div>
+                    </div>
+                    <div class="version-item">
+                        <div class="version-marker"></div>
+                        <div class="version-content">
+                            <div class="version-date">2025-01-05 14:20</div>
+                            <div class="version-desc">初始版本创建</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 质量优化建议 -->
+            <div class="form-group">
+                <label class="form-label">优化建议</label>
+                <div style="padding: 12px; background: var(--gray-50); border-radius: 8px; font-size: 14px; line-height: 1.6;">
+                    <div style="margin-bottom: 8px;">
+                        <strong>📝 内容优化：</strong><br>
+                        建议添加更多具体的数据支撑，提高可信度
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong>🏷️ 标签优化：</strong><br>
+                        推荐添加"企业版"、"安全认证"等相关标签
+                    </div>
+                    <div>
+                        <strong>🔗 关联建议：</strong><br>
+                        可以关联"安全白皮书"和"合规认证"资产
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量操作栏 -->
+    <div class="bulk-actions" id="bulkActions">
+        <div class="bulk-info">
+            <span class="bulk-count">已选择 3 个资产</span>
+            <button class="action-btn" onclick="clearSelection()">清除选择</button>
+        </div>
+        <div class="bulk-buttons">
+            <button class="toolbar-btn" onclick="bulkEdit()">
+                <span>✏️</span>
+                <span>批量编辑</span>
+            </button>
+            <button class="toolbar-btn" onclick="bulkTag()">
+                <span>🏷️</span>
+                <span>批量标签</span>
+            </button>
+            <button class="toolbar-btn" onclick="bulkExport()">
+                <span>📤</span>
+                <span>导出选中</span>
+            </button>
+            <button class="toolbar-btn" onclick="bulkDelete()">
+                <span>🗑️</span>
+                <span>删除</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 初始化页面
+        let selectedAssets = new Set();
+        let currentFilter = 'all';
+        let relationshipChart;
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadAssets();
+        });
+
+        // 初始化图表
+        function initializeCharts() {
+            // 初始化关系图谱
+            const chartDom = document.getElementById('relationshipChart');
+            relationshipChart = echarts.init(chartDom);
+
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}'
+                },
+                series: [{
+                    type: 'graph',
+                    layout: 'force',
+                    data: [
+                        {name: '当前资产', symbolSize: 50, itemStyle: {color: '#5B21B6'}},
+                        {name: 'FAQ-001', symbolSize: 30, itemStyle: {color: '#8B5CF6'}},
+                        {name: 'HowTo-023', symbolSize: 30, itemStyle: {color: '#3B82F6'}},
+                        {name: 'Data-045', symbolSize: 30, itemStyle: {color: '#06B6D4'}},
+                        {name: 'Compare-012', symbolSize: 30, itemStyle: {color: '#10B981'}},
+                        {name: 'Video-089', symbolSize: 30, itemStyle: {color: '#EF4444'}}
+                    ],
+                    links: [
+                        {source: '当前资产', target: 'FAQ-001'},
+                        {source: '当前资产', target: 'HowTo-023'},
+                        {source: '当前资产', target: 'Data-045'},
+                        {source: 'FAQ-001', target: 'Compare-012'},
+                        {source: 'HowTo-023', target: 'Video-089'}
+                    ],
+                    roam: true,
+                    label: {
+                        show: true,
+                        position: 'bottom'
+                    },
+                    force: {
+                        repulsion: 100,
+                        edgeLength: 50
+                    }
+                }]
+            };
+
+            relationshipChart.setOption(option);
+
+            // 响应式调整
+            window.addEventListener('resize', function() {
+                relationshipChart.resize();
+            });
+        }
+
+        // 加载资产数据
+        function loadAssets() {
+            // 模拟加载资产数据
+            console.log('Loading assets...');
+        }
+
+        // 打开创建模态框
+        function openCreateModal() {
+            document.getElementById('createModal').classList.add('show');
+        }
+
+        // 打开导入模态框
+        function openImportModal() {
+            document.getElementById('importModal').classList.add('show');
+        }
+
+        // 关闭模态框
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // 选择资产类型
+        function selectAssetType(element, type) {
+            // 移除其他选中状态
+            document.querySelectorAll('.type-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            // 添加当前选中状态
+            element.classList.add('selected');
+            console.log('Selected asset type:', type);
+        }
+
+        // 保存资产
+        function saveAsset() {
+            const title = document.getElementById('assetTitle').value;
+            const content = document.getElementById('assetContent').innerText;
+            
+            if (!title || !content) {
+                alert('请填写必填字段');
+                return;
+            }
+
+            // 模拟保存操作
+            console.log('Saving asset:', {title, content});
+            
+            // 显示成功提示
+            closeModal('createModal');
+            showNotification('资产创建成功', 'success');
+        }
+
+        // 筛选资产类型
+        function filterByType(type) {
+            currentFilter = type;
+            // 更新筛选器状态
+            document.querySelectorAll('.filter-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // 重新加载资产
+            loadAssets();
+        }
+
+        // 质量筛选
+        function filterByQuality(quality) {
+            console.log('Filtering by quality:', quality);
+            loadAssets();
+        }
+
+        // 标签切换
+        function toggleTag(element) {
+            element.classList.toggle('active');
+            loadAssets();
+        }
+
+        // 搜索资产
+        function searchAssets(query) {
+            console.log('Searching:', query);
+            // 实现搜索逻辑
+        }
+
+        // 切换视图
+        function switchView(view) {
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            const grid = document.getElementById('assetsGrid');
+            if (view === 'list') {
+                grid.style.gridTemplateColumns = '1fr';
+            } else {
+                grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(320px, 1fr))';
+            }
+        }
+
+        // 导出资产
+        function exportAssets() {
+            console.log('Exporting assets...');
+            showNotification('正在准备导出文件...', 'info');
+        }
+
+        // 刷新资产列表
+        function refreshAssets() {
+            loadAssets();
+            showNotification('资产列表已刷新', 'success');
+        }
+
+        // 编辑资产
+        function editAsset(event, id) {
+            event.stopPropagation();
+            console.log('Editing asset:', id);
+            openCreateModal();
+        }
+
+        // 复制资产
+        function duplicateAsset(event, id) {
+            event.stopPropagation();
+            console.log('Duplicating asset:', id);
+            showNotification('资产已复制', 'success');
+        }
+
+        // 查看历史
+        function viewHistory(event, id) {
+            event.stopPropagation();
+            console.log('Viewing history:', id);
+            showAssetDetail();
+        }
+
+        // 显示资产详情
+        function showAssetDetail(element) {
+            document.getElementById('detailPanel').classList.add('show');
+            if (relationshipChart) {
+                setTimeout(() => {
+                    relationshipChart.resize();
+                }, 300);
+            }
+        }
+
+        // 关闭详情面板
+        function closeDetailPanel() {
+            document.getElementById('detailPanel').classList.remove('show');
+        }
+
+        // 标签输入处理
+        function handleTagInput(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const input = event.target;
+                const value = input.value.trim();
+                
+                if (value) {
+                    const container = document.getElementById('tagContainer');
+                    const chip = document.createElement('div');
+                    chip.className = 'tag-input-chip';
+                    chip.innerHTML = `${value} <span class="tag-remove" onclick="removeTag(this)">×</span>`;
+                    container.insertBefore(chip, input);
+                    input.value = '';
+                }
+            }
+        }
+
+        // 移除标签
+        function removeTag(element) {
+            element.parentElement.remove();
+        }
+
+        // 文件拖拽处理
+        function handleDragOver(event) {
+            event.preventDefault();
+            document.getElementById('importZone').classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            document.getElementById('importZone').classList.remove('dragover');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            document.getElementById('importZone').classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                handleFiles(files);
+            }
+        }
+
+        // 文件选择处理
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                handleFiles(files);
+            }
+        }
+
+        // 处理文件
+        function handleFiles(files) {
+            const file = files[0];
+            console.log('Selected file:', file.name);
+            
+            // 更新导入区域显示
+            const importZone = document.getElementById('importZone');
+            importZone.innerHTML = `
+                <div class="import-icon">✅</div>
+                <div class="import-text">${file.name}</div>
+                <div class="import-hint">文件大小: ${(file.size / 1024).toFixed(2)} KB</div>
+            `;
+        }
+
+        // 开始导入
+        function startImport() {
+            console.log('Starting import...');
+            closeModal('importModal');
+            showNotification('正在导入资产...', 'info');
+            
+            // 模拟导入进度
+            setTimeout(() => {
+                showNotification('成功导入 25 个资产', 'success');
+                loadAssets();
+            }, 2000);
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 10000;
+                animation: slideIn 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            `;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            notification.innerHTML = `
+                <span style="font-size: 20px;">${icons[type]}</span>
+                <span style="font-size: 14px; color: #374151;">${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3秒后自动移除
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // 点击导入区域触发文件选择
+        document.getElementById('importZone').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

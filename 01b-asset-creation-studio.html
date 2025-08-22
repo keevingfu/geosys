@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GEO资产创作工作台 - 智能内容生产平台</title>
+  <style>
+    /* 设计理念：创建一个专业且高效的内容创作环境，
+           通过结构化的编辑界面和AI辅助功能，让内容创作变得简单而精准 */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* 专业的色彩系统，营造专注的创作氛围 */
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #60a5fa;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --purple: #8b5cf6;
+      --indigo: #6366f1;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --background: #f9fafb;
+      --surface: #ffffff;
+      --hover: #f3f4f6;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    /* 顶部导航栏：提供快速访问和状态信息 */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-content {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .asset-selector {
+      display: flex;
+      gap: 8px;
+      padding: 4px;
+      background: var(--hover);
+      border-radius: 8px;
+    }
+
+    .asset-type-btn {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .asset-type-btn:hover {
+      background: var(--surface);
+    }
+
+    .asset-type-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* 主体布局：三列式设计 */
+    .main-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 300px 1fr 320px;
+      height: calc(100vh - 65px);
+    }
+
+    /* 左侧面板：资产结构和属性 */
+    .left-panel {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .panel-section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    /* 中间编辑区：核心创作空间 */
+    .editor-panel {
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--hover);
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .toolbar-btn {
+      padding: 6px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .toolbar-btn:hover {
+      background: var(--hover);
+      border-color: var(--primary);
+    }
+
+    /* 下拉菜单样式 */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-toggle {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: none;
+      min-width: 150px;
+      z-index: 1000;
+      margin-top: 4px;
+    }
+
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .dropdown-menu a:hover {
+      background: var(--hover);
+      color: var(--primary);
+    }
+
+    .editor-content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    /* 通知样式 */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .notification.error {
+      border-left: 4px solid var(--error);
+    }
+
+    .notification.info {
+      border-left: 4px solid var(--primary);
+    }
+
+    .notification-icon {
+      font-size: 20px;
+    }
+
+    .notification.success .notification-icon {
+      color: var(--success);
+    }
+
+    .notification.error .notification-icon {
+      color: var(--error);
+    }
+
+    .notification.info .notification-icon {
+      color: var(--primary);
+    }
+
+    /* AI加载动画 */
+    .ai-loading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      color: var(--text-secondary);
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* FAQ卡片编辑器样式 */
+    .faq-editor {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .faq-question {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      padding: 16px;
+      background: var(--hover);
+      border-radius: 8px;
+      margin-bottom: 16px;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+      cursor: text;
+    }
+
+    .faq-question:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--surface);
+    }
+
+    .faq-answer {
+      min-height: 200px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.8;
+      background: var(--surface);
+    }
+
+    .faq-answer:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    /* 证据引用卡片 */
+    .evidence-card {
+      background: var(--hover);
+      border-left: 4px solid var(--info);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-top: 16px;
+    }
+
+    .evidence-source {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .evidence-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    /* 右侧面板：AI助手和预览 */
+    .right-panel {
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-tab {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all 0.3s;
+    }
+
+    .panel-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    /* AI助手界面 */
+    .ai-assistant {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .ai-suggestions {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    /* 快速提示按钮 */
+    .ai-quick-prompts {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .quick-prompt {
+      padding: 6px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quick-prompt:hover {
+      background: var(--hover);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .suggestion-card {
+      background: var(--hover);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+
+    .suggestion-card:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+
+    .suggestion-label {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .suggestion-text {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .ai-prompt-box {
+      display: flex;
+      gap: 8px;
+    }
+
+    .ai-prompt-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    /* 渠道预览样式 */
+    .preview-container {
+      background: var(--hover);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .preview-channel {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .preview-content {
+      background: var(--surface);
+      border-radius: 4px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* 按钮样式系统 */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--hover);
+      border-color: var(--primary);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      background: var(--hover);
+      color: var(--primary);
+    }
+
+    /* 状态指示器 */
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-draft {
+      background: var(--hover);
+      color: var(--text-secondary);
+    }
+
+    .status-review {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-approved {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-published {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    /* 标签系统 */
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      background: var(--hover);
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .tag-remove {
+      margin-left: 4px;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+
+    .tag-remove:hover {
+      opacity: 1;
+    }
+
+    /* 字数统计器 */
+    .word-counter {
+      position: fixed;
+      bottom: 20px;
+      right: 340px;
+      background: var(--surface);
+      padding: 8px 16px;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .counter-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .counter-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* 加载动画 */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+
+      .left-panel,
+      .right-panel {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 顶部导航栏 -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">
+          <span>✍️</span>
+          <span>资产创作工作台</span>
+        </div>
+        <!-- 资产类型选择器 -->
+        <div class="asset-selector">
+          <button class="asset-type-btn active" onclick="switchAssetType('faq')">FAQ卡</button>
+          <button class="asset-type-btn" onclick="switchAssetType('howto')">步骤卡</button>
+          <button class="asset-type-btn" onclick="switchAssetType('compare')">对比卡</button>
+          <button class="asset-type-btn" onclick="switchAssetType('tldr')">TL;DR卡</button>
+          <button class="asset-type-btn" onclick="switchAssetType('data')">数据卡</button>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="status-indicator status-draft">
+          <span>●</span>
+          <span>草稿</span>
+        </span>
+        <button class="btn btn-ghost">
+          <span>💾</span>
+          <span>保存</span>
+        </button>
+        <button class="btn btn-secondary">
+          <span>👁️</span>
+          <span>预览</span>
+        </button>
+        <button class="btn btn-primary" onclick="publishAsset()">
+          <span>🚀</span>
+          <span>发布</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主体内容区 -->
+  <div class="main-container">
+    <!-- 左侧面板：资产属性配置 -->
+    <aside class="left-panel">
+      <div class="panel-section">
+        <h3 class="section-title">基本信息</h3>
+        <div class="form-group">
+          <label class="form-label">资产标题</label>
+          <input type="text" class="form-input" id="assetTitle" placeholder="例如：HEPA过滤器更换指南">
+        </div>
+        <div class="form-group">
+          <label class="form-label">用户意图</label>
+          <select class="form-select" id="userIntent">
+            <option value="">选择意图类型</option>
+            <option value="research">购买研究</option>
+            <option value="troubleshoot">问题解决</option>
+            <option value="learn">学习了解</option>
+            <option value="compare">对比选择</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">关键词标签</label>
+          <div class="tags-container" id="keywordTags">
+            <span class="tag">
+              空气净化器
+              <span class="tag-remove" onclick="removeTag(this)">×</span>
+            </span>
+            <span class="tag">
+              HEPA过滤器
+              <span class="tag-remove" onclick="removeTag(this)">×</span>
+            </span>
+          </div>
+          <input type="text" class="form-input" style="margin-top: 8px;" placeholder="输入后按回车添加"
+            onkeypress="addTag(event)">
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3 class="section-title">渠道配置</h3>
+        <div class="form-group">
+          <label style="display: flex; align-items: center; margin-bottom: 8px;">
+            <input type="checkbox" checked style="margin-right: 8px;">
+            <span>Reddit</span>
+          </label>
+          <label style="display: flex; align-items: center; margin-bottom: 8px;">
+            <input type="checkbox" checked style="margin-right: 8px;">
+            <span>Quora</span>
+          </label>
+          <label style="display: flex; align-items: center; margin-bottom: 8px;">
+            <input type="checkbox" style="margin-right: 8px;">
+            <span>Medium</span>
+          </label>
+          <label style="display: flex; align-items: center; margin-bottom: 8px;">
+            <input type="checkbox" checked style="margin-right: 8px;">
+            <span>官网FAQ</span>
+          </label>
+          <label style="display: flex; align-items: center; margin-bottom: 8px;">
+            <input type="checkbox" style="margin-right: 8px;">
+            <span>YouTube描述</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3 class="section-title">证据管理</h3>
+        <button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;">
+          <span>📎</span>
+          <span>添加数据源</span>
+        </button>
+        <button class="btn btn-secondary" style="width: 100%;">
+          <span>🔗</span>
+          <span>关联引用</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- 中间编辑区：内容创作核心区域 -->
+    <main class="editor-panel">
+      <div class="editor-toolbar">
+        <div class="toolbar-group">
+          <button class="toolbar-btn" title="加粗">
+            <strong>B</strong>
+          </button>
+          <button class="toolbar-btn" title="斜体">
+            <em>I</em>
+          </button>
+          <button class="toolbar-btn" title="下划线">
+            <u>U</u>
+          </button>
+          <span style="width: 1px; height: 20px; background: var(--border); margin: 0 8px;"></span>
+          <button class="toolbar-btn" title="标题">
+            H
+          </button>
+          <button class="toolbar-btn" title="列表">
+            ☰
+          </button>
+          <button class="toolbar-btn" title="链接">
+            🔗
+          </button>
+          <button class="toolbar-btn" title="图片">
+            🖼️
+          </button>
+        </div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn" onclick="requestAISuggestion()">
+            <span>✨</span>
+            <span>AI优化</span>
+          </button>
+          <button class="toolbar-btn" onclick="generateContent()">
+            <span>🤖</span>
+            <span>AI生成</span>
+          </button>
+          <button class="toolbar-btn" onclick="improveContent()">
+            <span>📝</span>
+            <span>改写</span>
+          </button>
+          <button class="toolbar-btn" onclick="expandContent()">
+            <span>➕</span>
+            <span>扩展</span>
+          </button>
+        </div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn" onclick="optimizeForSEO()">
+            <span>🔍</span>
+            <span>SEO优化</span>
+          </button>
+          <button class="toolbar-btn" onclick="improveReadability()">
+            <span>📖</span>
+            <span>易读性</span>
+          </button>
+          <div class="dropdown">
+            <button class="toolbar-btn dropdown-toggle">
+              <span>🎭</span>
+              <span>语气调整</span>
+            </button>
+            <div class="dropdown-menu">
+              <a href="#" onclick="adjustTone('professional'); return false;">专业正式</a>
+              <a href="#" onclick="adjustTone('friendly'); return false;">友好亲切</a>
+              <a href="#" onclick="adjustTone('casual'); return false;">轻松随意</a>
+              <a href="#" onclick="adjustTone('technical'); return false;">技术精确</a>
+            </div>
+          </div>
+        </div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn" onclick="validateContent()">
+            <span>✓</span>
+            <span>验证内容</span>
+          </button>
+          <button class="toolbar-btn" onclick="optimizeBatch()">
+            <span>⚡</span>
+            <span>一键优化</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="editor-content">
+        <!-- FAQ编辑器示例 -->
+        <div class="faq-editor" id="faqEditor">
+          <div contenteditable="true" class="faq-question" id="faqQuestion">
+            如何判断何时需要更换HEPA过滤器？
+          </div>
+          <div contenteditable="true" class="faq-answer" id="faqAnswer">
+            HEPA过滤器的更换时机取决于多个因素，包括使用频率、环境污染程度和过滤器质量。一般来说，建议每6-12个月更换一次HEPA过滤器。
+
+            以下是判断是否需要更换的关键指标：
+
+            1. 使用时间：大多数制造商建议每6-12个月更换一次
+            2. 视觉检查：如果过滤器明显变黑或有大量灰尘积累
+            3. 性能下降：空气净化效果明显降低，异味无法有效去除
+            4. 噪音增加：设备运行噪音明显增大，说明过滤器可能堵塞
+            5. 过敏症状加重：室内过敏症状没有改善或加重
+          </div>
+
+          <div class="evidence-card">
+            <div class="evidence-source">来源：EPA室内空气质量指南</div>
+            <div class="evidence-text">"定期更换HEPA过滤器对于维持空气净化器的效率至关重要。堵塞的过滤器不仅降低净化效果，还可能增加能耗。"</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 右侧面板：AI助手和预览 -->
+    <aside class="right-panel">
+      <div class="panel-tabs">
+        <button class="panel-tab active" onclick="switchPanelTab('ai')">AI助手</button>
+        <button class="panel-tab" onclick="switchPanelTab('preview')">渠道预览</button>
+        <button class="panel-tab" onclick="switchPanelTab('history')">版本历史</button>
+      </div>
+
+      <div class="tab-content">
+        <!-- AI助手标签 -->
+        <div id="aiTab" class="ai-assistant">
+          <div class="ai-suggestions">
+            <div class="suggestion-card" onclick="applySuggestion(this)">
+              <div class="suggestion-label">优化建议</div>
+              <div class="suggestion-text">
+                建议添加具体的时间范围，例如"在空气质量较差的地区，可能需要每3-6个月更换一次"
+              </div>
+            </div>
+            <div class="suggestion-card" onclick="applySuggestion(this)">
+              <div class="suggestion-label">数据补充</div>
+              <div class="suggestion-text">
+                可以引用研究数据：根据研究，定期更换HEPA过滤器可以保持99.97%的过滤效率
+              </div>
+            </div>
+            <div class="suggestion-card" onclick="applySuggestion(this)">
+              <div class="suggestion-label">结构优化</div>
+              <div class="suggestion-text">
+                建议将判断指标改为编号列表格式，更容易阅读和理解
+              </div>
+            </div>
+          </div>
+          <div class="ai-prompt-box">
+            <input type="text" class="ai-prompt-input" placeholder="询问AI助手..." id="aiPrompt" onkeypress="if(event.key === 'Enter') askAI()">
+            <button class="btn btn-primary" onclick="askAI()">
+              发送
+            </button>
+          </div>
+          <div class="ai-quick-prompts">
+            <button class="quick-prompt" onclick="setQuickPrompt('如何让这个答案更专业？')">专业化</button>
+            <button class="quick-prompt" onclick="setQuickPrompt('这个答案有什么可以改进的地方？')">改进建议</button>
+            <button class="quick-prompt" onclick="setQuickPrompt('帮我添加一些具体的例子')">添加例子</button>
+            <button class="quick-prompt" onclick="setQuickPrompt('如何让答案更适合SEO？')">SEO建议</button>
+          </div>
+        </div>
+
+        <!-- 渠道预览标签 -->
+        <div id="previewTab" style="display: none;">
+          <div class="preview-container">
+            <div class="preview-channel">Reddit预览</div>
+            <div class="preview-content">
+              <strong>Q: 如何判断何时需要更换HEPA过滤器？</strong><br><br>
+              根据我的经验，HEPA过滤器通常需要每6-12个月更换一次。判断方法包括...<br><br>
+              <em>来源：EPA室内空气质量指南</em>
+            </div>
+          </div>
+          <div class="preview-container">
+            <div class="preview-channel">官网FAQ预览</div>
+            <div class="preview-content">
+              <h3>如何判断何时需要更换HEPA过滤器？</h3>
+              <p>HEPA过滤器的更换时机取决于多个因素...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 版本历史标签 -->
+        <div id="historyTab" style="display: none;">
+          <div style="padding: 12px 0;">
+            <div
+              style="padding: 12px; background: var(--hover); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
+              <div style="font-size: 14px; font-weight: 500;">版本 3（当前）</div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                2024-01-15 14:30 - 添加了EPA引用
+              </div>
+            </div>
+            <div
+              style="padding: 12px; background: var(--hover); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
+              <div style="font-size: 14px; font-weight: 500;">版本 2</div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                2024-01-15 13:45 - 优化了答案结构
+              </div>
+            </div>
+            <div
+              style="padding: 12px; background: var(--hover); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
+              <div style="font-size: 14px; font-weight: 500;">版本 1</div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                2024-01-15 13:00 - 初始创建
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- 字数统计器 -->
+  <div class="word-counter">
+    <div class="counter-item">
+      <span>字数：</span>
+      <span class="counter-value" id="wordCount">186</span>
+    </div>
+    <div class="counter-item">
+      <span>字符：</span>
+      <span class="counter-value" id="charCount">298</span>
+    </div>
+    <div class="counter-item">
+      <span>阅读时间：</span>
+      <span class="counter-value" id="readTime">~1分钟</span>
+    </div>
+  </div>
+
+  <script>
+    // 资产创作工作台的核心JavaScript逻辑
+    // 这里实现了编辑器的主要功能，包括内容编辑、AI辅助、预览等
+
+    let currentAssetType = 'faq';
+    let assetData = {
+      id: generateId(),
+      type: 'faq',
+      title: '',
+      content: {},
+      metadata: {
+        intent: '',
+        keywords: [],
+        channels: [],
+        evidence: []
+      },
+      status: 'draft',
+      version: 1,
+      created: new Date().toISOString(),
+      modified: new Date().toISOString()
+    };
+
+    // 初始化编辑器
+    function initializeEditor() {
+      // 设置自动保存
+      setInterval(autoSave, 30000); // 每30秒自动保存
+
+      // 监听内容变化
+      document.getElementById('faqAnswer').addEventListener('input', function () {
+        updateWordCount();
+        // 触发AI建议更新
+        setTimeout(updateAISuggestions, 1000);
+      });
+
+      // 初始化字数统计
+      updateWordCount();
+    }
+
+    // 切换资产类型
+    function switchAssetType(type) {
+      currentAssetType = type;
+
+      // 更新按钮状态
+      document.querySelectorAll('.asset-type-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // 根据类型加载不同的编辑器模板
+      loadEditorTemplate(type);
+    }
+
+    // 加载编辑器模板
+    function loadEditorTemplate(type) {
+      const editorContent = document.querySelector('.editor-content');
+
+      switch (type) {
+        case 'faq':
+          // FAQ编辑器已经默认显示
+          break;
+        case 'howto':
+          editorContent.innerHTML = `
+                        <div class="howto-editor">
+                            <h2>步骤卡编辑器</h2>
+                            <div class="step-list" id="stepList">
+                                <div class="step-item">
+                                    <span class="step-number">1</span>
+                                    <input type="text" placeholder="步骤描述...">
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addStep()">+ 添加步骤</button>
+                        </div>
+                    `;
+          break;
+        case 'compare':
+          editorContent.innerHTML = `
+                        <div class="compare-editor">
+                            <h2>对比卡编辑器</h2>
+                            <table class="compare-table">
+                                <thead>
+                                    <tr>
+                                        <th>特性</th>
+                                        <th>产品A</th>
+                                        <th>产品B</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="text" placeholder="特性名称"></td>
+                                        <td><input type="text" placeholder="产品A数据"></td>
+                                        <td><input type="text" placeholder="产品B数据"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button class="btn btn-secondary" onclick="addCompareRow()">+ 添加对比项</button>
+                        </div>
+                    `;
+          break;
+      }
+    }
+
+    // 更新字数统计
+    function updateWordCount() {
+      const content = document.getElementById('faqAnswer').innerText;
+      const wordCount = content.trim().split(/\s+/).length;
+      const charCount = content.length;
+      const readTime = Math.ceil(wordCount / 200); // 假设每分钟阅读200字
+
+      document.getElementById('wordCount').textContent = wordCount;
+      document.getElementById('charCount').textContent = charCount;
+      document.getElementById('readTime').textContent = `~${readTime}分钟`;
+    }
+
+    // Gemini API配置
+    const GEMINI_API_KEY = 'AIzaSyCdO7tYgdJRDj0HQeGifTASNZQ1mQnwDI0';
+    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+
+    // AI辅助功能
+    async function requestAISuggestion() {
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+      const assetType = currentAssetType;
+      
+      if (!question && !answer) {
+        addAISuggestion('提示', '请先输入一些内容，我才能为您提供建议');
+        return;
+      }
+
+      // 显示加载状态
+      showAILoading(true);
+
+      try {
+        // 根据资产类型构建不同的提示词
+        const prompt = buildAIPrompt(assetType, question, answer);
+        
+        // 调用Gemini API
+        const response = await fetch(GEMINI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 500
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('API请求失败');
+        }
+
+        const data = await response.json();
+        const aiResponse = data.candidates[0].content.parts[0].text;
+        
+        // 解析AI响应并生成建议
+        const suggestions = parseAISuggestions(aiResponse);
+        updateAISuggestions(suggestions);
+        
+      } catch (error) {
+        console.error('AI建议生成失败:', error);
+        addAISuggestion('错误', '无法生成建议，请稍后重试');
+      } finally {
+        showAILoading(false);
+      }
+    }
+
+    // 构建AI提示词
+    function buildAIPrompt(assetType, question, answer) {
+      const prompts = {
+        faq: `作为内容优化专家，请分析以下FAQ内容并提供改进建议：
+问题：${question || '未填写'}
+答案：${answer || '未填写'}
+
+请从以下角度提供3-5条具体的改进建议：
+1. 内容完整性和准确性
+2. 语言表达的清晰度和友好性
+3. SEO优化和关键词使用
+4. 可以补充的相关信息
+5. 格式和结构优化
+
+请以JSON格式返回建议，格式如下：
+[
+  {"type": "建议类型", "text": "具体建议内容"},
+  ...
+]`,
+        
+        howto: `作为技术写作专家，请分析以下操作步骤内容并提供优化建议：
+标题：${question || '未填写'}
+步骤内容：${answer || '未填写'}
+
+请从以下角度提供改进建议：
+1. 步骤的逻辑性和完整性
+2. 操作说明的清晰度
+3. 可能遗漏的注意事项
+4. 视觉辅助建议（如需要添加图片的地方）
+
+请以JSON格式返回建议。`,
+        
+        compare: `作为产品分析专家，请分析以下对比内容并提供改进建议：
+对比主题：${question || '未填写'}
+对比内容：${answer || '未填写'}
+
+请从以下角度提供建议：
+1. 对比维度的全面性
+2. 数据的客观性和准确性
+3. 结论的公正性
+4. 可视化展示建议
+
+请以JSON格式返回建议。`
+      };
+      
+      return prompts[assetType] || prompts.faq;
+    }
+
+    // 解析AI建议
+    function parseAISuggestions(aiResponse) {
+      try {
+        // 尝试提取JSON部分
+        const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          return JSON.parse(jsonMatch[0]);
+        }
+        
+        // 如果不是JSON格式，按行分割作为建议
+        const lines = aiResponse.split('\n').filter(line => line.trim());
+        return lines.map((line, index) => ({
+          type: `建议 ${index + 1}`,
+          text: line.trim()
+        }));
+      } catch (error) {
+        console.error('解析AI响应失败:', error);
+        return [{
+          type: 'AI建议',
+          text: aiResponse
+        }];
+      }
+    }
+
+    // 更新AI建议
+    function updateAISuggestions(suggestions) {
+      const suggestionsContainer = document.querySelector('.ai-suggestions');
+      
+      // 清空现有建议
+      suggestionsContainer.innerHTML = '';
+      
+      // 添加新建议
+      suggestions.forEach(suggestion => {
+        addAISuggestion(suggestion.type, suggestion.text);
+      });
+    }
+
+    // 显示AI加载状态
+    function showAILoading(show) {
+      const suggestionsContainer = document.querySelector('.ai-suggestions');
+      
+      if (show) {
+        suggestionsContainer.innerHTML = `
+          <div class="ai-loading">
+            <div class="spinner"></div>
+            <span>AI正在分析您的内容...</span>
+          </div>
+        `;
+      }
+    }
+
+    // 应用AI建议
+    function applySuggestion(element) {
+      const suggestionText = element.querySelector('.suggestion-text').textContent;
+      // 这里可以将建议应用到编辑器中
+      alert('应用建议：' + suggestionText);
+    }
+
+    // 询问AI助手
+    async function askAI() {
+      const prompt = document.getElementById('aiPrompt').value;
+      if (!prompt) return;
+
+      // 显示加载状态
+      const input = document.getElementById('aiPrompt');
+      input.disabled = true;
+      
+      // 获取当前内容上下文
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      try {
+        // 构建上下文感知的提示词
+        const contextPrompt = `作为内容创作助手，请回答以下问题。
+当前正在编辑的内容：
+问题：${question || '未填写'}
+答案：${answer || '未填写'}
+
+用户的问题：${prompt}
+
+请提供具体、实用的建议。`;
+
+        // 调用Gemini API
+        const response = await fetch(GEMINI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: contextPrompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.8,
+              maxOutputTokens: 300
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('API请求失败');
+        }
+
+        const data = await response.json();
+        const aiResponse = data.candidates[0].content.parts[0].text;
+        
+        // 添加AI回复到建议列表
+        addAISuggestion('AI助手', aiResponse);
+        
+      } catch (error) {
+        console.error('AI助手错误:', error);
+        addAISuggestion('错误', '无法获取AI响应，请稍后重试');
+      } finally {
+        input.value = '';
+        input.disabled = false;
+        input.focus();
+      }
+    }
+
+    // 添加AI建议到列表
+    function addAISuggestion(label, text) {
+      const suggestionsContainer = document.querySelector('.ai-suggestions');
+      const suggestionCard = document.createElement('div');
+      suggestionCard.className = 'suggestion-card';
+      suggestionCard.innerHTML = `
+                <div class="suggestion-label">${label}</div>
+                <div class="suggestion-text">${text}</div>
+            `;
+      suggestionCard.onclick = function () { applySuggestion(this); };
+      suggestionsContainer.insertBefore(suggestionCard, suggestionsContainer.firstChild);
+    }
+
+    // 切换右侧面板标签
+    function switchPanelTab(tab) {
+      // 更新标签状态
+      document.querySelectorAll('.panel-tab').forEach(t => {
+        t.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // 显示对应内容
+      document.getElementById('aiTab').style.display = tab === 'ai' ? 'flex' : 'none';
+      document.getElementById('previewTab').style.display = tab === 'preview' ? 'block' : 'none';
+      document.getElementById('historyTab').style.display = tab === 'history' ? 'block' : 'none';
+
+      // 如果是预览标签，更新预览内容
+      if (tab === 'preview') {
+        updatePreview();
+      }
+    }
+
+    // 更新预览
+    function updatePreview() {
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+
+      // 更新各渠道的预览内容
+      // 这里可以根据不同渠道的格式要求进行转换
+      console.log('更新预览内容');
+    }
+
+    // 添加标签
+    function addTag(event) {
+      if (event.key === 'Enter') {
+        const input = event.target;
+        const tagValue = input.value.trim();
+        if (tagValue) {
+          const tagsContainer = document.getElementById('keywordTags');
+          const tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.innerHTML = `
+                        ${tagValue}
+                        <span class="tag-remove" onclick="removeTag(this)">×</span>
+                    `;
+          tagsContainer.appendChild(tag);
+          input.value = '';
+        }
+      }
+    }
+
+    // 移除标签
+    function removeTag(element) {
+      element.parentElement.remove();
+    }
+
+    // 自动保存
+    function autoSave() {
+      // 收集所有数据
+      assetData.title = document.getElementById('assetTitle').value;
+      assetData.content.question = document.getElementById('faqQuestion').innerText;
+      assetData.content.answer = document.getElementById('faqAnswer').innerText;
+      assetData.modified = new Date().toISOString();
+
+      // 保存到localStorage
+      localStorage.setItem('currentAsset', JSON.stringify(assetData));
+      console.log('自动保存成功');
+    }
+
+    // 发布资产
+    function publishAsset() {
+      // 验证必填字段
+      if (!document.getElementById('assetTitle').value) {
+        alert('请填写资产标题');
+        return;
+      }
+
+      // 更新状态
+      assetData.status = 'published';
+
+      // 显示成功消息
+      alert('资产发布成功！已添加到资产库。');
+
+      // 更新状态指示器
+      document.querySelector('.status-indicator').className = 'status-indicator status-published';
+      document.querySelector('.status-indicator span:last-child').textContent = '已发布';
+    }
+
+    // 生成唯一ID
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    // AI内容生成
+    async function generateContent() {
+      const title = document.getElementById('assetTitle').value;
+      const intent = document.getElementById('userIntent').value;
+      
+      if (!title && !intent) {
+        alert('请先填写资产标题或用户意图，以便AI生成相关内容');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `请为以下主题生成${currentAssetType === 'faq' ? 'FAQ' : currentAssetType === 'howto' ? '操作步骤' : '对比'}内容：
+主题：${title || intent}
+类型：${currentAssetType}
+
+请生成：
+1. 一个清晰的问题/标题
+2. 详细的答案/内容（约150-200字）
+3. 包含具体的例子或数据
+
+格式要求：
+问题：[生成的问题]
+答案：[生成的答案]`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        // 解析生成的内容
+        const lines = response.split('\n');
+        let question = '';
+        let answer = '';
+        let isAnswer = false;
+        
+        lines.forEach(line => {
+          if (line.startsWith('问题：')) {
+            question = line.replace('问题：', '').trim();
+          } else if (line.startsWith('答案：')) {
+            answer = line.replace('答案：', '').trim();
+            isAnswer = true;
+          } else if (isAnswer && line.trim()) {
+            answer += '\n' + line.trim();
+          }
+        });
+        
+        // 填充到编辑器
+        if (question) {
+          document.getElementById('faqQuestion').innerText = question;
+        }
+        if (answer) {
+          document.getElementById('faqAnswer').innerText = answer;
+        }
+        
+        updateWordCount();
+        showNotification('内容已生成！您可以继续编辑优化。', 'success');
+        
+      } catch (error) {
+        console.error('内容生成失败:', error);
+        showNotification('生成失败，请稍后重试', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+    
+    // AI内容改写
+    async function improveContent() {
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!answer || answer.length < 20) {
+        alert('请先输入一些内容再进行改写');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `请改写以下内容，使其更加清晰、专业和易读：
+
+原内容：
+${answer}
+
+改写要求：
+1. 保持原意不变
+2. 优化语言表达
+3. 增强可读性
+4. 使用更专业的术语
+5. 保持相似的长度`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        // 更新内容
+        document.getElementById('faqAnswer').innerText = response;
+        updateWordCount();
+        
+        showNotification('内容已改写！原内容已保存到版本历史。', 'success');
+        
+      } catch (error) {
+        console.error('改写失败:', error);
+        showNotification('改写失败，请稍后重试', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+    
+    // AI内容扩展
+    async function expandContent() {
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!answer || answer.length < 20) {
+        alert('请先输入一些内容再进行扩展');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `请扩展以下内容，添加更多细节、例子和说明：
+
+原内容：
+${answer}
+
+扩展要求：
+1. 添加具体的例子
+2. 补充相关的数据或统计
+3. 增加实用的建议
+4. 解释专业术语
+5. 扩展到原内容的1.5-2倍长度`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        // 更新内容
+        document.getElementById('faqAnswer').innerText = answer + '\n\n' + response;
+        updateWordCount();
+        
+        showNotification('内容已扩展！', 'success');
+        
+      } catch (error) {
+        console.error('扩展失败:', error);
+        showNotification('扩展失败，请稍后重试', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+    
+    // 通用的Gemini API调用函数
+    async function callGeminiAPI(prompt) {
+      const response = await fetch(GEMINI_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-goog-api-key': GEMINI_API_KEY
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 800
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('API请求失败');
+      }
+
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    // SEO优化功能
+    async function optimizeForSEO() {
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!question || !answer) {
+        alert('请先填写问题和答案内容');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `作为SEO专家，请优化以下FAQ内容，使其更适合搜索引擎排名：
+
+问题：${question}
+答案：${answer}
+
+优化要求：
+1. 在答案开头自然地包含关键词
+2. 使用清晰的段落结构
+3. 添加相关的语义关键词
+4. 保持内容自然可读
+5. 确保答案完整回答了问题
+6. 适当使用列表或编号来组织信息`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        // 更新答案内容
+        document.getElementById('faqAnswer').innerText = response;
+        updateWordCount();
+        
+        // 添加SEO优化建议
+        const seoTips = await getSEOTips(question, response);
+        updateAISuggestions(seoTips);
+        
+        showNotification('内容已进行SEO优化！', 'success');
+        
+      } catch (error) {
+        console.error('SEO优化失败:', error);
+        showNotification('SEO优化失败，请稍后重试', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+
+    // 获取SEO提示
+    async function getSEOTips(question, answer) {
+      try {
+        const prompt = `分析以下FAQ的SEO表现，提供改进建议：
+
+问题：${question}
+答案：${answer}
+
+请提供3-5条具体的SEO改进建议。`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        return [{
+          type: 'SEO建议',
+          text: response
+        }];
+      } catch (error) {
+        return [{
+          type: 'SEO建议',
+          text: '无法获取SEO建议'
+        }];
+      }
+    }
+
+    // 可读性优化
+    async function improveReadability() {
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!answer) {
+        alert('请先填写答案内容');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `请优化以下内容的可读性，使其更容易理解：
+
+原内容：
+${answer}
+
+优化要求：
+1. 使用简单、清晰的语言
+2. 避免专业术语，或在使用时提供解释
+3. 使用短句和短段落
+4. 添加适当的过渡词
+5. 确保逻辑流畅
+6. 保持友好的语气`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        document.getElementById('faqAnswer').innerText = response;
+        updateWordCount();
+        
+        showNotification('内容可读性已优化！', 'success');
+        
+      } catch (error) {
+        console.error('可读性优化失败:', error);
+        showNotification('可读性优化失败，请稍后重试', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+
+    // 语气调整
+    async function adjustTone(tone) {
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!answer) {
+        alert('请先填写答案内容');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      const toneDescriptions = {
+        professional: '专业、正式、权威',
+        friendly: '友好、亲切、易于接近',
+        casual: '轻松、随意、对话式',
+        technical: '技术性、精确、详细'
+      };
+      
+      try {
+        const prompt = `请将以下内容调整为${toneDescriptions[tone]}的语气：
+
+原内容：
+${answer}
+
+请保持原意不变，只调整表达方式和语气。`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        document.getElementById('faqAnswer').innerText = response;
+        updateWordCount();
+        
+        showNotification(`语气已调整为${toneDescriptions[tone]}！`, 'success');
+        
+      } catch (error) {
+        console.error('语气调整失败:', error);
+        showNotification('语气调整失败，请稍后重试', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+    
+    // 显示内容加载状态
+    function showContentLoading(show) {
+      const editorContent = document.querySelector('.editor-content');
+      
+      if (show) {
+        editorContent.style.opacity = '0.6';
+        editorContent.style.pointerEvents = 'none';
+      } else {
+        editorContent.style.opacity = '1';
+        editorContent.style.pointerEvents = 'auto';
+      }
+    }
+    
+    // 显示通知
+    function showNotification(message, type = 'info') {
+      // 创建通知元素
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      
+      const icons = {
+        success: '✅',
+        error: '❌',
+        info: 'ℹ️'
+      };
+      
+      notification.innerHTML = `
+        <span class="notification-icon">${icons[type]}</span>
+        <span>${message}</span>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // 3秒后自动移除
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // 设置快速提示词
+    function setQuickPrompt(prompt) {
+      document.getElementById('aiPrompt').value = prompt;
+      document.getElementById('aiPrompt').focus();
+    }
+
+    // 内容验证
+    async function validateContent() {
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!question || !answer) {
+        showNotification('请先填写问题和答案', 'error');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `请验证以下FAQ内容的质量：
+
+问题：${question}
+答案：${answer}
+
+请从以下方面评分（1-10分）并给出简短评价：
+1. 完整性：答案是否完整回答了问题
+2. 准确性：信息是否准确可靠
+3. 清晰度：表达是否清楚易懂
+4. 实用性：是否提供了实际价值
+5. SEO友好度：是否适合搜索引擎优化
+
+最后给出总体评分和改进建议。`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        // 显示验证结果
+        const validationResult = {
+          type: '内容质量评估',
+          text: response
+        };
+        
+        updateAISuggestions([validationResult]);
+        
+        showNotification('内容验证完成！', 'success');
+        
+      } catch (error) {
+        console.error('内容验证失败:', error);
+        showNotification('验证失败，请稍后重试', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+
+    // 批量优化工具栏
+    function addBatchOptimizationToolbar() {
+      const toolbar = document.createElement('div');
+      toolbar.className = 'batch-optimization-toolbar';
+      toolbar.innerHTML = `
+        <button class="toolbar-btn" onclick="validateContent()">
+          <span>✓</span>
+          <span>验证内容</span>
+        </button>
+        <button class="toolbar-btn" onclick="optimizeBatch()">
+          <span>⚡</span>
+          <span>一键优化</span>
+        </button>
+      `;
+      
+      const existingToolbar = document.querySelector('.editor-toolbar');
+      if (existingToolbar) {
+        existingToolbar.appendChild(toolbar);
+      }
+    }
+
+    // 一键优化功能
+    async function optimizeBatch() {
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!question || !answer) {
+        showNotification('请先填写内容', 'error');
+        return;
+      }
+      
+      showContentLoading(true);
+      showNotification('正在执行一键优化...', 'info');
+      
+      try {
+        // 依次执行多个优化
+        await optimizeForSEO();
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 延迟避免API限制
+        
+        await improveReadability();
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        await validateContent();
+        
+        showNotification('一键优化完成！', 'success');
+        
+      } catch (error) {
+        console.error('批量优化失败:', error);
+        showNotification('优化过程中出现错误', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+
+    // 页面加载时初始化
+    window.onload = function () {
+      initializeEditor();
+
+      // 尝试加载之前的草稿
+      const savedAsset = localStorage.getItem('currentAsset');
+      if (savedAsset) {
+        assetData = JSON.parse(savedAsset);
+        // 恢复内容到编辑器
+        if (assetData.content.question) {
+          document.getElementById('faqQuestion').innerText = assetData.content.question;
+        }
+        if (assetData.content.answer) {
+          document.getElementById('faqAnswer').innerText = assetData.content.answer;
+        }
+      }
+      
+      // 添加动画样式
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(100%); opacity: 0; }
+        }
+        .ai-loading {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 40px;
+          gap: 16px;
+        }
+        .spinner {
+          width: 40px;
+          height: 40px;
+          border: 3px solid var(--border);
+          border-top-color: var(--primary);
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    };
+  </script>
+</body>
+
+</html>

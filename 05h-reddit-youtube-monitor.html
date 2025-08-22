@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEO Reddit+YouTube 闭环监测系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #FF4500;
+            --youtube: #FF0000;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1F2937;
+            --light: #F9FAFB;
+            --border: #E5E7EB;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            color: var(--dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header .subtitle {
+            color: #6B7280;
+            font-size: 16px;
+        }
+        
+        .status-badges {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .badge.active {
+            background: #DCFCE7;
+            color: var(--success);
+        }
+        
+        .badge.pending {
+            background: #FEF3C7;
+            color: var(--warning);
+        }
+        
+        /* 执行阶段时间轴 */
+        .timeline {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .timeline h2 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            color: var(--dark);
+        }
+        
+        .timeline-track {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline-track::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--border);
+            z-index: 0;
+        }
+        
+        .phase {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .phase-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid var(--border);
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .phase.active .phase-dot {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+            transform: scale(1.2);
+        }
+        
+        .phase.current .phase-dot {
+            border-color: var(--warning);
+            background: var(--warning);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .phase-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .phase-date {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+        
+        /* 双阵地监测看板 */
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .platform-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .platform-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .platform-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .reddit-icon {
+            background: #FF45001A;
+            color: var(--primary);
+        }
+        
+        .youtube-icon {
+            background: #FF00001A;
+            color: var(--youtube);
+        }
+        
+        .platform-title h3 {
+            font-size: 20px;
+            color: var(--dark);
+        }
+        
+        .platform-title p {
+            font-size: 14px;
+            color: #9CA3AF;
+        }
+        
+        /* 指标卡片 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .metric-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 8px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark);
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        
+        .metric-change {
+            font-size: 14px;
+            font-weight: normal;
+        }
+        
+        .metric-change.up {
+            color: var(--success);
+        }
+        
+        .metric-change.down {
+            color: var(--danger);
+        }
+        
+        /* 内容监测表格 */
+        .content-monitor {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .monitor-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #9CA3AF;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--dark);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+        
+        .content-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .content-table th {
+            text-align: left;
+            padding: 12px;
+            font-size: 14px;
+            color: #6B7280;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .content-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .content-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .content-meta {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+        
+        .engagement-stats {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .stat {
+            font-size: 14px;
+            color: #6B7280;
+        }
+        
+        .stat strong {
+            color: var(--dark);
+        }
+        
+        .ai-citation {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .citation-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .citation-badge.high {
+            background: #DCFCE7;
+            color: var(--success);
+        }
+        
+        .citation-badge.medium {
+            background: #FEF3C7;
+            color: var(--warning);
+        }
+        
+        .citation-badge.low {
+            background: #FEE2E2;
+            color: var(--danger);
+        }
+        
+        /* 闭环流程图 */
+        .loop-diagram {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .loop-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 30px 0;
+        }
+        
+        .loop-node {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        
+        .loop-node::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--primary);
+        }
+        
+        .loop-node:last-child::after {
+            content: none;
+        }
+        
+        .node-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .node-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .node-desc {
+            font-size: 14px;
+            color: #6B7280;
+        }
+        
+        /* 转化漏斗 */
+        .funnel-chart {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .funnel-stage {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .funnel-bar {
+            height: 50px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .funnel-bar:hover {
+            transform: translateX(10px);
+        }
+        
+        .funnel-label {
+            position: absolute;
+            left: 0;
+            top: -20px;
+            font-size: 12px;
+            color: #6B7280;
+        }
+        
+        .funnel-value {
+            margin-left: auto;
+            font-size: 20px;
+        }
+        
+        /* 实时警报 */
+        .alerts-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-item.success {
+            background: #DCFCE7;
+        }
+        
+        .alert-item.warning {
+            background: #FEF3C7;
+        }
+        
+        .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .alert-desc {
+            font-size: 14px;
+            color: #6B7280;
+        }
+        
+        .alert-time {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部信息 -->
+        <div class="header">
+            <h1>
+                🚀 GEO Reddit+YouTube 闭环监测系统
+            </h1>
+            <p class="subtitle">90天执行蓝图 · 双阵地策略 · AI引用优化</p>
+            
+            <div class="status-badges">
+                <span class="badge active">
+                    <span>●</span> 系统运行中
+                </span>
+                <span class="badge active">
+                    <span>●</span> Reddit监测: 活跃
+                </span>
+                <span class="badge active">
+                    <span>●</span> YouTube监测: 活跃
+                </span>
+                <span class="badge pending">
+                    <span>●</span> AI引用追踪: 12次/今日
+                </span>
+            </div>
+        </div>
+        
+        <!-- 执行阶段时间轴 -->
+        <div class="timeline">
+            <h2>📅 90天执行进度</h2>
+            <div class="timeline-track">
+                <div class="phase active">
+                    <div class="phase-dot">✓</div>
+                    <div class="phase-title">诊断与选题</div>
+                    <div class="phase-date">第1-2周</div>
+                </div>
+                <div class="phase current">
+                    <div class="phase-dot">2</div>
+                    <div class="phase-title">Reddit落地</div>
+                    <div class="phase-date">第2-6周</div>
+                </div>
+                <div class="phase">
+                    <div class="phase-dot">3</div>
+                    <div class="phase-title">YouTube落地</div>
+                    <div class="phase-date">第2-8周</div>
+                </div>
+                <div class="phase">
+                    <div class="phase-dot">4</div>
+                    <div class="phase-title">监测与放大</div>
+                    <div class="phase-date">第6-12周</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 双阵地监测看板 -->
+        <div class="platforms-grid">
+            <!-- Reddit监测 -->
+            <div class="platform-card">
+                <div class="platform-header">
+                    <div class="platform-icon reddit-icon">📱</div>
+                    <div class="platform-title">
+                        <h3>Reddit 讨论阵地</h3>
+                        <p>UGC证据池 · 高意图捕获</p>
+                    </div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">内搜排名</div>
+                        <div class="metric-value">
+                            #3
+                            <span class="metric-change up">↑2</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Save/长评比</div>
+                        <div class="metric-value">
+                            68%
+                            <span class="metric-change up">+12%</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">AMA参与度</div>
+                        <div class="metric-value">
+                            342
+                            <span class="metric-change up">+45</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">FAQ互链率</div>
+                        <div class="metric-value">
+                            85%
+                            <span class="metric-change up">+8%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="font-size: 16px; margin-bottom: 15px;">热门帖子表现</h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">[AMA] 我们团队关于AI工具选择的10个避坑指南</div>
+                            <div style="font-size: 12px; color: #6B7280;">r/artificialintelligence · 892 upvotes · 156 comments</div>
+                        </div>
+                        <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">对比测评：主流AI工具实战对比表</div>
+                            <div style="font-size: 12px; color: #6B7280;">r/ChatGPT · 567 upvotes · 89 comments</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- YouTube监测 -->
+            <div class="platform-card">
+                <div class="platform-header">
+                    <div class="platform-icon youtube-icon">📺</div>
+                    <div class="platform-title">
+                        <h3>YouTube 证据中枢</h3>
+                        <p>视频证据 · 章节引用</p>
+                    </div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">章节引用率</div>
+                        <div class="metric-value">
+                            42%
+                            <span class="metric-change up">+15%</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">完播率</div>
+                        <div class="metric-value">
+                            58%
+                            <span class="metric-change up">+6%</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">描述区CTR</div>
+                        <div class="metric-value">
+                            12.3%
+                            <span class="metric-change up">+2.1%</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Shorts导流</div>
+                        <div class="metric-value">
+                            2.8K
+                            <span class="metric-change up">+450</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="font-size: 16px; margin-bottom: 15px;">高引用视频</h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">完整对比测评：2025最新AI工具深度评测</div>
+                            <div style="font-size: 12px; color: #6B7280;">15K views · 89% 章节完成率 · 23个AI引用</div>
+                        </div>
+                        <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">10分钟快速上手指南（多语字幕）</div>
+                            <div style="font-size: 12px; color: #6B7280;">8.2K views · 12个语言版本 · 18个AI引用</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 闭环流程监测 -->
+        <div class="loop-diagram">
+            <h2>🔄 讨论-证据-FAQ闭环监测</h2>
+            <div class="loop-flow">
+                <div class="loop-node">
+                    <div class="node-icon">💬</div>
+                    <div class="node-title">Reddit讨论</div>
+                    <div class="node-desc">高意图问题捕获</div>
+                </div>
+                <div class="loop-node">
+                    <div class="node-icon">🎥</div>
+                    <div class="node-title">YouTube证据</div>
+                    <div class="node-desc">视频验证与展示</div>
+                </div>
+                <div class="loop-node">
+                    <div class="node-icon">📚</div>
+                    <div class="node-title">FAQ沉淀</div>
+                    <div class="node-desc">结构化知识库</div>
+                </div>
+                <div class="loop-node">
+                    <div class="node-icon">🤖</div>
+                    <div class="node-title">AI引用</div>
+                    <div class="node-desc">搜索结果优化</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 内容监测表格 -->
+        <div class="content-monitor">
+            <h2>📊 内容表现监测</h2>
+            <div class="monitor-tabs">
+                <button class="tab active">高引用内容</button>
+                <button class="tab">待优化内容</button>
+                <button class="tab">竞品监测</button>
+            </div>
+            
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>内容主题</th>
+                        <th>平台分布</th>
+                        <th>互动指标</th>
+                        <th>AI引用</th>
+                        <th>转化效果</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="content-title">AI工具对比选型指南</div>
+                            <div class="content-meta">任务型 · 高意图</div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Reddit: <strong>3篇</strong></span>
+                                <span class="stat">YouTube: <strong>2视频</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Save率: <strong>72%</strong></span>
+                                <span class="stat">完播: <strong>61%</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ai-citation">
+                                <span class="citation-badge high">高频引用</span>
+                                <span style="font-size: 14px;">34次/周</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">CTR: <strong>15.2%</strong></span>
+                                <span class="stat">试用: <strong>89</strong></span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="content-title">避坑指南：常见误区解析</div>
+                            <div class="content-meta">避坑型 · 信任建立</div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Reddit: <strong>5篇</strong></span>
+                                <span class="stat">YouTube: <strong>1视频</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Save率: <strong>85%</strong></span>
+                                <span class="stat">完播: <strong>73%</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ai-citation">
+                                <span class="citation-badge high">高频引用</span>
+                                <span style="font-size: 14px;">28次/周</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">CTR: <strong>18.7%</strong></span>
+                                <span class="stat">试用: <strong>126</strong></span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="content-title">10分钟快速上手教程</div>
+                            <div class="content-meta">步骤型 · 实操指导</div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Reddit: <strong>2篇</strong></span>
+                                <span class="stat">YouTube: <strong>4视频</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Save率: <strong>45%</strong></span>
+                                <span class="stat">完播: <strong>52%</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ai-citation">
+                                <span class="citation-badge medium">中频引用</span>
+                                <span style="font-size: 14px;">15次/周</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">CTR: <strong>9.3%</strong></span>
+                                <span class="stat">试用: <strong>67</strong></span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 转化漏斗 -->
+        <div class="funnel-chart">
+            <h2>🎯 Reddit+YouTube 转化漏斗</h2>
+            
+            <div class="funnel-stage">
+                <div class="funnel-label">曝光量（AI搜索+平台内搜）</div>
+                <div class="funnel-bar" style="width: 100%;">
+                    <span>Reddit+YouTube曝光</span>
+                    <span class="funnel-value">45.2K</span>
+                </div>
+            </div>
+            
+            <div class="funnel-stage">
+                <div class="funnel-label">深度互动（Save/长评/完播）</div>
+                <div class="funnel-bar" style="width: 75%;">
+                    <span>有效互动</span>
+                    <span class="funnel-value">33.9K</span>
+                </div>
+            </div>
+            
+            <div class="funnel-stage">
+                <div class="funnel-label">FAQ/官网点击</div>
+                <div class="funnel-bar" style="width: 45%;">
+                    <span>导流成功</span>
+                    <span class="funnel-value">20.3K</span>
+                </div>
+            </div>
+            
+            <div class="funnel-stage">
+                <div class="funnel-label">Action触发（试用/咨询）</div>
+                <div class="funnel-bar" style="width: 25%;">
+                    <span>转化行动</span>
+                    <span class="funnel-value">11.3K</span>
+                </div>
+            </div>
+            
+            <div class="funnel-stage">
+                <div class="funnel-label">私域承接</div>
+                <div class="funnel-bar" style="width: 15%;">
+                    <span>长期价值</span>
+                    <span class="funnel-value">6.8K</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 实时警报 -->
+        <div class="alerts-panel">
+            <h2>🔔 实时监测警报</h2>
+            
+            <div class="alert-item success">
+                <div class="alert-icon" style="background: #DCFCE7; color: var(--success);">✓</div>
+                <div class="alert-content">
+                    <div class="alert-title">Reddit AMA获得高度关注</div>
+                    <div class="alert-desc">r/artificialintelligence的AMA帖子获得892个upvotes，已沉淀23个高质量FAQ</div>
+                </div>
+                <div class="alert-time">10分钟前</div>
+            </div>
+            
+            <div class="alert-item success">
+                <div class="alert-icon" style="background: #DCFCE7; color: var(--success);">📈</div>
+                <div class="alert-content">
+                    <div class="alert-title">YouTube章节引用率突破40%</div>
+                    <div class="alert-desc">对比测评视频的章节标记被AI搜索引用34次，建议制作更多章节化内容</div>
+                </div>
+                <div class="alert-time">1小时前</div>
+            </div>
+            
+            <div class="alert-item warning">
+                <div class="alert-icon" style="background: #FEF3C7; color: var(--warning);">⚠️</div>
+                <div class="alert-content">
+                    <div class="alert-title">跨平台口径一致性需要优化</div>
+                    <div class="alert-desc">检测到Reddit FAQ与YouTube描述区存在3处数据不一致，建议同步更新</div>
+                </div>
+                <div class="alert-time">2小时前</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 模拟实时数据更新
+        function updateMetrics() {
+            // 更新Reddit指标
+            const redditMetrics = document.querySelectorAll('.reddit-icon').closest('.platform-card').querySelectorAll('.metric-value');
+            
+            // 随机更新一些数值，模拟实时变化
+            if (Math.random() > 0.7) {
+                const saveRate = Math.floor(Math.random() * 5 + 65);
+                redditMetrics[1].innerHTML = `${saveRate}%<span class="metric-change up">+${Math.floor(Math.random() * 5 + 10)}%</span>`;
+            }
+            
+            // 更新YouTube指标
+            const youtubeMetrics = document.querySelectorAll('.youtube-icon').closest('.platform-card').querySelectorAll('.metric-value');
+            
+            if (Math.random() > 0.7) {
+                const citationRate = Math.floor(Math.random() * 10 + 38);
+                youtubeMetrics[0].innerHTML = `${citationRate}%<span class="metric-change up">+${Math.floor(Math.random() * 5 + 10)}%</span>`;
+            }
+        }
+        
+        // 每5秒更新一次数据
+        setInterval(updateMetrics, 5000);
+        
+        // Tab切换功能
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 这里可以添加切换内容的逻辑
+                console.log('切换到:', this.textContent);
+            });
+        });
+        
+        // 动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加渐入动画
+            const elements = document.querySelectorAll('.platform-card, .content-monitor, .loop-diagram, .funnel-chart, .alerts-panel');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'all 0.5s ease';
+                
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+        
+        // 模拟新警报
+        function addNewAlert() {
+            const alertsContainer = document.querySelector('.alerts-panel');
+            const alerts = [
+                {
+                    type: 'success',
+                    icon: '🎯',
+                    title: 'Shorts导流效果显著',
+                    desc: 'YouTube Shorts带来2.8K新用户访问主视频，转化率达18%'
+                },
+                {
+                    type: 'success',
+                    icon: '📊',
+                    title: 'AI引用率持续上升',
+                    desc: 'Perplexity和ChatGPT搜索中出现频率提升23%'
+                },
+                {
+                    type: 'warning',
+                    icon: '🔄',
+                    title: '需要更新FAQ内容',
+                    desc: '检测到用户新问题趋势，建议补充3个新FAQ条目'
+                }
+            ];
+            
+            // 随机添加新警报（实际应用中应该基于真实事件）
+            if (Math.random() > 0.95) {
+                const randomAlert = alerts[Math.floor(Math.random() * alerts.length)];
+                console.log('新警报:', randomAlert.title);
+            }
+        }
+        
+        // 每10秒检查一次新警报
+        setInterval(addNewAlert, 10000);
+    </script>
+</body>
+</html>
