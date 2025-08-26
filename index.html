@@ -6,6 +6,22 @@
     <title>Content Intelligence Center - Leap Company</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script>
+        // 认证检查
+        (function() {
+            const authToken = localStorage.getItem('authToken');
+            const sessionExpiry = localStorage.getItem('sessionExpiry');
+            
+            if (!authToken || !sessionExpiry || new Date().getTime() > parseInt(sessionExpiry)) {
+                // 清除过期的认证信息
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('sessionExpiry');
+                localStorage.removeItem('currentUser');
+                // 重定向到登录页
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
     <style>
         * {
             margin: 0;
@@ -38,6 +54,7 @@
             color: white;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: 0 30px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             z-index: 1000;
@@ -47,6 +64,48 @@
             font-size: 24px;
             font-weight: 600;
             letter-spacing: -0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .user-info i {
+            font-size: 20px;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .logout-btn i {
+            font-size: 14px;
         }
 
         /* Sidebar Navigation */
@@ -358,6 +417,27 @@
                 transform: translateX(0);
             }
 
+            .header-right {
+                gap: 10px;
+            }
+
+            .user-info {
+                font-size: 12px;
+            }
+
+            .user-info i {
+                font-size: 16px;
+            }
+
+            .logout-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .logout-btn span {
+                display: none;
+            }
+
             .main-content {
                 margin-left: 0;
             }
@@ -387,6 +467,16 @@
         <header class="header">
             <i class="fas fa-bars mobile-menu-toggle" onclick="toggleMobileMenu()"></i>
             <h1>Content Intelligence Center</h1>
+            <div class="header-right">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="currentUserDisplay"></span>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>退出</span>
+                </button>
+            </div>
         </header>
 
         <!-- Sidebar Navigation -->
@@ -713,6 +803,12 @@
         
         // Initialize monitoring system
         document.addEventListener('DOMContentLoaded', function() {
+            // 显示当前用户
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                document.getElementById('currentUserDisplay').textContent = currentUser;
+            }
+            
             // Expand the first menu and load default page
             const firstParent = document.querySelector('.nav-item-parent');
             if (firstParent) {
@@ -986,6 +1082,18 @@
                 e.preventDefault();
             });
         });
+
+        // 登出功能
+        function handleLogout() {
+            if (confirm('确定要退出登录吗？')) {
+                // 清除认证信息
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('sessionExpiry');
+                localStorage.removeItem('currentUser');
+                // 重定向到登录页
+                window.location.href = 'login.html';
+            }
+        }
     </script>
 </body>
 </html>
