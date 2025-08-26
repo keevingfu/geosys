@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEO实时监控中心 - Real-time Monitoring Dashboard</title>
-    <!-- 引入 ECharts -->
+    <title>GEO Real-time Monitoring Center - Real-time Monitoring Dashboard</title>
+    <!-- Import ECharts -->
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
-        /* 全局样式设置 - 定义设计系统的基础变量 */
+        /* Global Style Settings - Define design system base variables */
         * {
             margin: 0;
             padding: 0;
@@ -15,7 +15,7 @@
         }
 
         :root {
-            /* 色彩系统 - 遵循统一的设计语言 */
+            /* Color System - Follow unified design language */
             --primary: #5E72E4;
             --success: #2DCE89;
             --warning: #FB6340;
@@ -26,7 +26,7 @@
             --light: #F4F5F7;
             --white: #FFFFFF;
             
-            /* 渐变色定义 */
+            /* Gradient Color Definitions */
             --gradient-primary: linear-gradient(87deg, #5E72E4 0, #825EE4 100%);
             --gradient-success: linear-gradient(87deg, #2DCE89 0, #2DCECC 100%);
             --gradient-danger: linear-gradient(87deg, #F5365C 0, #F56036 100%);
@@ -39,14 +39,14 @@
             color: var(--dark);
         }
 
-        /* 容器布局 - 采用响应式网格系统 */
+        /* Container Layout - Responsive grid system */
         .container {
             max-width: 1440px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        /* 页面头部样式 */
+        /* Page Header Styles */
         .header {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -90,7 +90,7 @@
             100% { box-shadow: 0 0 0 0 rgba(45, 206, 137, 0); }
         }
 
-        /* KPI 卡片网格布局 */
+        /* KPI Card Grid Layout */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -141,7 +141,7 @@
             color: var(--danger);
         }
 
-        /* 主内容区域布局 */
+        /* Main Content Area Layout */
         .main-content {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -149,7 +149,7 @@
             margin-bottom: 30px;
         }
 
-        /* 图表容器样式 */
+        /* Chart Container Styles */
         .chart-container {
             background: white;
             border-radius: 12px;
@@ -200,13 +200,13 @@
             border-color: var(--primary);
         }
 
-        /* 图表渲染区域 */
+        /* Chart Rendering Area */
         .chart-body {
             height: 300px;
             position: relative;
         }
 
-        /* 实时告警面板 */
+        /* Real-time Alert Panel */
         .alert-panel {
             background: white;
             border-radius: 12px;
@@ -286,7 +286,7 @@
             line-height: 1.4;
         }
 
-        /* 渠道状态网格 */
+        /* Channel Status Grid */
         .channel-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -339,7 +339,7 @@
             color: var(--warning);
         }
 
-        /* 系统资源监控 */
+        /* System Resource Monitoring */
         .resource-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -360,7 +360,7 @@
             height: 100px;
         }
 
-        /* 响应式设计 */
+        /* Responsive Design */
         @media (max-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -381,7 +381,7 @@
             }
         }
 
-        /* 加载动画 */
+        /* Loading Animation */
         .loading {
             display: inline-block;
             width: 20px;
@@ -399,206 +399,206 @@
 </head>
 <body>
     <div class="container">
-        <!-- 页面头部 - 显示标题和系统状态 -->
+        <!-- Page Header - Display title and system status -->
         <header class="header">
             <h1>
                 <span>📊</span>
-                GEO实时监控中心
+                GEO Real-time Monitoring Center
             </h1>
             <div class="header-time">
                 <div class="status-indicator"></div>
-                <span>系统运行正常</span>
+                <span>System Status Normal</span>
                 <span>|</span>
                 <span id="currentTime">2025-01-15 14:30:45</span>
             </div>
         </header>
 
-        <!-- KPI指标卡片 - 展示核心业务指标 -->
+        <!-- KPI Metrics Cards - Core Business Metrics -->
         <div class="kpi-grid">
             <div class="kpi-card">
-                <div class="kpi-label">AI引擎引用率</div>
+                <div class="kpi-label">AI Engine Citation Rate</div>
                 <div class="kpi-value" id="aiCitationRate">78.5%</div>
                 <div class="kpi-change positive">
-                    <span>↑</span> 12.3% vs 昨日
+                    <span>↑</span> 12.3% vs Yesterday
                 </div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">内容发布成功率</div>
+                <div class="kpi-label">Content Publishing Success Rate</div>
                 <div class="kpi-value" id="publishSuccess">95.2%</div>
                 <div class="kpi-change positive">
-                    <span>↑</span> 2.1% vs 昨日
+                    <span>↑</span> 2.1% vs Yesterday
                 </div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">平均响应时间</div>
+                <div class="kpi-label">Average Response Time</div>
                 <div class="kpi-value" id="avgResponse">234ms</div>
                 <div class="kpi-change positive">
-                    <span>↓</span> 15ms 优化
+                    <span>↓</span> 15ms Optimized
                 </div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">活跃渠道数</div>
+                <div class="kpi-label">Active Channel Count</div>
                 <div class="kpi-value" id="activeChannels">18/24</div>
                 <div class="kpi-change negative">
-                    <span>↓</span> 2个离线
+                    <span>↓</span> 2 Offline
                 </div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">今日转化数</div>
+                <div class="kpi-label">Today's Conversion Count</div>
                 <div class="kpi-value" id="todayConversions">1,247</div>
                 <div class="kpi-change positive">
-                    <span>↑</span> 156 vs 昨日同期
+                    <span>↑</span> 156 vs Yesterday Same Period
                 </div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">异常告警</div>
+                <div class="kpi-label">Abnormal Alerts</div>
                 <div class="kpi-value" id="alertCount">3</div>
                 <div class="kpi-change negative">
-                    <span>↑</span> 2个新告警
+                    <span>↑</span> 2 New Alerts
                 </div>
             </div>
         </div>
 
-        <!-- 主内容区域 -->
+        <!-- Main Content Area -->
         <div class="main-content">
-            <!-- 左侧图表区域 -->
+            <!-- Left Chart Area -->
             <div class="charts-section">
-                <!-- AI引擎引用率实时趋势图 -->
+                <!-- AI Engine Citation Rate Real-time Trend Chart -->
                 <div class="chart-container">
                     <div class="chart-header">
-                        <h3 class="chart-title">AI引擎引用率趋势</h3>
+                        <h3 class="chart-title">AI Engine Citation Rate Trend</h3>
                         <div class="chart-controls">
-                            <button class="chart-btn active" onclick="updateTimeRange('ai', '1h')">1小时</button>
-                            <button class="chart-btn" onclick="updateTimeRange('ai', '24h')">24小时</button>
-                            <button class="chart-btn" onclick="updateTimeRange('ai', '7d')">7天</button>
+                            <button class="chart-btn active" onclick="updateTimeRange('ai', '1h')">1 Hour</button>
+                            <button class="chart-btn" onclick="updateTimeRange('ai', '24h')">24 Hours</button>
+                            <button class="chart-btn" onclick="updateTimeRange('ai', '7d')">7 Days</button>
                         </div>
                     </div>
                     <div class="chart-body" id="aiTrendChart"></div>
                 </div>
 
-                <!-- 渠道发布状态监控 -->
+                <!-- Channel Publishing Status Monitoring -->
                 <div class="chart-container">
                     <div class="chart-header">
-                        <h3 class="chart-title">渠道发布状态</h3>
+                        <h3 class="chart-title">Channel Publishing Status</h3>
                         <div class="chart-controls">
-                            <button class="chart-btn" onclick="refreshChannelStatus()">🔄 刷新</button>
+                            <button class="chart-btn" onclick="refreshChannelStatus()">🔄 Refresh</button>
                         </div>
                     </div>
                     <div class="channel-grid">
                         <div class="channel-card">
                             <div class="channel-icon">📘</div>
                             <div class="channel-name">LinkedIn</div>
-                            <div class="channel-status online">运行中</div>
+                            <div class="channel-status online">Running</div>
                         </div>
                         <div class="channel-card">
                             <div class="channel-icon">🐦</div>
                             <div class="channel-name">Twitter/X</div>
-                            <div class="channel-status online">运行中</div>
+                            <div class="channel-status online">Running</div>
                         </div>
                         <div class="channel-card">
                             <div class="channel-icon">📺</div>
                             <div class="channel-name">YouTube</div>
-                            <div class="channel-status online">运行中</div>
+                            <div class="channel-status online">Running</div>
                         </div>
                         <div class="channel-card">
                             <div class="channel-icon">👽</div>
                             <div class="channel-name">Reddit</div>
-                            <div class="channel-status pending">发布中</div>
+                            <div class="channel-status pending">Publishing</div>
                         </div>
                         <div class="channel-card">
                             <div class="channel-icon">📝</div>
                             <div class="channel-name">Medium</div>
-                            <div class="channel-status online">运行中</div>
+                            <div class="channel-status online">Running</div>
                         </div>
                         <div class="channel-card">
                             <div class="channel-icon">💬</div>
                             <div class="channel-name">Quora</div>
-                            <div class="channel-status offline">维护中</div>
+                            <div class="channel-status offline">Under Maintenance</div>
                         </div>
                         <div class="channel-card">
                             <div class="channel-icon">📱</div>
                             <div class="channel-name">WhatsApp</div>
-                            <div class="channel-status online">运行中</div>
+                            <div class="channel-status online">Running</div>
                         </div>
                         <div class="channel-card">
                             <div class="channel-icon">🛍️</div>
                             <div class="channel-name">Amazon</div>
-                            <div class="channel-status offline">离线</div>
+                            <div class="channel-status offline">Offline</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 内容表现实时数据流 -->
+                <!-- Content Performance Real-time Data Stream -->
                 <div class="chart-container">
                     <div class="chart-header">
-                        <h3 class="chart-title">内容表现实时流</h3>
+                        <h3 class="chart-title">Content Performance Real-time Stream</h3>
                         <div class="chart-controls">
-                            <span style="font-size: 12px; color: var(--secondary);">最近100条数据</span>
+                            <span style="font-size: 12px; color: var(--secondary);">Latest 100 Data Points</span>
                         </div>
                     </div>
                     <div class="chart-body" id="contentPerformanceChart"></div>
                 </div>
             </div>
 
-            <!-- 右侧告警和监控面板 -->
+            <!-- Right Sidebar Alerts and Monitoring Panel -->
             <div class="sidebar">
-                <!-- 实时告警面板 -->
+                <!-- Real-time Alert Panel -->
                 <div class="alert-panel">
                     <div class="alert-header">
                         <h3 class="alert-title">
-                            实时告警
+                            Real-time Alerts
                             <span class="alert-count">3</span>
                         </h3>
                     </div>
                     <div class="alert-list" id="alertList">
                         <div class="alert-item critical">
                             <div class="alert-time">14:28:32</div>
-                            <div class="alert-message">YouTube API 响应超时，连续3次失败</div>
+                            <div class="alert-message">YouTube API response timeout, 3 consecutive failures</div>
                         </div>
                         <div class="alert-item warning">
                             <div class="alert-time">14:25:17</div>
-                            <div class="alert-message">Reddit 发布队列积压超过阈值（当前: 45）</div>
+                            <div class="alert-message">Reddit publishing queue backlog exceeds threshold (current: 45)</div>
                         </div>
                         <div class="alert-item info">
                             <div class="alert-time">14:20:45</div>
-                            <div class="alert-message">AI引用率低于目标值（当前: 65%, 目标: 70%）</div>
+                            <div class="alert-message">AI Citation Rate below target (current: 65%, target: 70%)</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 竞品监测 -->
+                <!-- Competitor Monitoring -->
                 <div class="chart-container" style="margin-top: 20px;">
                     <div class="chart-header">
-                        <h3 class="chart-title">竞品内容监测</h3>
+                        <h3 class="chart-title">Competitor Content Monitoring</h3>
                     </div>
                     <div class="chart-body" id="competitorChart"></div>
                 </div>
             </div>
         </div>
 
-        <!-- 系统性能监控 -->
+        <!-- System Performance Monitoring -->
         <div class="chart-container">
             <div class="chart-header">
-                <h3 class="chart-title">系统资源监控</h3>
+                <h3 class="chart-title">System Resource Monitoring</h3>
                 <div class="chart-controls">
-                    <span style="font-size: 12px; color: var(--secondary);">实时更新中...</span>
+                    <span style="font-size: 12px; color: var(--secondary);">Real-time updating...</span>
                 </div>
             </div>
             <div class="resource-grid">
                 <div class="resource-item">
-                    <div class="resource-label">CPU使用率</div>
+                    <div class="resource-label">CPU Usage</div>
                     <div class="resource-chart" id="cpuChart"></div>
                 </div>
                 <div class="resource-item">
-                    <div class="resource-label">内存使用率</div>
+                    <div class="resource-label">Memory Usage</div>
                     <div class="resource-chart" id="memoryChart"></div>
                 </div>
                 <div class="resource-item">
-                    <div class="resource-label">网络吞吐量</div>
+                    <div class="resource-label">Network Throughput</div>
                     <div class="resource-chart" id="networkChart"></div>
                 </div>
                 <div class="resource-item">
-                    <div class="resource-label">API调用量</div>
+                    <div class="resource-label">API Call Volume</div>
                     <div class="resource-chart" id="apiChart"></div>
                 </div>
             </div>
@@ -606,9 +606,9 @@
     </div>
 
     <script>
-        // ========== 全局配置和初始化 ==========
+        // ========== Global Configuration and Initialization ==========
         
-        // 图表主题配置 - 统一的视觉风格
+        // Chart Theme Configuration - Unified visual style
         const chartTheme = {
             color: ['#5E72E4', '#2DCE89', '#FB6340', '#11CDEF', '#F5365C'],
             backgroundColor: 'transparent',
@@ -617,10 +617,10 @@
             }
         };
 
-        // 初始化所有图表实例
+        // Initialize all chart instances
         let charts = {};
 
-        // ========== 实时时间更新 ==========
+        // ========== Real-time Time Updates ==========
         function updateCurrentTime() {
             const now = new Date();
             const formattedTime = now.toLocaleString('zh-CN', {
@@ -634,15 +634,15 @@
             document.getElementById('currentTime').textContent = formattedTime;
         }
         
-        // 每秒更新时间
+        // Update time every second
         setInterval(updateCurrentTime, 1000);
 
-        // ========== AI引擎引用率趋势图 ==========
+        // ========== AI Engine Citation Rate Trend Chart ==========
         function initAITrendChart() {
             const chartDom = document.getElementById('aiTrendChart');
             charts.aiTrend = echarts.init(chartDom);
             
-            // 生成模拟数据 - 实际应用中应从API获取
+            // Generate mock data - In real applications should fetch from API
             const generateData = () => {
                 const data = [];
                 const now = new Date();
@@ -661,7 +661,7 @@
             const option = {
                 tooltip: {
                     trigger: 'axis',
-                    formatter: '{b}<br/>引用率: {c}%'
+                    formatter: '{b}<br/>Citation Rate: {c}%'
                 },
                 grid: {
                     left: '3%',
@@ -699,7 +699,7 @@
                     }
                 },
                 series: [{
-                    name: 'AI引用率',
+                    name: 'AI Citation Rate',
                     type: 'line',
                     smooth: true,
                     symbol: 'none',
@@ -723,13 +723,13 @@
             charts.aiTrend.setOption(option);
         }
 
-        // ========== 内容表现实时数据流图表 ==========
+        // ========== Content Performance Real-time Data Stream Chart ==========
         function initContentPerformanceChart() {
             const chartDom = document.getElementById('contentPerformanceChart');
             charts.contentPerformance = echarts.init(chartDom);
             
-            // 模拟实时数据流
-            const categories = ['浏览量', '互动率', '转化率', '分享数'];
+            // Simulate real-time data stream
+            const categories = ['Views', 'Engagement Rate', 'Conversion Rate', 'Shares'];
             const generateStreamData = () => {
                 return categories.map(cat => ({
                     name: cat,
@@ -785,7 +785,7 @@
             charts.contentPerformance.setOption(option);
         }
 
-        // ========== 竞品监测雷达图 ==========
+        // ========== Competitor Monitoring Radar Chart ==========
         function initCompetitorChart() {
             const chartDom = document.getElementById('competitorChart');
             charts.competitor = echarts.init(chartDom);
@@ -794,11 +794,11 @@
                 tooltip: {},
                 radar: {
                     indicator: [
-                        { name: '内容量', max: 100 },
-                        { name: '互动率', max: 100 },
-                        { name: 'AI引用', max: 100 },
-                        { name: '品牌提及', max: 100 },
-                        { name: '转化率', max: 100 }
+                        { name: 'Content Volume', max: 100 },
+                        { name: 'Engagement Rate', max: 100 },
+                        { name: 'AI Citations', max: 100 },
+                        { name: 'Brand Mentions', max: 100 },
+                        { name: 'Conversion Rate', max: 100 }
                     ],
                     radius: '60%',
                     splitArea: {
@@ -812,7 +812,7 @@
                     data: [
                         {
                             value: [85, 78, 92, 67, 88],
-                            name: '我们',
+                            name: 'Us',
                             lineStyle: {
                                 color: '#5E72E4',
                                 width: 2
@@ -823,7 +823,7 @@
                         },
                         {
                             value: [72, 85, 65, 82, 75],
-                            name: '竞品A',
+                            name: 'Competitor A',
                             lineStyle: {
                                 color: '#2DCE89',
                                 width: 2
@@ -834,7 +834,7 @@
                         },
                         {
                             value: [68, 70, 78, 72, 70],
-                            name: '竞品B',
+                            name: 'Competitor B',
                             lineStyle: {
                                 color: '#FB6340',
                                 width: 2
@@ -850,34 +850,34 @@
             charts.competitor.setOption(option);
         }
 
-        // ========== 系统资源监控仪表盘 ==========
+        // ========== System Resource Monitoring Dashboards ==========
         function initResourceCharts() {
-            // CPU使用率仪表盘
+            // CPU usage dashboard
             const cpuChart = echarts.init(document.getElementById('cpuChart'));
             const cpuOption = createGaugeOption('CPU', 45, '#5E72E4');
             cpuChart.setOption(cpuOption);
             charts.cpu = cpuChart;
 
-            // 内存使用率仪表盘
+            // Memory usage dashboard
             const memoryChart = echarts.init(document.getElementById('memoryChart'));
-            const memoryOption = createGaugeOption('内存', 62, '#2DCE89');
+            const memoryOption = createGaugeOption('Memory', 62, '#2DCE89');
             memoryChart.setOption(memoryOption);
             charts.memory = memoryChart;
 
-            // 网络吞吐量仪表盘
+            // Network throughput dashboard
             const networkChart = echarts.init(document.getElementById('networkChart'));
-            const networkOption = createGaugeOption('网络', 78, '#11CDEF');
+            const networkOption = createGaugeOption('Network', 78, '#11CDEF');
             networkChart.setOption(networkOption);
             charts.network = networkChart;
 
-            // API调用量仪表盘
+            // API call volume dashboard
             const apiChart = echarts.init(document.getElementById('apiChart'));
             const apiOption = createGaugeOption('API', 35, '#FB6340');
             apiChart.setOption(apiOption);
             charts.api = apiChart;
         }
 
-        // 创建仪表盘配置的辅助函数
+        // Helper function to create gauge configuration
         function createGaugeOption(name, value, color) {
             return {
                 series: [{
@@ -930,15 +930,15 @@
             };
         }
 
-        // ========== 实时数据更新逻辑 ==========
+        // ========== Real-time Data Update Logic ==========
         function updateRealTimeData() {
-            // 更新KPI数值 - 模拟数据变化
+            // Update KPI values - simulate data changes
             const updateKPIValue = (elementId, baseValue, variance) => {
                 const element = document.getElementById(elementId);
                 const currentValue = parseFloat(element.textContent);
                 let newValue = baseValue + (Math.random() - 0.5) * variance;
                 
-                // 根据不同的KPI类型格式化显示
+                // Format display based on different KPI types
                 if (elementId === 'aiCitationRate' || elementId === 'publishSuccess') {
                     newValue = Math.max(0, Math.min(100, newValue));
                     element.textContent = newValue.toFixed(1) + '%';
@@ -950,19 +950,19 @@
                 }
             };
 
-            // 定期更新各项KPI
+            // Periodically update all KPIs
             updateKPIValue('aiCitationRate', 78.5, 5);
             updateKPIValue('publishSuccess', 95.2, 3);
             updateKPIValue('avgResponse', 234, 50);
             updateKPIValue('todayConversions', 1247, 100);
 
-            // 更新AI趋势图 - 添加新数据点
+            // Update AI trend chart - add new data points
             if (charts.aiTrend) {
                 const option = charts.aiTrend.getOption();
                 const data = option.series[0].data;
                 const xData = option.xAxis[0].data;
                 
-                // 移除最旧的数据点，添加新数据点
+                // Remove oldest data point, add new data point
                 data.shift();
                 xData.shift();
                 
@@ -974,7 +974,7 @@
                 charts.aiTrend.setOption(option);
             }
 
-            // 更新系统资源使用率
+            // Update system resource usage
             if (charts.cpu) {
                 updateGaugeValue(charts.cpu, 35, 65);
                 updateGaugeValue(charts.memory, 50, 75);
@@ -983,7 +983,7 @@
             }
         }
 
-        // 更新仪表盘数值的辅助函数
+        // Helper function to update gauge values
         function updateGaugeValue(chart, min, max) {
             const option = chart.getOption();
             const newValue = min + Math.random() * (max - min);
@@ -991,7 +991,7 @@
             chart.setOption(option);
         }
 
-        // ========== 告警管理 ==========
+        // ========== Alert Management ==========
         function addNewAlert(type, message) {
             const alertList = document.getElementById('alertList');
             const alertItem = document.createElement('div');
@@ -1005,67 +1005,67 @@
                 <div class="alert-message">${message}</div>
             `;
             
-            // 添加到列表顶部
+            // Add to top of list
             alertList.insertBefore(alertItem, alertList.firstChild);
             
-            // 限制显示数量
+            // Limit display count
             while (alertList.children.length > 10) {
                 alertList.removeChild(alertList.lastChild);
             }
             
-            // 更新告警计数
+            // Update alert count
             const alertCount = document.getElementById('alertCount');
             alertCount.textContent = alertList.children.length;
         }
 
-        // 模拟告警生成
+        // Simulate alert generation
         function simulateAlerts() {
             const alertTypes = ['critical', 'warning', 'info'];
             const alertMessages = [
-                'API响应时间超过阈值',
-                '渠道连接异常',
-                '内容发布队列积压',
-                'AI引用率低于目标',
-                '系统内存使用率过高',
-                '竞品内容激增检测'
+                'API response time exceeds threshold',
+                'Channel connection abnormal',
+                'Content publishing queue backlog',
+                'AI citation rate below target',
+                'System memory usage too high',
+                'Competitor content surge detected'
             ];
             
-            // 随机生成告警
-            if (Math.random() < 0.1) { // 10%概率生成新告警
+            // Randomly generate alerts
+            if (Math.random() < 0.1) { // 10% probability of generating new alert
                 const type = alertTypes[Math.floor(Math.random() * alertTypes.length)];
                 const message = alertMessages[Math.floor(Math.random() * alertMessages.length)];
                 addNewAlert(type, message);
             }
         }
 
-        // ========== 交互功能 ==========
+        // ========== Interactive Functions ==========
         
-        // 时间范围切换
+        // Time range switching
         function updateTimeRange(chartType, range) {
-            // 更新按钮状态
+            // Update button state
             const buttons = event.target.parentElement.querySelectorAll('.chart-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
-            // 根据时间范围重新加载数据
-            console.log(`切换 ${chartType} 图表时间范围为: ${range}`);
-            // 实际应用中这里应该调用API获取对应时间范围的数据
+            // Reload data based on time range
+            console.log(`Switch ${chartType} chart time range to: ${range}`);
+            // In real applications, this should call API to get data for corresponding time range
         }
 
-        // 刷新渠道状态
+        // Refresh channel status
         function refreshChannelStatus() {
             const channels = document.querySelectorAll('.channel-card');
             channels.forEach(channel => {
-                // 随机更新状态模拟
+                // Random status update simulation
                 const statusElement = channel.querySelector('.channel-status');
                 const statuses = ['online', 'offline', 'pending'];
                 const statusTexts = {
-                    'online': '运行中',
-                    'offline': '离线',
-                    'pending': '发布中'
+                    'online': 'Running',
+                    'offline': 'Offline',
+                    'pending': 'Publishing'
                 };
                 
-                if (Math.random() < 0.3) { // 30%概率改变状态
+                if (Math.random() < 0.3) { // 30% probability of status change
                     const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
                     statusElement.className = `channel-status ${newStatus}`;
                     statusElement.textContent = statusTexts[newStatus];
@@ -1073,9 +1073,9 @@
             });
         }
 
-        // ========== 响应式处理 ==========
+        // ========== Responsive Handling ==========
         function handleResize() {
-            // 重新调整所有图表大小
+            // Resize all charts
             Object.values(charts).forEach(chart => {
                 if (chart && !chart.isDisposed()) {
                     chart.resize();
@@ -1083,30 +1083,30 @@
             });
         }
 
-        // ========== 初始化和启动 ==========
+        // ========== Initialization and Startup ==========
         document.addEventListener('DOMContentLoaded', function() {
-            // 初始化所有图表
+            // Initialize all charts
             initAITrendChart();
             initContentPerformanceChart();
             initCompetitorChart();
             initResourceCharts();
             
-            // 启动实时更新
-            setInterval(updateRealTimeData, 3000); // 每3秒更新数据
-            setInterval(simulateAlerts, 5000); // 每5秒检查告警
+            // Start real-time updates
+            setInterval(updateRealTimeData, 3000); // Update data every 3 seconds
+            setInterval(simulateAlerts, 5000); // Check alerts every 5 seconds
             
-            // 监听窗口大小变化
+            // Listen for window resize events
             window.addEventListener('resize', handleResize);
             
-            // 初始化时间显示
+            // Initialize time display
             updateCurrentTime();
             
-            console.log('实时监控系统初始化完成');
+            console.log('Real-time Monitoring system initialization completed');
         });
 
-        // ========== 清理资源 ==========
+        // ========== Resource Cleanup ==========
         window.addEventListener('beforeunload', function() {
-            // 销毁所有图表实例，释放资源
+            // Destroy all chart instances, free resources
             Object.values(charts).forEach(chart => {
                 if (chart && !chart.isDisposed()) {
                     chart.dispose();

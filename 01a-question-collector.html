@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEO问题采集系统 - 发现用户真实意图</title>
+    <title>GEO Question Collection System - Discover User Intent</title>
     <style>
-        /* 设计理念：创建一个高效的问题发现和采集工作台 */
+        /* Design philosophy: Create an efficient question discovery and collection workspace */
         * {
             margin: 0;
             padding: 0;
@@ -36,7 +36,7 @@
             line-height: 1.6;
         }
 
-        /* 顶部导航：展示采集进度和关键指标 */
+        /* Top navigation: Display collection progress and key metrics */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -90,7 +90,7 @@
             opacity: 0.9;
         }
 
-        /* 进度条设计 */
+        /* Progress bar design */
         .progress-bar-container {
             background: rgba(255,255,255,0.2);
             height: 8px;
@@ -122,14 +122,14 @@
             100% { transform: translateX(100%); }
         }
 
-        /* 主容器布局 */
+        /* Main container layout */
         .container {
             max-width: 1400px;
             margin: 24px auto;
             padding: 0 24px;
         }
 
-        /* 渠道卡片网格 */
+        /* Channel card grid */
         .channels-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -229,7 +229,7 @@
             color: var(--text-secondary);
         }
 
-        /* 采集控制面板 */
+        /* Collection control panel */
         .control-panel {
             background: var(--card-bg);
             border-radius: 12px;
@@ -279,7 +279,7 @@
             background: var(--hover-bg);
         }
 
-        /* 批量导入区域 */
+        /* Bulk import area */
         .import-zone {
             border: 2px dashed var(--border);
             border-radius: 8px;
@@ -300,7 +300,7 @@
             opacity: 0.5;
         }
 
-        /* 实时采集流 */
+        /* Real-time collection stream */
         .live-stream {
             background: var(--card-bg);
             border-radius: 12px;
@@ -345,7 +345,7 @@
             50% { opacity: 0.5; }
         }
 
-        /* 问题项样式 */
+        /* Question item styles */
         .question-item {
             background: var(--hover-bg);
             border-radius: 8px;
@@ -402,7 +402,7 @@
             gap: 8px;
         }
 
-        /* 按钮样式 */
+        /* Button styles */
         .btn {
             padding: 8px 16px;
             border-radius: 6px;
@@ -448,7 +448,7 @@
             font-size: 12px;
         }
 
-        /* 质量评分标签 */
+        /* Quality score labels */
         .quality-badge {
             display: inline-flex;
             align-items: center;
@@ -462,7 +462,7 @@
         .quality-medium { background: #fff7e6; color: #faad14; }
         .quality-low { background: #fff1f0; color: #f5222d; }
 
-        /* AI智能提取面板 */
+        /* AI Smart Extraction Panel */
         .ai-panel {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -496,7 +496,7 @@
             font-size: 14px;
         }
 
-        /* 文本输入区域 */
+        /* Text input area */
         .text-input-area {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
@@ -521,7 +521,7 @@
             color: rgba(255,255,255,0.6);
         }
 
-        /* 过滤和排序工具栏 */
+        /* Filter and sort toolbar */
         .toolbar {
             background: var(--card-bg);
             border-radius: 8px;
@@ -552,7 +552,7 @@
             border-color: var(--primary);
         }
 
-        /* 批量操作浮动栏 */
+        /* Bulk operation floating bar */
         .batch-actions {
             position: fixed;
             bottom: 24px;
@@ -572,7 +572,7 @@
             display: flex;
         }
 
-        /* 统计图表 */
+        /* Statistical charts */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -614,7 +614,7 @@
             opacity: 0.8;
         }
 
-        /* 右侧固定操作面板 */
+        /* Right-side fixed operation panel */
         .side-panel {
             position: fixed;
             right: 24px;
@@ -650,7 +650,7 @@
             transform: scale(1.1);
         }
 
-        /* 响应式设计 */
+        /* Responsive design */
         @media (max-width: 768px) {
             .channels-grid {
                 grid-template-columns: 1fr;
@@ -665,7 +665,7 @@
             }
         }
 
-        /* 加载动画 */
+        /* Loading animation */
         .spinner {
             display: inline-block;
             width: 16px;
@@ -682,30 +682,30 @@
     </style>
 </head>
 <body>
-    <!-- 顶部进度展示：让团队清晰了解采集进度 -->
+    <!-- Top progress display: Let the team clearly understand collection progress -->
     <header class="header">
         <div class="header-content">
             <div class="header-top">
                 <div class="logo">
                     <span>🎯</span>
-                    <span>GEO问题采集系统</span>
+                    <span>GEO Question Collection System</span>
                 </div>
                 <div class="progress-info">
                     <div class="progress-stat">
                         <div class="progress-value" id="totalCollected">87</div>
-                        <div class="progress-label">已采集问题</div>
+                        <div class="progress-label">Questions Collected</div>
                     </div>
                     <div class="progress-stat">
                         <div class="progress-value" id="targetGoal">120</div>
-                        <div class="progress-label">目标数量</div>
+                        <div class="progress-label">Target Quantity</div>
                     </div>
                     <div class="progress-stat">
                         <div class="progress-value" id="qualityRate">76%</div>
-                        <div class="progress-label">高质量率</div>
+                        <div class="progress-label">High Quality Rate</div>
                     </div>
                     <div class="progress-stat">
-                        <div class="progress-value" id="timeLeft">5天</div>
-                        <div class="progress-label">剩余时间</div>
+                        <div class="progress-value" id="timeLeft">5 days</div>
+                        <div class="progress-label">Time Remaining</div>
                     </div>
                 </div>
             </div>
@@ -716,233 +716,233 @@
     </header>
 
     <div class="container">
-        <!-- 多渠道数据源监控面板 -->
+        <!-- Multi-channel data source monitoring panel -->
         <section class="channels-section">
             <div class="panel-header">
                 <h2 class="panel-title">
                     <span>📡</span>
-                    <span>数据源渠道</span>
+                    <span>Data Source Channels</span>
                 </h2>
                 <button class="btn btn-primary">
                     <span>➕</span>
-                    <span>添加渠道</span>
+                    <span>Add Channel</span>
                 </button>
             </div>
             
             <div class="channels-grid">
-                <!-- Reddit监听 -->
+                <!-- Reddit Monitoring -->
                 <div class="channel-card active">
                     <div class="channel-header">
                         <div class="channel-icon channel-reddit">R</div>
-                        <span class="channel-status status-active">采集中</span>
+                        <span class="channel-status status-active">Collecting</span>
                     </div>
                     <div class="channel-info">
-                        <h3>Reddit社区</h3>
+                        <h3>Reddit Community</h3>
                         <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0;">
-                            监控: r/airpurifiers, r/allergies, r/homeimprovement
+                            Monitoring: r/airpurifiers, r/allergies, r/homeimprovement
                         </p>
                     </div>
                     <div class="channel-stats">
                         <div class="stat">
                             <div class="stat-value">34</div>
-                            <div class="stat-label">今日新增</div>
+                            <div class="stat-label">Added Today</div>
                         </div>
                         <div class="stat">
                             <div class="stat-value">156</div>
-                            <div class="stat-label">累计采集</div>
+                            <div class="stat-label">Total Collected</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 搜索数据 -->
+                <!-- Search data -->
                 <div class="channel-card active">
                     <div class="channel-header">
                         <div class="channel-icon channel-search">G</div>
-                        <span class="channel-status status-active">同步中</span>
+                        <span class="channel-status status-active">Syncing</span>
                     </div>
                     <div class="channel-info">
-                        <h3>搜索查询</h3>
+                        <h3>Search Queries</h3>
                         <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0;">
-                            Google Search Console + 相关搜索
+                            Google Search Console + Related Searches
                         </p>
                     </div>
                     <div class="channel-stats">
                         <div class="stat">
                             <div class="stat-value">89</div>
-                            <div class="stat-label">热门查询</div>
+                            <div class="stat-label">Popular Queries</div>
                         </div>
                         <div class="stat">
                             <div class="stat-value">2.3k</div>
-                            <div class="stat-label">月搜索量</div>
+                            <div class="stat-label">Monthly Searches</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 社交媒体 -->
+                <!-- Social media -->
                 <div class="channel-card">
                     <div class="channel-header">
                         <div class="channel-icon channel-social">T</div>
-                        <span class="channel-status status-pending">待配置</span>
+                        <span class="channel-status status-pending">Pending Setup</span>
                     </div>
                     <div class="channel-info">
-                        <h3>社交媒体</h3>
+                        <h3>Social Media</h3>
                         <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0;">
-                            Twitter/X 提及监控
+                            Twitter/X Mention Monitoring
                         </p>
                     </div>
                     <div class="channel-stats">
                         <div class="stat">
                             <div class="stat-value">12</div>
-                            <div class="stat-label">待处理</div>
+                            <div class="stat-label">Pending</div>
                         </div>
                         <div class="stat">
                             <div class="stat-value">45</div>
-                            <div class="stat-label">累计采集</div>
+                            <div class="stat-label">Total Collected</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 客服记录 -->
+                <!-- Customer service records -->
                 <div class="channel-card active">
                     <div class="channel-header">
                         <div class="channel-icon channel-support">📞</div>
-                        <span class="channel-status status-active">已连接</span>
+                        <span class="channel-status status-active">Connected</span>
                     </div>
                     <div class="channel-info">
-                        <h3>客服系统</h3>
+                        <h3>Customer Service System</h3>
                         <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0;">
-                            Zendesk工单 + 在线聊天记录
+                            Zendesk Tickets + Live Chat Records
                         </p>
                     </div>
                     <div class="channel-stats">
                         <div class="stat">
                             <div class="stat-value">67</div>
-                            <div class="stat-label">常见问题</div>
+                            <div class="stat-label">Common Questions</div>
                         </div>
                         <div class="stat">
                             <div class="stat-value">92%</div>
-                            <div class="stat-label">覆盖率</div>
+                            <div class="stat-label">Coverage Rate</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 竞品分析 -->
+                <!-- Competitor analysis -->
                 <div class="channel-card">
                     <div class="channel-header">
                         <div class="channel-icon channel-competitor">👁️</div>
-                        <span class="channel-status status-inactive">未启用</span>
+                        <span class="channel-status status-inactive">Disabled</span>
                     </div>
                     <div class="channel-info">
-                        <h3>竞品内容</h3>
+                        <h3>Competitor Content</h3>
                         <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0;">
-                            竞品FAQ和内容分析
+                            Competitor FAQ and Content Analysis
                         </p>
                     </div>
                     <div class="channel-stats">
                         <div class="stat">
                             <div class="stat-value">0</div>
-                            <div class="stat-label">待分析</div>
+                            <div class="stat-label">To Analyze</div>
                         </div>
                         <div class="stat">
                             <div class="stat-value">--</div>
-                            <div class="stat-label">差异化</div>
+                            <div class="stat-label">Differentiation</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 评论评价 -->
+                <!-- Reviews and ratings -->
                 <div class="channel-card active">
                     <div class="channel-header">
                         <div class="channel-icon channel-review">⭐</div>
-                        <span class="channel-status status-active">采集中</span>
+                        <span class="channel-status status-active">Collecting</span>
                     </div>
                     <div class="channel-info">
-                        <h3>用户评价</h3>
+                        <h3>User Reviews</h3>
                         <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0;">
-                            Amazon + YouTube评论
+                            Amazon + YouTube Comments
                         </p>
                     </div>
                     <div class="channel-stats">
                         <div class="stat">
                             <div class="stat-value">28</div>
-                            <div class="stat-label">新问题</div>
+                            <div class="stat-label">New Questions</div>
                         </div>
                         <div class="stat">
                             <div class="stat-value">4.2</div>
-                            <div class="stat-label">平均分</div>
+                            <div class="stat-label">Average Score</div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- AI智能提取工具 -->
+        <!-- AI intelligent extraction tool -->
         <section class="ai-panel">
             <div class="ai-header">
                 <h2 class="ai-title">
                     <span>🤖</span>
-                    <span>AI智能问题提取</span>
+                    <span>AI Intelligent Question Extraction</span>
                 </h2>
                 <div class="ai-status">
                     <div class="spinner"></div>
-                    <span>模型就绪</span>
+                    <span>Model Ready</span>
                 </div>
             </div>
             <div class="text-input-area">
-                <textarea class="textarea" id="aiInput" placeholder="粘贴任何文本内容（社交帖子、客服对话、评论等），AI将自动识别并提取其中的问题..."></textarea>
+                <textarea class="textarea" id="aiInput" placeholder="Paste any text content (social posts, customer service conversations, comments, etc.), AI will automatically identify and extract questions..."></textarea>
             </div>
             <div style="display: flex; gap: 12px;">
                 <button class="btn btn-primary" style="background: white; color: #667eea;" onclick="extractQuestions()">
                     <span>🔍</span>
-                    <span>提取问题</span>
+                    <span>Extract Questions</span>
                 </button>
                 <button class="btn btn-ghost" style="border-color: rgba(255,255,255,0.3); color: white;">
                     <span>📋</span>
-                    <span>批量导入</span>
+                    <span>Bulk Import</span>
                 </button>
                 <button class="btn btn-ghost" style="border-color: rgba(255,255,255,0.3); color: white;">
                     <span>⚙️</span>
-                    <span>设置规则</span>
+                    <span>Set Rules</span>
                 </button>
             </div>
         </section>
 
-        <!-- 采集控制中心 -->
+        <!-- Collection control center -->
         <section class="control-panel">
             <div class="panel-header">
                 <h2 class="panel-title">
                     <span>🎛️</span>
-                    <span>采集控制中心</span>
+                    <span>Collection Control Center</span>
                 </h2>
             </div>
             
             <div class="control-tabs">
-                <button class="tab active" onclick="switchTab('manual')">手动录入</button>
-                <button class="tab" onclick="switchTab('batch')">批量导入</button>
-                <button class="tab" onclick="switchTab('api')">API接入</button>
-                <button class="tab" onclick="switchTab('rules')">采集规则</button>
+                <button class="tab active" onclick="switchTab('manual')">Manual Entry</button>
+                <button class="tab" onclick="switchTab('batch')">Bulk Import</button>
+                <button class="tab" onclick="switchTab('api')">API Integration</button>
+                <button class="tab" onclick="switchTab('rules')">Collection Rules</button>
             </div>
 
             <div id="manualTab">
                 <div style="display: grid; grid-template-columns: 1fr 200px; gap: 16px;">
-                    <input type="text" class="filter-select" style="padding: 12px;" placeholder="直接输入发现的问题..." id="quickInput">
-                    <button class="btn btn-primary" onclick="quickAdd()">快速添加</button>
+                    <input type="text" class="filter-select" style="padding: 12px;" placeholder="Enter discovered questions directly..." id="quickInput">
+                    <button class="btn btn-primary" onclick="quickAdd()">Quick Add</button>
                 </div>
             </div>
 
             <div id="batchTab" style="display: none;">
                 <div class="import-zone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
                     <div class="import-icon">📁</div>
-                    <p style="font-size: 16px; margin-bottom: 8px;">拖拽CSV/Excel文件到这里</p>
-                    <p style="font-size: 14px; color: var(--text-secondary);">或点击选择文件</p>
+                    <p style="font-size: 16px; margin-bottom: 8px;">Drag CSV/Excel files here</p>
+                    <p style="font-size: 14px; color: var(--text-secondary);">Or click to select files</p>
                 </div>
             </div>
         </section>
 
-        <!-- 质量评分统计 -->
+        <!-- Quality score statistics -->
         <section class="charts-grid">
             <div class="chart-card">
-                <h3 class="chart-title">问题类型分布</h3>
+                <h3 class="chart-title">Question Type Distribution</h3>
                 <div class="mini-chart">
                     <div class="chart-bar" style="height: 70%;"></div>
                     <div class="chart-bar" style="height: 85%;"></div>
@@ -960,7 +960,7 @@
             </div>
 
             <div class="chart-card">
-                <h3 class="chart-title">渠道贡献度</h3>
+                <h3 class="chart-title">Channel Contribution</h3>
                 <div class="mini-chart">
                     <div class="chart-bar" style="height: 95%; background: linear-gradient(180deg, #ff4500, #ff6b6b);"></div>
                     <div class="chart-bar" style="height: 78%; background: linear-gradient(180deg, #4285f4, #66a6ff);"></div>
@@ -969,14 +969,14 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--text-secondary);">
                     <span>Reddit</span>
-                    <span>搜索</span>
-                    <span>客服</span>
-                    <span>评论</span>
+                    <span>Search</span>
+                    <span>Support</span>
+                    <span>Reviews</span>
                 </div>
             </div>
 
             <div class="chart-card">
-                <h3 class="chart-title">质量评分趋势</h3>
+                <h3 class="chart-title">Quality Score Trend</h3>
                 <div style="position: relative; height: 120px;">
                     <svg width="100%" height="100%" viewBox="0 0 300 120">
                         <polyline points="0,80 50,70 100,50 150,55 200,30 250,35 300,20" 
@@ -997,24 +997,24 @@
             </div>
         </section>
 
-        <!-- 过滤和排序工具栏 -->
+        <!-- Filter and sort toolbar -->
         <div class="toolbar">
             <div class="filter-group">
                 <select class="filter-select" id="sourceFilter">
-                    <option value="">所有来源</option>
+                    <option value="">All Sources</option>
                     <option value="reddit">Reddit</option>
-                    <option value="search">搜索数据</option>
-                    <option value="support">客服系统</option>
-                    <option value="review">用户评价</option>
+                    <option value="search">Search Data</option>
+                    <option value="support">Customer Service</option>
+                    <option value="review">User Reviews</option>
                 </select>
                 <select class="filter-select" id="qualityFilter">
-                    <option value="">质量筛选</option>
-                    <option value="high">高质量</option>
-                    <option value="medium">中等</option>
-                    <option value="low">待改进</option>
+                    <option value="">Quality Filter</option>
+                    <option value="high">High Quality</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Needs Improvement</option>
                 </select>
                 <select class="filter-select" id="typeFilter">
-                    <option value="">问题类型</option>
+                    <option value="">Question Type</option>
                     <option value="what">What</option>
                     <option value="why">Why</option>
                     <option value="how">How</option>
@@ -1025,30 +1025,30 @@
             <div class="filter-group">
                 <button class="btn btn-ghost btn-sm">
                     <span>🔄</span>
-                    <span>刷新</span>
+                    <span>Refresh</span>
                 </button>
                 <button class="btn btn-success btn-sm">
                     <span>✅</span>
-                    <span>批量审核</span>
+                    <span>Bulk Review</span>
                 </button>
             </div>
         </div>
 
-        <!-- 实时问题采集流 -->
+        <!-- Real-time question collection stream -->
         <section class="live-stream">
             <div class="stream-header">
                 <h3 class="stream-title">
                     <span>📊</span>
-                    <span>实时采集流</span>
+                    <span>Real-time Collection Stream</span>
                 </h3>
                 <div class="live-indicator">
                     <div class="live-dot"></div>
-                    <span>实时更新</span>
+                    <span>Live Updates</span>
                 </div>
             </div>
 
             <div id="questionStream">
-                <!-- 示例问题1 -->
+                <!-- Sample question 1 -->
                 <div class="question-item">
                     <div class="question-content">
                         <div class="question-text">
@@ -1065,18 +1065,18 @@
                             </span>
                             <span class="meta-tag">
                                 <span>⏰</span>
-                                <span>2分钟前</span>
+                                <span>2 minutes ago</span>
                             </span>
-                            <span class="quality-badge quality-high">高质量</span>
+                            <span class="quality-badge quality-high">High Quality</span>
                         </div>
                     </div>
                     <div class="question-actions">
-                        <button class="btn btn-ghost btn-sm" onclick="editQuestion(this)">编辑</button>
-                        <button class="btn btn-primary btn-sm" onclick="approveQuestion(this)">采纳</button>
+                        <button class="btn btn-ghost btn-sm" onclick="editQuestion(this)">Edit</button>
+                        <button class="btn btn-primary btn-sm" onclick="approveQuestion(this)">Approve</button>
                     </div>
                 </div>
 
-                <!-- 示例问题2 -->
+                <!-- Example Question 2 -->
                 <div class="question-item">
                     <div class="question-content">
                         <div class="question-text">
@@ -1093,18 +1093,18 @@
                             </span>
                             <span class="meta-tag">
                                 <span>⏰</span>
-                                <span>5分钟前</span>
+                                <span>5 minutes ago</span>
                             </span>
-                            <span class="quality-badge quality-high">高质量</span>
+                            <span class="quality-badge quality-high">High Quality</span>
                         </div>
                     </div>
                     <div class="question-actions">
-                        <button class="btn btn-ghost btn-sm">编辑</button>
-                        <button class="btn btn-primary btn-sm">采纳</button>
+                        <button class="btn btn-ghost btn-sm">Edit</button>
+                        <button class="btn btn-primary btn-sm">Approve</button>
                     </div>
                 </div>
 
-                <!-- 示例问题3 -->
+                <!-- Example Question 3 -->
                 <div class="question-item">
                     <div class="question-content">
                         <div class="question-text">
@@ -1121,18 +1121,18 @@
                             </span>
                             <span class="meta-tag">
                                 <span>⏰</span>
-                                <span>8分钟前</span>
+                                <span>8 minutes ago</span>
                             </span>
-                            <span class="quality-badge quality-medium">中等</span>
+                            <span class="quality-badge quality-medium">Medium</span>
                         </div>
                     </div>
                     <div class="question-actions">
-                        <button class="btn btn-ghost btn-sm">编辑</button>
-                        <button class="btn btn-primary btn-sm">采纳</button>
+                        <button class="btn btn-ghost btn-sm">Edit</button>
+                        <button class="btn btn-primary btn-sm">Approve</button>
                     </div>
                 </div>
 
-                <!-- 示例问题4 -->
+                <!-- Example Question 4 -->
                 <div class="question-item">
                     <div class="question-content">
                         <div class="question-text">
@@ -1149,14 +1149,14 @@
                             </span>
                             <span class="meta-tag">
                                 <span>⏰</span>
-                                <span>12分钟前</span>
+                                <span>12 minutes ago</span>
                             </span>
-                            <span class="quality-badge quality-high">高质量</span>
+                            <span class="quality-badge quality-high">High Quality</span>
                         </div>
                     </div>
                     <div class="question-actions">
-                        <button class="btn btn-ghost btn-sm">编辑</button>
-                        <button class="btn btn-primary btn-sm">采纳</button>
+                        <button class="btn btn-ghost btn-sm">Edit</button>
+                        <button class="btn btn-primary btn-sm">Approve</button>
                     </div>
                 </div>
             </div>
@@ -1164,57 +1164,57 @@
             <div style="text-align: center; margin-top: 20px;">
                 <button class="btn btn-ghost" onclick="loadMore()">
                     <span>📥</span>
-                    <span>加载更多</span>
+                    <span>Load More</span>
                 </button>
             </div>
         </section>
 
-        <!-- 批量操作浮动栏 -->
+        <!-- Batch operation floating bar -->
         <div class="batch-actions" id="batchActions">
-            <span>已选择 <strong id="selectedCount">0</strong> 个问题</span>
-            <button class="btn btn-ghost btn-sm">设置类型</button>
-            <button class="btn btn-ghost btn-sm">添加标签</button>
-            <button class="btn btn-success btn-sm">批量采纳</button>
-            <button class="btn btn-primary btn-sm">导出选中</button>
+            <span>Selected <strong id="selectedCount">0</strong> questions</span>
+            <button class="btn btn-ghost btn-sm">Set Type</button>
+            <button class="btn btn-ghost btn-sm">Add Tags</button>
+            <button class="btn btn-success btn-sm">Batch Approve</button>
+            <button class="btn btn-primary btn-sm">Export Selected</button>
         </div>
 
-        <!-- 右侧快捷操作面板 -->
+        <!-- Right-side quick operation panel -->
         <div class="side-panel">
-            <button class="side-btn" title="AI提取" onclick="scrollToAI()">
+            <button class="side-btn" title="AI Extract" onclick="scrollToAI()">
                 <span>🤖</span>
             </button>
-            <button class="side-btn" title="筛选" onclick="toggleFilters()">
+            <button class="side-btn" title="Filter" onclick="toggleFilters()">
                 <span>🔍</span>
             </button>
-            <button class="side-btn" title="统计" onclick="showStats()">
+            <button class="side-btn" title="Statistics" onclick="showStats()">
                 <span>📊</span>
             </button>
-            <button class="side-btn" title="导出" onclick="exportData()">
+            <button class="side-btn" title="Export" onclick="exportData()">
                 <span>📤</span>
             </button>
-            <button class="side-btn" title="设置" onclick="showSettings()">
+            <button class="side-btn" title="Settings" onclick="showSettings()">
                 <span>⚙️</span>
             </button>
         </div>
     </div>
 
     <script>
-        // 初始化系统状态
+        // Initialize system state
         let collectedQuestions = [];
         let selectedQuestions = new Set();
         let currentTab = 'manual';
         let liveUpdateInterval;
 
-        // 页面加载时初始化
+        // Initialize when page loads
         window.onload = function() {
             initializeSystem();
             startLiveUpdates();
             updateProgress();
         };
 
-        // 系统初始化
+        // System initialization
         function initializeSystem() {
-            // 加载已保存的问题
+            // Load saved questions
             const saved = localStorage.getItem('geoCollectedQuestions');
             if (saved) {
                 collectedQuestions = JSON.parse(saved);
@@ -1222,16 +1222,16 @@
             updateStatistics();
         }
 
-        // 启动实时更新模拟
+        // Start real-time update simulation
         function startLiveUpdates() {
-            // 模拟实时数据流
+            // Simulate real-time data flow
             liveUpdateInterval = setInterval(() => {
-                // 随机更新某个渠道的数据
+                // Randomly update data for a channel
                 updateChannelStats();
             }, 5000);
         }
 
-        // 更新进度条
+        // Update progress bar
         function updateProgress() {
             const current = parseInt(document.getElementById('totalCollected').textContent);
             const target = parseInt(document.getElementById('targetGoal').textContent);
@@ -1239,43 +1239,43 @@
             document.getElementById('progressBar').style.width = percentage + '%';
         }
 
-        // AI智能提取问题
+        // AI smart extraction questions
         function extractQuestions() {
             const input = document.getElementById('aiInput').value;
             if (!input) {
-                showNotification('请输入要分析的文本', 'warning');
+                showNotification('Please enter text to analyze', 'warning');
                 return;
             }
 
-            // 模拟AI处理
-            showNotification('AI正在分析文本...', 'info');
+            // Simulate AI processing
+            showNotification('AI is analyzing text...', 'info');
             
             setTimeout(() => {
-                // 模拟提取结果
+                // Simulate extraction results
                 const extracted = [
                     "How to choose the right size air purifier for my room?",
                     "What's the difference between ACH and CADR ratings?",
                     "Why does my air purifier make clicking noises?"
                 ];
                 
-                // 添加到问题流
+                // Add to question stream
                 extracted.forEach(q => addQuestionToStream(q, 'AI Extract'));
                 
-                showNotification(`成功提取 ${extracted.length} 个问题`, 'success');
+                showNotification(`Successfully extracted ${extracted.length} questions`, 'success');
                 document.getElementById('aiInput').value = '';
             }, 2000);
         }
 
-        // 添加问题到实时流
+        // Add question to real-time stream
         function addQuestionToStream(text, source) {
             const streamContainer = document.getElementById('questionStream');
             const questionItem = document.createElement('div');
             questionItem.className = 'question-item';
             questionItem.style.animation = 'slideIn 0.5s';
             
-            // 判断质量等级
+            // Determine quality level
             const quality = Math.random() > 0.5 ? 'high' : 'medium';
-            const qualityText = quality === 'high' ? '高质量' : '中等';
+            const qualityText = quality === 'high' ? 'High Quality' : 'Medium';
             const qualityClass = quality === 'high' ? 'quality-high' : 'quality-medium';
             
             questionItem.innerHTML = `
@@ -1288,58 +1288,58 @@
                         </span>
                         <span class="meta-tag">
                             <span>⏰</span>
-                            <span>刚刚</span>
+                            <span>Just now</span>
                         </span>
                         <span class="quality-badge ${qualityClass}">${qualityText}</span>
                     </div>
                 </div>
                 <div class="question-actions">
-                    <button class="btn btn-ghost btn-sm" onclick="editQuestion(this)">编辑</button>
-                    <button class="btn btn-primary btn-sm" onclick="approveQuestion(this)">采纳</button>
+                    <button class="btn btn-ghost btn-sm" onclick="editQuestion(this)">Edit</button>
+                    <button class="btn btn-primary btn-sm" onclick="approveQuestion(this)">Approve</button>
                 </div>
             `;
             
-            // 添加到顶部
+            // Add to top
             streamContainer.insertBefore(questionItem, streamContainer.firstChild);
             
-            // 更新统计
+            // Update statistics
             updateStatistics();
         }
 
-        // 快速添加问题
+        // Quick add question
         function quickAdd() {
             const input = document.getElementById('quickInput');
             if (!input.value.trim()) {
-                showNotification('请输入问题内容', 'warning');
+                showNotification('Please enter question content', 'warning');
                 return;
             }
             
             addQuestionToStream(input.value, 'Manual');
             input.value = '';
-            showNotification('问题已添加', 'success');
+            showNotification('Question added', 'success');
         }
 
-        // 切换标签页
+        // Switch tab
         function switchTab(tab) {
             currentTab = tab;
             
-            // 更新标签样式
+            // Update tab style
             document.querySelectorAll('.tab').forEach(t => {
                 t.classList.remove('active');
             });
             event.target.classList.add('active');
             
-            // 显示对应内容
+            // Show corresponding content
             document.getElementById('manualTab').style.display = tab === 'manual' ? 'block' : 'none';
             document.getElementById('batchTab').style.display = tab === 'batch' ? 'block' : 'none';
         }
 
-        // 批准问题
+        // Approve question
         function approveQuestion(btn) {
             const item = btn.closest('.question-item');
             const text = item.querySelector('.question-text').textContent;
             
-            // 添加到已采集列表
+            // Add to collected list
             collectedQuestions.push({
                 text: text,
                 source: item.querySelector('.meta-tag span:last-child').textContent,
@@ -1347,35 +1347,35 @@
                 timestamp: new Date().toISOString()
             });
             
-            // 保存到本地
+            // Save to local storage
             localStorage.setItem('geoCollectedQuestions', JSON.stringify(collectedQuestions));
             
-            // 视觉反馈
+            // Visual feedback
             item.style.background = '#f6ffed';
-            btn.textContent = '已采纳';
+            btn.textContent = 'Approved';
             btn.disabled = true;
             
-            // 更新统计
+            // Update statistics
             updateStatistics();
-            showNotification('问题已采纳到问题库', 'success');
+            showNotification('Question has been added to question library', 'success');
         }
 
-        // 更新统计数据
+        // Update statistics data
         function updateStatistics() {
             const totalElement = document.getElementById('totalCollected');
             const currentTotal = collectedQuestions.length;
             totalElement.textContent = currentTotal;
             
-            // 更新进度
+            // Update progress
             updateProgress();
             
-            // 计算质量率
-            const highQuality = collectedQuestions.filter(q => q.quality === '高质量').length;
+            // Calculate quality rate
+            const highQuality = collectedQuestions.filter(q => q.quality === 'High Quality').length;
             const qualityRate = currentTotal > 0 ? (highQuality / currentTotal * 100).toFixed(0) : 0;
             document.getElementById('qualityRate').textContent = qualityRate + '%';
         }
 
-        // 更新渠道统计（模拟）
+        // Update channel statistics (simulation)
         function updateChannelStats() {
             const channels = document.querySelectorAll('.channel-card');
             const randomChannel = channels[Math.floor(Math.random() * channels.length)];
@@ -1386,7 +1386,7 @@
             }
         }
 
-        // 拖拽处理
+        // Drag and drop handling
         function handleDragOver(e) {
             e.preventDefault();
             e.currentTarget.classList.add('dragover');
@@ -1395,12 +1395,12 @@
         function handleDrop(e) {
             e.preventDefault();
             e.currentTarget.classList.remove('dragover');
-            showNotification('文件上传功能开发中', 'info');
+            showNotification('File upload feature is under development', 'info');
         }
 
-        // 显示通知
+        // Show notification
         function showNotification(message, type = 'success') {
-            // 创建通知元素
+            // Create notification element
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
@@ -1415,7 +1415,7 @@
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             `;
             
-            // 设置背景色
+            // Set background color
             const colors = {
                 success: '#52c41a',
                 warning: '#faad14',
@@ -1427,13 +1427,13 @@
             
             document.body.appendChild(notification);
             
-            // 3秒后移除
+            // Remove after 3 seconds
             setTimeout(() => {
                 notification.remove();
             }, 3000);
         }
 
-        // 导出数据
+        // Export data
         function exportData() {
             const data = collectedQuestions.map(q => ({
                 question: q.text,
@@ -1447,7 +1447,7 @@
                 ...data.map(row => [row.question, row.source, row.quality, row.timestamp])
             ].map(row => row.join(',')).join('\n');
             
-            // 创建下载
+            // Create download
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1455,10 +1455,10 @@
             a.download = `geo-questions-${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             
-            showNotification('数据导出成功', 'success');
+            showNotification('Data exported successfully', 'success');
         }
 
-        // 页面卸载时清理
+        // Clean up when page unloads
         window.onbeforeunload = function() {
             if (liveUpdateInterval) {
                 clearInterval(liveUpdateInterval);

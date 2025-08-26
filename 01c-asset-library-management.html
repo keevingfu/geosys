@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>资产库管理中心 - Asset Library Management</title>
-    <!-- 引入 ECharts -->
+    <title>Asset Library Management Center - Asset Library Management</title>
+    <!-- Include ECharts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <style>
-        /* 全局设计系统 - 专业的企业级内容管理界面 */
+        /* Global Design System - Professional Enterprise Content Management Interface */
         * {
             margin: 0;
             padding: 0;
@@ -15,17 +15,17 @@
         }
 
         :root {
-            /* 专业内容管理配色方案 */
-            --primary: #5B21B6;        /* 深紫色 - 创意与专业 */
-            --primary-light: #7C3AED;  /* 亮紫色 */
-            --primary-dark: #4C1D95;   /* 暗紫色 */
-            --secondary: #0891B2;       /* 青色 - 清新 */
-            --success: #059669;         /* 绿色 - 成功 */
-            --warning: #D97706;         /* 橙色 - 警告 */
-            --danger: #DC2626;          /* 红色 - 危险 */
-            --info: #0284C7;            /* 蓝色 - 信息 */
+            /* Professional Content Management Color Scheme */
+            --primary: #5B21B6;        /* Deep Purple - Creative & Professional */
+            --primary-light: #7C3AED;  /* Light Purple */
+            --primary-dark: #4C1D95;   /* Dark Purple */
+            --secondary: #0891B2;       /* Cyan - Fresh */
+            --success: #059669;         /* Green - Success */
+            --warning: #D97706;         /* Orange - Warning */
+            --danger: #DC2626;          /* Red - Danger */
+            --info: #0284C7;            /* Blue - Info */
             
-            /* 中性色阶 */
+            /* Neutral Color Scale */
             --gray-900: #111827;
             --gray-800: #1F2937;
             --gray-700: #374151;
@@ -38,7 +38,7 @@
             --gray-50: #F9FAFB;
             --white: #FFFFFF;
             
-            /* 资产类型配色 */
+            /* Asset Type Colors */
             --asset-faq: #8B5CF6;
             --asset-howto: #3B82F6;
             --asset-compare: #10B981;
@@ -58,13 +58,13 @@
             line-height: 1.6;
         }
 
-        /* 主容器布局 */
+        /* Main Container Layout */
         .app-container {
             display: flex;
             height: 100vh;
         }
 
-        /* 左侧边栏 - 导航和筛选 */
+        /* Left Sidebar - Navigation and Filter */
         .sidebar {
             width: 280px;
             background: white;
@@ -104,7 +104,7 @@
             color: var(--gray-900);
         }
 
-        /* 快速创建按钮 */
+        /* Quick Create Button */
         .create-btn-primary {
             width: 100%;
             padding: 12px;
@@ -127,7 +127,7 @@
             box-shadow: 0 4px 12px rgba(91, 33, 182, 0.3);
         }
 
-        /* 筛选区域 */
+        /* Filter Area */
         .filter-section {
             padding: 20px;
             flex: 1;
@@ -187,7 +187,7 @@
             color: white;
         }
 
-        /* 标签云 */
+        /* Tag Cloud */
         .tag-cloud {
             display: flex;
             flex-wrap: wrap;
@@ -217,7 +217,7 @@
             border-color: var(--primary);
         }
 
-        /* 主内容区 */
+        /* Main Content Area */
         .main-content {
             flex: 1;
             display: flex;
@@ -225,7 +225,7 @@
             overflow: hidden;
         }
 
-        /* 顶部工具栏 */
+        /* Top Toolbar */
         .toolbar {
             background: white;
             padding: 16px 24px;
@@ -312,7 +312,7 @@
             border-color: var(--gray-300);
         }
 
-        /* 统计条 */
+        /* Statistics Bar */
         .stats-bar {
             background: white;
             padding: 16px 24px;
@@ -353,7 +353,7 @@
             color: var(--gray-500);
         }
 
-        /* 内容网格视图 */
+        /* Content Grid View */
         .content-area {
             flex: 1;
             padding: 24px;
@@ -367,7 +367,7 @@
             gap: 20px;
         }
 
-        /* 资产卡片 */
+        /* Asset Card */
         .asset-card {
             background: white;
             border-radius: 12px;
@@ -466,7 +466,7 @@
             color: var(--gray-600);
         }
 
-        /* 质量评分 */
+        /* QualityScore */
         .quality-score {
             display: flex;
             align-items: center;
@@ -515,7 +515,7 @@
             color: var(--gray-700);
         }
 
-        /* 资产操作栏 */
+        /* Asset Action Bar */
         .asset-actions {
             padding: 12px 16px;
             background: var(--gray-50);
@@ -552,7 +552,7 @@
             color: var(--gray-500);
         }
 
-        /* 创建/编辑模态框 */
+        /* Create/Edit Modal */
         .modal {
             display: none;
             position: fixed;
@@ -623,7 +623,7 @@
             flex: 1;
         }
 
-        /* 资产类型选择器 */
+        /* Asset Type Selector */
         .asset-type-selector {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -667,7 +667,7 @@
             color: var(--gray-500);
         }
 
-        /* 表单元素 */
+        /* Form Elements */
         .form-group {
             margin-bottom: 20px;
         }
@@ -704,7 +704,7 @@
             resize: vertical;
         }
 
-        /* 富文本编辑器模拟 */
+        /* Rich Text Editor Simulation */
         .editor-toolbar {
             display: flex;
             gap: 4px;
@@ -745,7 +745,7 @@
             outline: none;
         }
 
-        /* 标签输入 */
+        /* Tag Input */
         .tag-input-container {
             display: flex;
             flex-wrap: wrap;
@@ -787,7 +787,7 @@
             font-size: 14px;
         }
 
-        /* 模态框底部 */
+        /* Modal Footer */
         .modal-footer {
             padding: 20px 24px;
             border-top: 1px solid var(--gray-200);
@@ -836,7 +836,7 @@
             box-shadow: 0 4px 12px rgba(91, 33, 182, 0.3);
         }
 
-        /* 右侧面板 - 资产详情 */
+        /* Right Panel - Asset Details */
         .detail-panel {
             position: fixed;
             right: -400px;
@@ -875,13 +875,13 @@
             padding: 20px;
         }
 
-        /* 关系图谱 */
+        /* Relationship Graph */
         .relationship-chart {
             height: 300px;
             margin-bottom: 24px;
         }
 
-        /* 版本历史 */
+        /* Version History */
         .version-timeline {
             position: relative;
             padding-left: 24px;
@@ -929,7 +929,7 @@
             color: var(--gray-700);
         }
 
-        /* 批量操作栏 */
+        /* Bulk Actions Bar */
         .bulk-actions {
             position: fixed;
             bottom: -80px;
@@ -970,7 +970,7 @@
             gap: 8px;
         }
 
-        /* 导入导出弹窗 */
+        /* Import/Export Popup */
         .import-zone {
             border: 2px dashed var(--gray-300);
             border-radius: 12px;
@@ -1008,7 +1008,7 @@
             color: var(--gray-500);
         }
 
-        /* 加载状态 */
+        /* Loading State */
         .loading-spinner {
             display: inline-block;
             width: 20px;
@@ -1039,7 +1039,7 @@
             }
         }
 
-        /* 响应式设计 */
+        /* Responsive Design */
         @media (max-width: 1024px) {
             .sidebar {
                 position: fixed;
@@ -1080,117 +1080,117 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- 左侧边栏 -->
+        <!-- Left Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="logo-section">
                     <div class="logo-icon">📚</div>
-                    <div class="logo-text">资产库管理中心</div>
+                    <div class="logo-text">Asset Library Management Center</div>
                 </div>
                 <button class="create-btn-primary" onclick="openCreateModal()">
                     <span>✨</span>
-                    <span>创建新资产</span>
+                    <span>Create New Asset</span>
                 </button>
             </div>
 
             <div class="filter-section">
-                <!-- 资产类型筛选 -->
+                <!-- Asset Type Filter -->
                 <div class="filter-group">
-                    <div class="filter-title">资产类型</div>
+                    <div class="filter-title">Asset Type</div>
                     <div class="filter-item active" onclick="filterByType('all')">
                         <span class="filter-label">
                             <span>📋</span>
-                            <span>全部资产</span>
+                            <span>All Assets</span>
                         </span>
                         <span class="filter-count">1,234</span>
                     </div>
                     <div class="filter-item" onclick="filterByType('faq')">
                         <span class="filter-label">
                             <span>❓</span>
-                            <span>FAQ卡</span>
+                            <span>FAQ Card</span>
                         </span>
                         <span class="filter-count">256</span>
                     </div>
                     <div class="filter-item" onclick="filterByType('howto')">
                         <span class="filter-label">
                             <span>📖</span>
-                            <span>步骤卡</span>
+                            <span>How-to Card</span>
                         </span>
                         <span class="filter-count">189</span>
                     </div>
                     <div class="filter-item" onclick="filterByType('compare')">
                         <span class="filter-label">
                             <span>⚖️</span>
-                            <span>对比卡</span>
+                            <span>Compare Card</span>
                         </span>
                         <span class="filter-count">145</span>
                     </div>
                     <div class="filter-item" onclick="filterByType('tldr')">
                         <span class="filter-label">
                             <span>📝</span>
-                            <span>TL;DR卡</span>
+                            <span>TL;DR Card</span>
                         </span>
                         <span class="filter-count">178</span>
                     </div>
                     <div class="filter-item" onclick="filterByType('data')">
                         <span class="filter-label">
                             <span>📊</span>
-                            <span>数据卡</span>
+                            <span>Data Card</span>
                         </span>
                         <span class="filter-count">134</span>
                     </div>
                 </div>
 
-                <!-- 质量评分筛选 -->
+                <!-- QualityScoreFilter -->
                 <div class="filter-group">
-                    <div class="filter-title">质量评分</div>
+                    <div class="filter-title">Quality Score</div>
                     <div class="filter-item" onclick="filterByQuality('high')">
                         <span class="filter-label">
                             <span>⭐</span>
-                            <span>优秀 (85-100)</span>
+                            <span>Excellent (85-100)</span>
                         </span>
                         <span class="filter-count">423</span>
                     </div>
                     <div class="filter-item" onclick="filterByQuality('medium')">
                         <span class="filter-label">
                             <span>⭐</span>
-                            <span>良好 (60-84)</span>
+                            <span>Good (60-84)</span>
                         </span>
                         <span class="filter-count">567</span>
                     </div>
                     <div class="filter-item" onclick="filterByQuality('low')">
                         <span class="filter-label">
                             <span>⭐</span>
-                            <span>待优化 (<60)</span>
+                            <span>Needs Optimization (<60)</span>
                         </span>
                         <span class="filter-count">244</span>
                     </div>
                 </div>
 
-                <!-- 热门标签 -->
+                <!-- Popular Tags -->
                 <div class="filter-group">
-                    <div class="filter-title">热门标签</div>
+                    <div class="filter-title">Popular Tags</div>
                     <div class="tag-cloud">
-                        <span class="tag-chip" onclick="toggleTag(this)">产品功能</span>
-                        <span class="tag-chip" onclick="toggleTag(this)">价格方案</span>
-                        <span class="tag-chip" onclick="toggleTag(this)">使用教程</span>
-                        <span class="tag-chip" onclick="toggleTag(this)">集成指南</span>
-                        <span class="tag-chip" onclick="toggleTag(this)">最佳实践</span>
-                        <span class="tag-chip" onclick="toggleTag(this)">常见问题</span>
-                        <span class="tag-chip" onclick="toggleTag(this)">安全合规</span>
-                        <span class="tag-chip" onclick="toggleTag(this)">API文档</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Product Features</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Pricing Plans</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Usage Tutorials</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Integration Guide</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Best Practices</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Common Questions</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Security Compliance</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">API Documentation</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 主内容区 -->
+        <!-- Main Content Area -->
         <div class="main-content">
-            <!-- 顶部工具栏 -->
+            <!-- Top Toolbar -->
             <div class="toolbar">
                 <div class="search-bar">
                     <span class="search-icon">🔍</span>
-                    <input type="text" class="search-input" placeholder="搜索资产标题、内容或标签..." oninput="searchAssets(this.value)">
+                    <input type="text" class="search-input" placeholder="Search asset titles, content or tags..." oninput="searchAssets(this.value)">
                 </div>
 
                 <div class="view-toggles">
@@ -1205,20 +1205,20 @@
                 <div class="toolbar-actions">
                     <button class="toolbar-btn" onclick="openImportModal()">
                         <span>📥</span>
-                        <span>批量导入</span>
+                        <span>Bulk Import</span>
                     </button>
                     <button class="toolbar-btn" onclick="exportAssets()">
                         <span>📤</span>
-                        <span>导出</span>
+                        <span>Export</span>
                     </button>
                     <button class="toolbar-btn" onclick="refreshAssets()">
                         <span>🔄</span>
-                        <span>刷新</span>
+                        <span>Refresh</span>
                     </button>
                 </div>
             </div>
 
-            <!-- 统计条 -->
+            <!-- Statistics Bar -->
             <div class="stats-bar">
                 <div class="stat-item">
                     <div class="stat-icon" style="background: rgba(91, 33, 182, 0.1); color: var(--primary);">
@@ -1226,7 +1226,7 @@
                     </div>
                     <div class="stat-info">
                         <div class="stat-value">1,234</div>
-                        <div class="stat-label">总资产数</div>
+                        <div class="stat-label">Total Assets</div>
                     </div>
                 </div>
                 <div class="stat-item">
@@ -1235,7 +1235,7 @@
                     </div>
                     <div class="stat-info">
                         <div class="stat-value">89.2%</div>
-                        <div class="stat-label">平均质量评分</div>
+                        <div class="stat-label">Average Quality Score</div>
                     </div>
                 </div>
                 <div class="stat-item">
@@ -1244,7 +1244,7 @@
                     </div>
                     <div class="stat-info">
                         <div class="stat-value">45</div>
-                        <div class="stat-label">今日更新</div>
+                        <div class="stat-label">Updated Today</div>
                     </div>
                 </div>
                 <div class="stat-item">
@@ -1253,24 +1253,24 @@
                     </div>
                     <div class="stat-info">
                         <div class="stat-value">12</div>
-                        <div class="stat-label">待审核</div>
+                        <div class="stat-label">Pending Review</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 内容区域 -->
+            <!-- Content Area -->
             <div class="content-area">
                 <div class="assets-grid" id="assetsGrid">
-                    <!-- FAQ卡示例 -->
+                    <!-- FAQ Card Example -->
                     <div class="asset-card" onclick="showAssetDetail(this)">
                         <div class="asset-header">
                             <span class="asset-type-badge badge-faq">
                                 <span>❓</span>
-                                <span>FAQ卡</span>
+                                <span>FAQ Card</span>
                             </span>
                             <div class="asset-title">How does the product handle data privacy?</div>
                             <div class="asset-meta">
-                                <span>更新于 2小时前</span>
+                                <span>Updated 2 hours ago</span>
                                 <span>•</span>
                                 <span>v2.3</span>
                             </div>
@@ -1280,165 +1280,165 @@
                                 Our product implements end-to-end encryption for all user data. We follow GDPR compliance standards and undergo regular security audits. User data is never shared with third parties without explicit consent...
                             </div>
                             <div class="asset-tags">
-                                <span class="asset-tag">隐私保护</span>
+                                <span class="asset-tag">Privacy Protection</span>
                                 <span class="asset-tag">GDPR</span>
-                                <span class="asset-tag">加密技术</span>
-                                <span class="asset-tag">合规性</span>
+                                <span class="asset-tag">Encryption Technology</span>
+                                <span class="asset-tag">Compliance</span>
                             </div>
                             <div class="quality-score">
                                 <div class="score-circle score-high">92</div>
                                 <div class="score-info">
-                                    <div class="score-label">内容质量评分</div>
-                                    <div class="score-desc">结构清晰，信息完整</div>
+                                    <div class="score-label">Content Quality Score</div>
+                                    <div class="score-desc">Clear structure, complete information</div>
                                 </div>
                             </div>
                         </div>
                         <div class="asset-actions">
                             <div class="action-buttons">
-                                <button class="action-btn" onclick="editAsset(event, 1)">编辑</button>
-                                <button class="action-btn" onclick="duplicateAsset(event, 1)">复制</button>
-                                <button class="action-btn" onclick="viewHistory(event, 1)">历史</button>
+                                <button class="action-btn" onclick="editAsset(event, 1)">Edit</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 1)">Duplicate</button>
+                                <button class="action-btn" onclick="viewHistory(event, 1)">History</button>
                             </div>
                             <div class="version-info">
-                                <span>5个关联资产</span>
+                                <span>5 Related Assets</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- How-to卡示例 -->
+                    <!-- How-to Card Example -->
                     <div class="asset-card" onclick="showAssetDetail(this)">
                         <div class="asset-header">
                             <span class="asset-type-badge badge-howto">
                                 <span>📖</span>
-                                <span>步骤卡</span>
+                                <span>How-to Card</span>
                             </span>
-                            <div class="asset-title">如何设置双因素认证</div>
+                            <div class="asset-title">How to Set Up Two-Factor Authentication</div>
                             <div class="asset-meta">
-                                <span>更新于 5小时前</span>
+                                <span>Updated 5 hours ago</span>
                                 <span>•</span>
                                 <span>v1.2</span>
                             </div>
                         </div>
                         <div class="asset-content">
                             <div class="asset-preview">
-                                1. 进入设置页面 → 安全选项
-                                2. 点击"启用双因素认证"
-                                3. 选择验证方式（短信或验证器应用）
-                                4. 按照提示完成验证流程...
+                                1. Go to Settings page → Security options
+                                2. Click "Enable Two-Factor Authentication"
+                                3. Choose verification method (SMS or authenticator app)
+                                4. Follow instructions to complete verification process...
                             </div>
                             <div class="asset-tags">
-                                <span class="asset-tag">安全设置</span>
-                                <span class="asset-tag">用户指南</span>
+                                <span class="asset-tag">Security Settings</span>
+                                <span class="asset-tag">User Guide</span>
                                 <span class="asset-tag">2FA</span>
                             </div>
                             <div class="quality-score">
                                 <div class="score-circle score-high">88</div>
                                 <div class="score-info">
-                                    <div class="score-label">内容质量评分</div>
-                                    <div class="score-desc">步骤详细，易于理解</div>
+                                    <div class="score-label">Content Quality Score</div>
+                                    <div class="score-desc">Detailed steps, easy to understand</div>
                                 </div>
                             </div>
                         </div>
                         <div class="asset-actions">
                             <div class="action-buttons">
-                                <button class="action-btn" onclick="editAsset(event, 2)">编辑</button>
-                                <button class="action-btn" onclick="duplicateAsset(event, 2)">复制</button>
-                                <button class="action-btn" onclick="viewHistory(event, 2)">历史</button>
+                                <button class="action-btn" onclick="editAsset(event, 2)">Edit</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 2)">Duplicate</button>
+                                <button class="action-btn" onclick="viewHistory(event, 2)">History</button>
                             </div>
                             <div class="version-info">
-                                <span>3个关联资产</span>
+                                <span>3 Related Assets</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 对比卡示例 -->
+                    <!-- Compare Card Example -->
                     <div class="asset-card" onclick="showAssetDetail(this)">
                         <div class="asset-header">
                             <span class="asset-type-badge badge-compare">
                                 <span>⚖️</span>
-                                <span>对比卡</span>
+                                <span>Compare Card</span>
                             </span>
-                            <div class="asset-title">产品版本功能对比</div>
+                            <div class="asset-title">Product Version Feature Comparison</div>
                             <div class="asset-meta">
-                                <span>更新于 1天前</span>
+                                <span>Updated 1 day ago</span>
                                 <span>•</span>
                                 <span>v3.0</span>
                             </div>
                         </div>
                         <div class="asset-content">
                             <div class="asset-preview">
-                                基础版 vs 专业版 vs 企业版
-                                • 用户数量：10 vs 100 vs 无限
-                                • API调用：1000/月 vs 10000/月 vs 无限
-                                • 技术支持：邮件 vs 24/7在线 vs 专属客户经理...
+                                Basic vs Professional vs Enterprise
+                                • User Limit: 10 vs 100 vs Unlimited
+                                • API Calls: 1000/Month vs 10000/Month vs Unlimited
+                                • Support: Email vs 24/7 Online vs Dedicated Account Manager...
                             </div>
                             <div class="asset-tags">
-                                <span class="asset-tag">定价方案</span>
-                                <span class="asset-tag">功能对比</span>
-                                <span class="asset-tag">产品版本</span>
+                                <span class="asset-tag">Pricing Plans</span>
+                                <span class="asset-tag">Feature Comparison</span>
+                                <span class="asset-tag">Product Versions</span>
                             </div>
                             <div class="quality-score">
                                 <div class="score-circle score-medium">75</div>
                                 <div class="score-info">
-                                    <div class="score-label">内容质量评分</div>
-                                    <div class="score-desc">建议添加更多细节</div>
+                                    <div class="score-label">Content Quality Score</div>
+                                    <div class="score-desc">Suggest adding more details</div>
                                 </div>
                             </div>
                         </div>
                         <div class="asset-actions">
                             <div class="action-buttons">
-                                <button class="action-btn" onclick="editAsset(event, 3)">编辑</button>
-                                <button class="action-btn" onclick="duplicateAsset(event, 3)">复制</button>
-                                <button class="action-btn" onclick="viewHistory(event, 3)">历史</button>
+                                <button class="action-btn" onclick="editAsset(event, 3)">Edit</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 3)">Duplicate</button>
+                                <button class="action-btn" onclick="viewHistory(event, 3)">History</button>
                             </div>
                             <div class="version-info">
-                                <span>8个关联资产</span>
+                                <span>8 Related Assets</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- TL;DR卡示例 -->
+                    <!-- TL;DR Card Example -->
                     <div class="asset-card" onclick="showAssetDetail(this)">
                         <div class="asset-header">
                             <span class="asset-type-badge badge-tldr">
                                 <span>📝</span>
-                                <span>TL;DR卡</span>
+                                <span>TL;DR Card</span>
                             </span>
-                            <div class="asset-title">Q4产品更新要点</div>
+                            <div class="asset-title">Q4 Product Update Highlights</div>
                             <div class="asset-meta">
-                                <span>更新于 3天前</span>
+                                <span>Updated 3 days ago</span>
                                 <span>•</span>
                                 <span>v1.0</span>
                             </div>
                         </div>
                         <div class="asset-content">
                             <div class="asset-preview">
-                                🚀 新功能：AI智能助手上线
-                                ⚡ 性能提升：响应速度提升40%
-                                🔧 修复：解决了15个已知问题
-                                📊 数据：用户增长率达到25%
+                                🚀 New feature: AI assistant launched
+                                ⚡ Performance boost: Response speed increased by 40%
+                                🔧 Fixes: Resolved 15 known issues
+                                📊 Data: User growth rate reached 25%
                             </div>
                             <div class="asset-tags">
-                                <span class="asset-tag">产品更新</span>
-                                <span class="asset-tag">季度总结</span>
-                                <span class="asset-tag">新功能</span>
+                                <span class="asset-tag">Product Updates</span>
+                                <span class="asset-tag">Quarterly Summary</span>
+                                <span class="asset-tag">New Features</span>
                             </div>
                             <div class="quality-score">
                                 <div class="score-circle score-high">85</div>
                                 <div class="score-info">
-                                    <div class="score-label">内容质量评分</div>
-                                    <div class="score-desc">简洁明了，重点突出</div>
+                                    <div class="score-label">Content Quality Score</div>
+                                    <div class="score-desc">Concise and clear, key points highlighted</div>
                                 </div>
                             </div>
                         </div>
                         <div class="asset-actions">
                             <div class="action-buttons">
-                                <button class="action-btn" onclick="editAsset(event, 4)">编辑</button>
-                                <button class="action-btn" onclick="duplicateAsset(event, 4)">复制</button>
-                                <button class="action-btn" onclick="viewHistory(event, 4)">历史</button>
+                                <button class="action-btn" onclick="editAsset(event, 4)">Edit</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 4)">Duplicate</button>
+                                <button class="action-btn" onclick="viewHistory(event, 4)">History</button>
                             </div>
                             <div class="version-info">
-                                <span>2个关联资产</span>
+                                <span>2 Related Assets</span>
                             </div>
                         </div>
                     </div>
@@ -1447,248 +1447,248 @@
         </div>
     </div>
 
-    <!-- 创建/编辑模态框 -->
+    <!-- Create/Edit Modal -->
     <div class="modal" id="createModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">创建新资产</h2>
+                <h2 class="modal-title">Create New Asset</h2>
                 <button class="modal-close" onclick="closeModal('createModal')">×</button>
             </div>
             <div class="modal-body">
-                <!-- 资产类型选择 -->
+                <!-- Asset Type Selection -->
                 <div class="form-group">
-                    <label class="form-label">选择资产类型</label>
+                    <label class="form-label">Select Asset Type</label>
                     <div class="asset-type-selector">
                         <div class="type-option selected" onclick="selectAssetType(this, 'faq')">
                             <div class="type-icon">❓</div>
-                            <div class="type-name">FAQ卡</div>
-                            <div class="type-desc">问答形式</div>
+                            <div class="type-name">FAQ Card</div>
+                            <div class="type-desc">Q&A Format</div>
                         </div>
                         <div class="type-option" onclick="selectAssetType(this, 'howto')">
                             <div class="type-icon">📖</div>
-                            <div class="type-name">步骤卡</div>
-                            <div class="type-desc">操作指南</div>
+                            <div class="type-name">How-to Card</div>
+                            <div class="type-desc">Operation Guide</div>
                         </div>
                         <div class="type-option" onclick="selectAssetType(this, 'compare')">
                             <div class="type-icon">⚖️</div>
-                            <div class="type-name">对比卡</div>
-                            <div class="type-desc">功能对比</div>
+                            <div class="type-name">Compare Card</div>
+                            <div class="type-desc">Feature Comparison</div>
                         </div>
                         <div class="type-option" onclick="selectAssetType(this, 'tldr')">
                             <div class="type-icon">📝</div>
-                            <div class="type-name">TL;DR卡</div>
-                            <div class="type-desc">快速概览</div>
+                            <div class="type-name">TL;DR Card</div>
+                            <div class="type-desc">Quick Overview</div>
                         </div>
                         <div class="type-option" onclick="selectAssetType(this, 'data')">
                             <div class="type-icon">📊</div>
-                            <div class="type-name">数据卡</div>
-                            <div class="type-desc">数据展示</div>
+                            <div class="type-name">Data Card</div>
+                            <div class="type-desc">Data Insights</div>
                         </div>
                         <div class="type-option" onclick="selectAssetType(this, 'review')">
                             <div class="type-icon">⭐</div>
-                            <div class="type-name">评测卡</div>
-                            <div class="type-desc">用户评价</div>
+                            <div class="type-name">Review Card</div>
+                            <div class="type-desc">User Reviews</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 基本信息 -->
+                <!-- Basic Information -->
                 <div class="form-group">
-                    <label class="form-label">标题 <span style="color: var(--danger);">*</span></label>
-                    <input type="text" class="form-input" placeholder="输入资产标题..." id="assetTitle">
+                    <label class="form-label">Title <span style="color: var(--danger);">*</span></label>
+                    <input type="text" class="form-input" placeholder="Enter asset title..." id="assetTitle">
                 </div>
 
-                <!-- 内容编辑器 -->
+                <!-- Content Editor -->
                 <div class="form-group">
-                    <label class="form-label">内容 <span style="color: var(--danger);">*</span></label>
+                    <label class="form-label">Content <span style="color: var(--danger);">*</span></label>
                     <div class="editor-toolbar">
-                        <button class="editor-btn" title="加粗">B</button>
-                        <button class="editor-btn" title="斜体">I</button>
-                        <button class="editor-btn" title="下划线">U</button>
-                        <button class="editor-btn" title="链接">🔗</button>
-                        <button class="editor-btn" title="列表">•</button>
-                        <button class="editor-btn" title="数字列表">1.</button>
-                        <button class="editor-btn" title="引用">❝</button>
-                        <button class="editor-btn" title="代码">{ }</button>
+                        <button class="editor-btn" title="Bold">B</button>
+                        <button class="editor-btn" title="Italic">I</button>
+                        <button class="editor-btn" title="Underline">U</button>
+                        <button class="editor-btn" title="Link">🔗</button>
+                        <button class="editor-btn" title="List">•</button>
+                        <button class="editor-btn" title="Numbered List">1.</button>
+                        <button class="editor-btn" title="Citations">❝</button>
+                        <button class="editor-btn" title="Code">{ }</button>
                     </div>
                     <div class="editor-content" contenteditable="true" id="assetContent">
-                        开始输入内容...
+                        Start typing content...
                     </div>
                 </div>
 
-                <!-- 标签管理 -->
+                <!-- Tag Management -->
                 <div class="form-group">
-                    <label class="form-label">标签</label>
+                    <label class="form-label">Tags</label>
                     <div class="tag-input-container" id="tagContainer">
                         <div class="tag-input-chip">
-                            产品功能
+                            Product Features
                             <span class="tag-remove" onclick="removeTag(this)">×</span>
                         </div>
-                        <input type="text" class="tag-input-field" placeholder="输入标签后按回车..." onkeydown="handleTagInput(event)">
+                        <input type="text" class="tag-input-field" placeholder="Enter tag and press Enter..." onkeydown="handleTagInput(event)">
                     </div>
                 </div>
 
-                <!-- 关联资产 -->
+                <!-- Related Assets -->
                 <div class="form-group">
-                    <label class="form-label">关联资产</label>
-                    <input type="text" class="form-input" placeholder="搜索并选择相关资产...">
+                    <label class="form-label">Related Assets</label>
+                    <input type="text" class="form-input" placeholder="Search and select related assets...">
                 </div>
 
-                <!-- 高级设置 -->
+                <!-- Advanced Settings -->
                 <div class="form-group">
-                    <label class="form-label">适用渠道</label>
+                    <label class="form-label">Applicable Channels</label>
                     <div class="tag-cloud">
                         <span class="tag-chip active">Reddit</span>
                         <span class="tag-chip active">LinkedIn</span>
                         <span class="tag-chip">Twitter</span>
                         <span class="tag-chip">YouTube</span>
-                        <span class="tag-chip">官网FAQ</span>
-                        <span class="tag-chip">邮件营销</span>
+                        <span class="tag-chip">Website FAQ</span>
+                        <span class="tag-chip">Email Marketing</span>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <div class="footer-info">
-                    <span>创建后将自动进行质量评分</span>
+                    <span>Quality score will be automatically calculated after creation</span>
                 </div>
                 <div class="footer-actions">
-                    <button class="btn btn-secondary" onclick="closeModal('createModal')">取消</button>
-                    <button class="btn btn-primary" onclick="saveAsset()">创建资产</button>
+                    <button class="btn btn-secondary" onclick="closeModal('createModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveAsset()">Create Asset</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 批量导入模态框 -->
+    <!-- Bulk Import Modal -->
     <div class="modal" id="importModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">批量导入资产</h2>
+                <h2 class="modal-title">Bulk Import Assets</h2>
                 <button class="modal-close" onclick="closeModal('importModal')">×</button>
             </div>
             <div class="modal-body">
                 <div class="import-zone" id="importZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
                     <div class="import-icon">📁</div>
-                    <div class="import-text">拖拽文件到此处或点击选择</div>
-                    <div class="import-hint">支持 CSV、Excel、JSON 格式，最大 10MB</div>
+                    <div class="import-text">Drag files here or click to select</div>
+                    <div class="import-hint">Supports CSV, Excel, JSON formats, max 10MB</div>
                     <input type="file" id="fileInput" style="display: none;" accept=".csv,.xlsx,.json" onchange="handleFileSelect(event)">
                 </div>
             </div>
             <div class="modal-footer">
                 <div class="footer-info">
-                    <a href="#" style="color: var(--primary);">下载导入模板</a>
+                    <a href="#" style="color: var(--primary);">Download Import Template</a>
                 </div>
                 <div class="footer-actions">
-                    <button class="btn btn-secondary" onclick="closeModal('importModal')">取消</button>
-                    <button class="btn btn-primary" onclick="startImport()">开始导入</button>
+                    <button class="btn btn-secondary" onclick="closeModal('importModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="startImport()">StartImport</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 右侧详情面板 -->
+    <!-- Right Details Panel -->
     <div class="detail-panel" id="detailPanel">
         <div class="panel-header">
-            <h3 class="panel-title">资产详情</h3>
+            <h3 class="panel-title">Asset Details</h3>
             <button class="modal-close" onclick="closeDetailPanel()">×</button>
         </div>
         <div class="panel-body">
-            <!-- 关系图谱 -->
+            <!-- Relationship Graph -->
             <div class="form-group">
-                <label class="form-label">资产关系图谱</label>
+                <label class="form-label">Asset Relationship Graph</label>
                 <div class="relationship-chart" id="relationshipChart"></div>
             </div>
 
-            <!-- 版本历史 -->
+            <!-- Version History -->
             <div class="form-group">
-                <label class="form-label">版本历史</label>
+                <label class="form-label">Version History</label>
                 <div class="version-timeline">
                     <div class="version-item">
                         <div class="version-marker"></div>
                         <div class="version-content">
                             <div class="version-date">2025-01-10 15:30</div>
-                            <div class="version-desc">更新了隐私政策相关内容</div>
+                            <div class="version-desc">Updated privacy policy related content</div>
                         </div>
                     </div>
                     <div class="version-item">
                         <div class="version-marker"></div>
                         <div class="version-content">
                             <div class="version-date">2025-01-08 10:15</div>
-                            <div class="version-desc">添加了GDPR合规说明</div>
+                            <div class="version-desc">Added GDPR compliance description</div>
                         </div>
                     </div>
                     <div class="version-item">
                         <div class="version-marker"></div>
                         <div class="version-content">
                             <div class="version-date">2025-01-05 14:20</div>
-                            <div class="version-desc">初始版本创建</div>
+                            <div class="version-desc">Initial version created</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 质量优化建议 -->
+            <!-- Quality Optimization Suggestions -->
             <div class="form-group">
-                <label class="form-label">优化建议</label>
+                <label class="form-label">Optimization Suggestions</label>
                 <div style="padding: 12px; background: var(--gray-50); border-radius: 8px; font-size: 14px; line-height: 1.6;">
                     <div style="margin-bottom: 8px;">
-                        <strong>📝 内容优化：</strong><br>
-                        建议添加更多具体的数据支撑，提高可信度
+                        <strong>📝 Content Optimization:</strong><br>
+                        Suggest adding more specific data support to improve credibility
                     </div>
                     <div style="margin-bottom: 8px;">
-                        <strong>🏷️ 标签优化：</strong><br>
-                        推荐添加"企业版"、"安全认证"等相关标签
+                        <strong>🏷️ Tag Optimization:</strong><br>
+                        Recommend adding "Enterprise Edition", "Security Authentication" and other related tags
                     </div>
                     <div>
-                        <strong>🔗 关联建议：</strong><br>
-                        可以关联"安全白皮书"和"合规认证"资产
+                        <strong>🔗 Relationship Suggestions:</strong><br>
+                        Can link to "Security Whitepaper" and "Compliance Certification" assets
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 批量操作栏 -->
+    <!-- Bulk Actions Bar -->
     <div class="bulk-actions" id="bulkActions">
         <div class="bulk-info">
-            <span class="bulk-count">已选择 3 个资产</span>
-            <button class="action-btn" onclick="clearSelection()">清除选择</button>
+            <span class="bulk-count">3 assets selected</span>
+            <button class="action-btn" onclick="clearSelection()">Clear Selection</button>
         </div>
         <div class="bulk-buttons">
             <button class="toolbar-btn" onclick="bulkEdit()">
                 <span>✏️</span>
-                <span>批量编辑</span>
+                <span>Bulk Edit</span>
             </button>
             <button class="toolbar-btn" onclick="bulkTag()">
                 <span>🏷️</span>
-                <span>批量标签</span>
+                <span>Bulk Tag</span>
             </button>
             <button class="toolbar-btn" onclick="bulkExport()">
                 <span>📤</span>
-                <span>导出选中</span>
+                <span>Export Selected</span>
             </button>
             <button class="toolbar-btn" onclick="bulkDelete()">
                 <span>🗑️</span>
-                <span>删除</span>
+                <span>Delete</span>
             </button>
         </div>
     </div>
 
     <script>
-        // 初始化页面
+        // Initialize page
         let selectedAssets = new Set();
         let currentFilter = 'all';
         let relationshipChart;
 
-        // 页面加载完成后初始化
+        // Initialize after page load
         document.addEventListener('DOMContentLoaded', function() {
             initializeCharts();
             loadAssets();
         });
 
-        // 初始化图表
+        // Initialize charts
         function initializeCharts() {
-            // 初始化关系图谱
+            // Initialize relationship graph
             const chartDom = document.getElementById('relationshipChart');
             relationshipChart = echarts.init(chartDom);
 
@@ -1701,7 +1701,7 @@
                     type: 'graph',
                     layout: 'force',
                     data: [
-                        {name: '当前资产', symbolSize: 50, itemStyle: {color: '#5B21B6'}},
+                        {name: 'Current Asset', symbolSize: 50, itemStyle: {color: '#5B21B6'}},
                         {name: 'FAQ-001', symbolSize: 30, itemStyle: {color: '#8B5CF6'}},
                         {name: 'HowTo-023', symbolSize: 30, itemStyle: {color: '#3B82F6'}},
                         {name: 'Data-045', symbolSize: 30, itemStyle: {color: '#06B6D4'}},
@@ -1709,9 +1709,9 @@
                         {name: 'Video-089', symbolSize: 30, itemStyle: {color: '#EF4444'}}
                     ],
                     links: [
-                        {source: '当前资产', target: 'FAQ-001'},
-                        {source: '当前资产', target: 'HowTo-023'},
-                        {source: '当前资产', target: 'Data-045'},
+                        {source: 'Current Asset', target: 'FAQ-001'},
+                        {source: 'Current Asset', target: 'HowTo-023'},
+                        {source: 'Current Asset', target: 'Data-045'},
                         {source: 'FAQ-001', target: 'Compare-012'},
                         {source: 'HowTo-023', target: 'Video-089'}
                     ],
@@ -1729,94 +1729,94 @@
 
             relationshipChart.setOption(option);
 
-            // 响应式调整
+            // Responsive adjustment
             window.addEventListener('resize', function() {
                 relationshipChart.resize();
             });
         }
 
-        // 加载资产数据
+        // Load asset data
         function loadAssets() {
-            // 模拟加载资产数据
+            // Simulate loading asset data
             console.log('Loading assets...');
         }
 
-        // 打开创建模态框
+        // Open create modal
         function openCreateModal() {
             document.getElementById('createModal').classList.add('show');
         }
 
-        // 打开导入模态框
+        // Open import modal
         function openImportModal() {
             document.getElementById('importModal').classList.add('show');
         }
 
-        // 关闭模态框
+        // Close modal
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('show');
         }
 
-        // 选择资产类型
+        // Select asset type
         function selectAssetType(element, type) {
-            // 移除其他选中状态
+            // Remove other selected states
             document.querySelectorAll('.type-option').forEach(opt => {
                 opt.classList.remove('selected');
             });
-            // 添加当前选中状态
+            // Add current selected state
             element.classList.add('selected');
             console.log('Selected asset type:', type);
         }
 
-        // 保存资产
+        // Save asset
         function saveAsset() {
             const title = document.getElementById('assetTitle').value;
             const content = document.getElementById('assetContent').innerText;
             
             if (!title || !content) {
-                alert('请填写必填字段');
+                alert('Please fill in required fields');
                 return;
             }
 
-            // 模拟保存操作
+            // Simulate save operation
             console.log('Saving asset:', {title, content});
             
-            // 显示成功提示
+            // Show success message
             closeModal('createModal');
-            showNotification('资产创建成功', 'success');
+            showNotification('Asset created successfully', 'success');
         }
 
-        // 筛选资产类型
+        // Filter asset type
         function filterByType(type) {
             currentFilter = type;
-            // 更新筛选器状态
+            // Update filter state
             document.querySelectorAll('.filter-item').forEach(item => {
                 item.classList.remove('active');
             });
             event.currentTarget.classList.add('active');
             
-            // 重新加载资产
+            // Reload assets
             loadAssets();
         }
 
-        // 质量筛选
+        // Quality filter
         function filterByQuality(quality) {
             console.log('Filtering by quality:', quality);
             loadAssets();
         }
 
-        // 标签切换
+        // Tag toggle
         function toggleTag(element) {
             element.classList.toggle('active');
             loadAssets();
         }
 
-        // 搜索资产
+        // Search assets
         function searchAssets(query) {
             console.log('Searching:', query);
-            // 实现搜索逻辑
+            // Implement search logic
         }
 
-        // 切换视图
+        // Switch view
         function switchView(view) {
             document.querySelectorAll('.view-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -1831,40 +1831,40 @@
             }
         }
 
-        // 导出资产
+        // Export assets
         function exportAssets() {
             console.log('Exporting assets...');
-            showNotification('正在准备导出文件...', 'info');
+            showNotification('Preparing export file...', 'info');
         }
 
-        // 刷新资产列表
+        // Refresh asset list
         function refreshAssets() {
             loadAssets();
-            showNotification('资产列表已刷新', 'success');
+            showNotification('Asset list refreshed', 'success');
         }
 
-        // 编辑资产
+        // Edit asset
         function editAsset(event, id) {
             event.stopPropagation();
             console.log('Editing asset:', id);
             openCreateModal();
         }
 
-        // 复制资产
+        // Duplicate asset
         function duplicateAsset(event, id) {
             event.stopPropagation();
             console.log('Duplicating asset:', id);
-            showNotification('资产已复制', 'success');
+            showNotification('Asset duplicated', 'success');
         }
 
-        // 查看历史
+        // View history
         function viewHistory(event, id) {
             event.stopPropagation();
             console.log('Viewing history:', id);
             showAssetDetail();
         }
 
-        // 显示资产详情
+        // Show asset details
         function showAssetDetail(element) {
             document.getElementById('detailPanel').classList.add('show');
             if (relationshipChart) {
@@ -1874,12 +1874,12 @@
             }
         }
 
-        // 关闭详情面板
+        // Close details panel
         function closeDetailPanel() {
             document.getElementById('detailPanel').classList.remove('show');
         }
 
-        // 标签输入处理
+        // Tag input handling
         function handleTagInput(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -1897,12 +1897,12 @@
             }
         }
 
-        // 移除标签
+        // Remove tag
         function removeTag(element) {
             element.parentElement.remove();
         }
 
-        // 文件拖拽处理
+        // File drag and drop handling
         function handleDragOver(event) {
             event.preventDefault();
             document.getElementById('importZone').classList.add('dragover');
@@ -1923,7 +1923,7 @@
             }
         }
 
-        // 文件选择处理
+        // File selection handling
         function handleFileSelect(event) {
             const files = event.target.files;
             if (files.length > 0) {
@@ -1931,36 +1931,36 @@
             }
         }
 
-        // 处理文件
+        // Handle files
         function handleFiles(files) {
             const file = files[0];
             console.log('Selected file:', file.name);
             
-            // 更新导入区域显示
+            // Update import zone display
             const importZone = document.getElementById('importZone');
             importZone.innerHTML = `
                 <div class="import-icon">✅</div>
                 <div class="import-text">${file.name}</div>
-                <div class="import-hint">文件大小: ${(file.size / 1024).toFixed(2)} KB</div>
+                <div class="import-hint">File size: ${(file.size / 1024).toFixed(2)} KB</div>
             `;
         }
 
-        // 开始导入
+        // Start import
         function startImport() {
             console.log('Starting import...');
             closeModal('importModal');
-            showNotification('正在导入资产...', 'info');
+            showNotification('Importing assets...', 'info');
             
-            // 模拟导入进度
+            // Simulate import progress
             setTimeout(() => {
-                showNotification('成功导入 25 个资产', 'success');
+                showNotification('Successfully imported 25 assets', 'success');
                 loadAssets();
             }, 2000);
         }
 
-        // 显示通知
+        // Show notification
         function showNotification(message, type = 'info') {
-            // 创建通知元素
+            // Create notification element
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
@@ -1991,7 +1991,7 @@
             
             document.body.appendChild(notification);
             
-            // 3秒后自动移除
+            // Auto remove after 3 seconds
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.3s';
                 setTimeout(() => {
@@ -2000,12 +2000,12 @@
             }, 3000);
         }
 
-        // 点击导入区域触发文件选择
+        // Click import zone to trigger file selection
         document.getElementById('importZone').addEventListener('click', function() {
             document.getElementById('fileInput').click();
         });
 
-        // 添加动画样式
+        // Add animation styles
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideIn {

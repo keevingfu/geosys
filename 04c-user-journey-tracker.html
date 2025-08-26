@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用户旅程追踪器 - User Journey Tracker</title>
-    <!-- 引入 ECharts -->
+    <title>User Journey Tracker - User Journey Tracker</title>
+    <!-- Import ECharts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <style>
         /* Global Design System - Creating a data-driven yet human-centered interface */
@@ -834,20 +834,20 @@
             <div class="sidebar-header">
                 <div class="app-title">
                     <div class="app-icon">🛤️</div>
-                    <span>用户旅程追踪器</span>
+                    <span>User Journey Tracker</span>
                 </div>
             </div>
 
             <!-- Time Range Selector -->
             <div class="time-selector">
-                <div class="time-label">时间范围</div>
+                <div class="time-label">Time Range</div>
                 <div class="time-options">
-                    <button class="time-btn" onclick="setTimeRange('1d')">今天</button>
-                    <button class="time-btn active" onclick="setTimeRange('7d')">7天</button>
-                    <button class="time-btn" onclick="setTimeRange('30d')">30天</button>
-                    <button class="time-btn" onclick="setTimeRange('90d')">90天</button>
-                    <button class="time-btn" onclick="setTimeRange('6m')">6个月</button>
-                    <button class="time-btn" onclick="setTimeRange('1y')">1年</button>
+                    <button class="time-btn" onclick="setTimeRange('1d')">Today</button>
+                    <button class="time-btn active" onclick="setTimeRange('7d')">7Days</button>
+                    <button class="time-btn" onclick="setTimeRange('30d')">30Days</button>
+                    <button class="time-btn" onclick="setTimeRange('90d')">90Days</button>
+                    <button class="time-btn" onclick="setTimeRange('6m')">6 Months</button>
+                    <button class="time-btn" onclick="setTimeRange('1y')">1Year</button>
                 </div>
             </div>
 
@@ -855,75 +855,75 @@
             <div class="filter-section">
                 <!-- Source Channel Filter -->
                 <div class="filter-group">
-                    <div class="filter-title">流量来源</div>
+                    <div class="filter-title">Traffic Source</div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox" checked>
-                        <span class="filter-label">搜索引擎</span>
+                        <span class="filter-label">Search Engine</span>
                         <span class="filter-count">2,456</span>
                     </div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox" checked>
-                        <span class="filter-label">社交媒体</span>
+                        <span class="filter-label">Social Media</span>
                         <span class="filter-count">1,823</span>
                     </div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox" checked>
-                        <span class="filter-label">直接访问</span>
+                        <span class="filter-label">Direct Visits</span>
                         <span class="filter-count">1,234</span>
                     </div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox">
-                        <span class="filter-label">邮件营销</span>
+                        <span class="filter-label">Email Marketing</span>
                         <span class="filter-count">567</span>
                     </div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox">
-                        <span class="filter-label">付费广告</span>
+                        <span class="filter-label">Paid Advertising</span>
                         <span class="filter-count">892</span>
                     </div>
                 </div>
 
                 <!-- User Segment Filter -->
                 <div class="filter-group">
-                    <div class="filter-title">用户分组</div>
+                    <div class="filter-title">User Segments</div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox" checked>
-                        <span class="filter-label">新用户</span>
+                        <span class="filter-label">New Users</span>
                         <span class="filter-count">3,456</span>
                     </div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox" checked>
-                        <span class="filter-label">回访用户</span>
+                        <span class="filter-label">Returning Users</span>
                         <span class="filter-count">2,789</span>
                     </div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox">
-                        <span class="filter-label">付费用户</span>
+                        <span class="filter-label">Paid Users</span>
                         <span class="filter-count">456</span>
                     </div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox">
-                        <span class="filter-label">VIP用户</span>
+                        <span class="filter-label">VIPUser</span>
                         <span class="filter-count">123</span>
                     </div>
                 </div>
 
                 <!-- Device Type Filter -->
                 <div class="filter-group">
-                    <div class="filter-title">设备类型</div>
+                    <div class="filter-title">Device Type</div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox" checked>
-                        <span class="filter-label">桌面端</span>
+                        <span class="filter-label">Desktop</span>
                         <span class="filter-count">4,123</span>
                     </div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox" checked>
-                        <span class="filter-label">移动端</span>
+                        <span class="filter-label">Mobile</span>
                         <span class="filter-count">2,845</span>
                     </div>
                     <div class="filter-item">
                         <input type="checkbox" class="filter-checkbox">
-                        <span class="filter-label">平板</span>
+                        <span class="filter-label">Tablet</span>
                         <span class="filter-count">234</span>
                     </div>
                 </div>
@@ -935,25 +935,25 @@
             <!-- Top Navigation -->
             <nav class="top-nav">
                 <div class="nav-tabs">
-                    <div class="nav-tab active" onclick="switchTab('journey')">旅程路径</div>
-                    <div class="nav-tab" onclick="switchTab('funnel')">转化漏斗</div>
-                    <div class="nav-tab" onclick="switchTab('touchpoint')">触点分析</div>
-                    <div class="nav-tab" onclick="switchTab('persona')">用户画像</div>
-                    <div class="nav-tab" onclick="switchTab('attribution')">归因分析</div>
-                    <div class="nav-tab" onclick="switchTab('personalization')">个性化配置</div>
+                    <div class="nav-tab active" onclick="switchTab('journey')">Journey Path</div>
+                    <div class="nav-tab" onclick="switchTab('funnel')">Conversion Funnel</div>
+                    <div class="nav-tab" onclick="switchTab('touchpoint')">Touchpoint Analytics</div>
+                    <div class="nav-tab" onclick="switchTab('persona')">User Persona</div>
+                    <div class="nav-tab" onclick="switchTab('attribution')">Attribution Analytics</div>
+                    <div class="nav-tab" onclick="switchTab('personalization')">Personalization Configuration</div>
                 </div>
                 <div class="nav-actions">
                     <button class="nav-btn" onclick="refreshData()">
                         <span>🔄</span>
-                        <span>刷新</span>
+                        <span>Refresh</span>
                     </button>
                     <button class="nav-btn" onclick="exportReport()">
                         <span>📤</span>
-                        <span>导出</span>
+                        <span>Export</span>
                     </button>
                     <button class="nav-btn primary" onclick="showInsights()">
                         <span>💡</span>
-                        <span>洞察</span>
+                        <span>Insights</span>
                     </button>
                 </div>
             </nav>
@@ -963,15 +963,15 @@
                 <!-- Alert Banner for Important Insights -->
                 <div class="alert-banner">
                     <span class="alert-icon">⚠️</span>
-                    <span class="alert-text">发现异常：过去24小时内，社交媒体渠道的转化率下降了35%，需要立即关注</span>
-                    <button class="alert-action" onclick="analyzeIssue()">分析原因</button>
+                    <span class="alert-text">Abnormality detected: In the past 24 hours, social media channel conversion rate declined by 35%, needs immediate attention</span>
+                    <button class="alert-action" onclick="analyzeIssue()">Analyze Cause</button>
                 </div>
 
                 <!-- Key Metrics Overview -->
                 <div class="metrics-grid">
                     <div class="metric-card">
                         <div class="metric-header">
-                            <span class="metric-label">总访问用户</span>
+                            <span class="metric-label">Total Visitors</span>
                             <div class="metric-icon" style="background: rgba(80, 70, 229, 0.1); color: var(--journey-primary);">
                                 👥
                             </div>
@@ -979,13 +979,13 @@
                         <div class="metric-value">23,456</div>
                         <div class="metric-change change-positive">
                             <span>↑</span>
-                            <span>比上期增长 12.3%</span>
+                            <span>12.3% Growth from Last Period</span>
                         </div>
                     </div>
                     
                     <div class="metric-card">
                         <div class="metric-header">
-                            <span class="metric-label">平均转化率</span>
+                            <span class="metric-label">Average Conversion Rate</span>
                             <div class="metric-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--journey-success);">
                                 🎯
                             </div>
@@ -993,27 +993,27 @@
                         <div class="metric-value">3.45%</div>
                         <div class="metric-change change-positive">
                             <span>↑</span>
-                            <span>提升 0.23%</span>
+                            <span>Increased 0.23%</span>
                         </div>
                     </div>
                     
                     <div class="metric-card">
                         <div class="metric-header">
-                            <span class="metric-label">平均旅程长度</span>
+                            <span class="metric-label">Average Journey Length</span>
                             <div class="metric-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--journey-warning);">
                                 ⏱️
                             </div>
                         </div>
-                        <div class="metric-value">5.2 天</div>
+                        <div class="metric-value">5.2 Days</div>
                         <div class="metric-change change-negative">
                             <span>↓</span>
-                            <span>缩短 0.8 天</span>
+                            <span>Shortened by 0.8 Days</span>
                         </div>
                     </div>
                     
                     <div class="metric-card">
                         <div class="metric-header">
-                            <span class="metric-label">私域转化用户</span>
+                            <span class="metric-label">Private Domain Conversions</span>
                             <div class="metric-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--journey-danger);">
                                 🔐
                             </div>
@@ -1021,13 +1021,13 @@
                         <div class="metric-value">1,234</div>
                         <div class="metric-change change-positive">
                             <span>↑</span>
-                            <span>新增 156 人</span>
+                            <span>Added 156 New Users</span>
                         </div>
                     </div>
                     
                     <div class="metric-card">
                         <div class="metric-header">
-                            <span class="metric-label">平均触点数</span>
+                            <span class="metric-label">Average Touchpoints</span>
                             <div class="metric-icon" style="background: rgba(14, 165, 233, 0.1); color: var(--journey-info);">
                                 📍
                             </div>
@@ -1035,7 +1035,7 @@
                         <div class="metric-value">7.8</div>
                         <div class="metric-change change-positive">
                             <span>↑</span>
-                            <span>增加 1.2 个</span>
+                            <span>Increased by 1.2</span>
                         </div>
                     </div>
                 </div>
@@ -1043,11 +1043,11 @@
                 <!-- Journey Path Visualization -->
                 <div class="journey-section">
                     <div class="section-header">
-                        <h2 class="section-title">用户旅程可视化</h2>
+                        <h2 class="section-title">User Journey Visualization</h2>
                         <div class="section-controls">
-                            <button class="control-btn active" onclick="setJourneyView('sankey')">桑基图</button>
-                            <button class="control-btn" onclick="setJourneyView('flow')">流程图</button>
-                            <button class="control-btn" onclick="setJourneyView('heatmap')">热力图</button>
+                            <button class="control-btn active" onclick="setJourneyView('sankey')">Sankey Diagram</button>
+                            <button class="control-btn" onclick="setJourneyView('flow')">Flow Chart</button>
+                            <button class="control-btn" onclick="setJourneyView('heatmap')">Heat Map</button>
                         </div>
                     </div>
                     <div class="journey-canvas" id="journeyChart"></div>
@@ -1056,75 +1056,75 @@
                     <div class="touchpoint-grid">
                         <div class="touchpoint-card">
                             <div class="touchpoint-header">
-                                <span class="touchpoint-name">首页访问</span>
-                                <span class="touchpoint-badge">入口</span>
+                                <span class="touchpoint-name">Homepage Visits</span>
+                                <span class="touchpoint-badge">Entry</span>
                             </div>
                             <div class="touchpoint-metrics">
                                 <div class="touchpoint-metric">
                                     <span class="touchpoint-metric-value">8,234</span>
-                                    <span class="touchpoint-metric-label">访问量</span>
+                                    <span class="touchpoint-metric-label">Visit Count</span>
                                 </div>
                                 <div class="touchpoint-metric">
                                     <span class="touchpoint-metric-value">45%</span>
-                                    <span class="touchpoint-metric-label">跳出率</span>
+                                    <span class="touchpoint-metric-label">Bounce Rate</span>
                                 </div>
                                 <div class="touchpoint-metric">
-                                    <span class="touchpoint-metric-value">2.3分</span>
-                                    <span class="touchpoint-metric-label">平均停留</span>
+                                    <span class="touchpoint-metric-value">2.3 min</span>
+                                    <span class="touchpoint-metric-label">Avg. Duration</span>
                                 </div>
                                 <div class="touchpoint-metric">
                                     <span class="touchpoint-metric-value">67%</span>
-                                    <span class="touchpoint-metric-label">继续率</span>
+                                    <span class="touchpoint-metric-label">Continue Rate</span>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="touchpoint-card">
                             <div class="touchpoint-header">
-                                <span class="touchpoint-name">产品页浏览</span>
-                                <span class="touchpoint-badge">关键</span>
+                                <span class="touchpoint-name">Product Page Views</span>
+                                <span class="touchpoint-badge">Key</span>
                             </div>
                             <div class="touchpoint-metrics">
                                 <div class="touchpoint-metric">
                                     <span class="touchpoint-metric-value">5,123</span>
-                                    <span class="touchpoint-metric-label">访问量</span>
+                                    <span class="touchpoint-metric-label">Visit Count</span>
                                 </div>
                                 <div class="touchpoint-metric">
                                     <span class="touchpoint-metric-value">23%</span>
-                                    <span class="touchpoint-metric-label">跳出率</span>
+                                    <span class="touchpoint-metric-label">Bounce Rate</span>
                                 </div>
                                 <div class="touchpoint-metric">
-                                    <span class="touchpoint-metric-value">4.5分</span>
-                                    <span class="touchpoint-metric-label">平均停留</span>
+                                    <span class="touchpoint-metric-value">4.5 min</span>
+                                    <span class="touchpoint-metric-label">Avg. Duration</span>
                                 </div>
                                 <div class="touchpoint-metric">
                                     <span class="touchpoint-metric-value">78%</span>
-                                    <span class="touchpoint-metric-label">继续率</span>
+                                    <span class="touchpoint-metric-label">Continue Rate</span>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="touchpoint-card">
                             <div class="touchpoint-header">
-                                <span class="touchpoint-name">注册转化</span>
-                                <span class="touchpoint-badge">转化</span>
+                                <span class="touchpoint-name">RegisterConversion</span>
+                                <span class="touchpoint-badge">Conversion</span>
                             </div>
                             <div class="touchpoint-metrics">
                                 <div class="touchpoint-metric">
                                     <span class="touchpoint-metric-value">1,234</span>
-                                    <span class="touchpoint-metric-label">转化量</span>
+                                    <span class="touchpoint-metric-label">Conversion Count</span>
                                 </div>
                                 <div class="touchpoint-metric">
                                     <span class="touchpoint-metric-value">15%</span>
-                                    <span class="touchpoint-metric-label">转化率</span>
+                                    <span class="touchpoint-metric-label">Conversion Rate</span>
                                 </div>
                                 <div class="touchpoint-metric">
-                                    <span class="touchpoint-metric-value">1.2分</span>
-                                    <span class="touchpoint-metric-label">完成时间</span>
+                                    <span class="touchpoint-metric-value">1.2 min</span>
+                                    <span class="touchpoint-metric-label">Completion Time</span>
                                 </div>
                                 <div class="touchpoint-metric">
                                     <span class="touchpoint-metric-value">89%</span>
-                                    <span class="touchpoint-metric-label">成功率</span>
+                                    <span class="touchpoint-metric-label">Success Rate</span>
                                 </div>
                             </div>
                         </div>
@@ -1134,11 +1134,11 @@
                 <!-- Conversion Funnel Analysis -->
                 <div class="journey-section">
                     <div class="section-header">
-                        <h2 class="section-title">转化漏斗分析</h2>
+                        <h2 class="section-title">Conversion Funnel Analytics</h2>
                         <div class="section-controls">
-                            <button class="control-btn" onclick="filterFunnel('all')">全部</button>
-                            <button class="control-btn" onclick="filterFunnel('new')">新用户</button>
-                            <button class="control-btn" onclick="filterFunnel('return')">回访用户</button>
+                            <button class="control-btn" onclick="filterFunnel('all')">All</button>
+                            <button class="control-btn" onclick="filterFunnel('new')">New Users</button>
+                            <button class="control-btn" onclick="filterFunnel('return')">Returning Users</button>
                         </div>
                     </div>
                     <div class="funnel-container" id="funnelChart"></div>
@@ -1147,95 +1147,95 @@
                 <!-- User Persona Cards -->
                 <div class="journey-section">
                     <div class="section-header">
-                        <h2 class="section-title">用户画像分析</h2>
+                        <h2 class="section-title">User Persona Analytics</h2>
                     </div>
                     <div class="persona-grid">
                         <div class="persona-card" onclick="viewPersonaDetail('explorer')">
                             <div class="persona-header">
-                                <div class="persona-avatar">探</div>
+                                <div class="persona-avatar">EX</div>
                                 <div class="persona-info">
-                                    <div class="persona-name">探索者</div>
-                                    <div class="persona-desc">对新功能充满好奇，愿意尝试</div>
+                                    <div class="persona-name">Explorer</div>
+                                    <div class="persona-desc">Curious about new features, willing to try</div>
                                 </div>
                             </div>
                             <div class="persona-traits">
-                                <span class="trait-chip">技术爱好者</span>
-                                <span class="trait-chip">早期采用者</span>
-                                <span class="trait-chip">活跃分享</span>
-                                <span class="trait-chip">高互动率</span>
+                                <span class="trait-chip">Tech Enthusiast</span>
+                                <span class="trait-chip">Early Adopter</span>
+                                <span class="trait-chip">Active Sharer</span>
+                                <span class="trait-chip">High Engagement</span>
                             </div>
                             <div class="persona-stats">
                                 <div class="persona-stat">
                                     <div class="persona-stat-value">35%</div>
-                                    <div class="persona-stat-label">用户占比</div>
+                                    <div class="persona-stat-label">User Percentage</div>
                                 </div>
                                 <div class="persona-stat">
                                     <div class="persona-stat-value">4.2%</div>
-                                    <div class="persona-stat-label">转化率</div>
+                                    <div class="persona-stat-label">Conversion Rate</div>
                                 </div>
                                 <div class="persona-stat">
                                     <div class="persona-stat-value">￥280</div>
-                                    <div class="persona-stat-label">平均价值</div>
+                                    <div class="persona-stat-label">Average Value</div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="persona-card" onclick="viewPersonaDetail('researcher')">
                             <div class="persona-header">
-                                <div class="persona-avatar" style="background: linear-gradient(135deg, #10B981, #059669);">研</div>
+                                <div class="persona-avatar" style="background: linear-gradient(135deg, #10B981, #059669);">RE</div>
                                 <div class="persona-info">
-                                    <div class="persona-name">研究者</div>
-                                    <div class="persona-desc">深度对比，谨慎决策</div>
+                                    <div class="persona-name">Researcher</div>
+                                    <div class="persona-desc">Deep comparison, cautious decision-making</div>
                                 </div>
                             </div>
                             <div class="persona-traits">
-                                <span class="trait-chip">详细对比</span>
-                                <span class="trait-chip">阅读文档</span>
-                                <span class="trait-chip">多次访问</span>
-                                <span class="trait-chip">慢决策</span>
+                                <span class="trait-chip">Detailed Comparison</span>
+                                <span class="trait-chip">Documentation Reader</span>
+                                <span class="trait-chip">Multiple Visits</span>
+                                <span class="trait-chip">Slow Decision</span>
                             </div>
                             <div class="persona-stats">
                                 <div class="persona-stat">
                                     <div class="persona-stat-value">28%</div>
-                                    <div class="persona-stat-label">用户占比</div>
+                                    <div class="persona-stat-label">User Percentage</div>
                                 </div>
                                 <div class="persona-stat">
                                     <div class="persona-stat-value">6.8%</div>
-                                    <div class="persona-stat-label">转化率</div>
+                                    <div class="persona-stat-label">Conversion Rate</div>
                                 </div>
                                 <div class="persona-stat">
                                     <div class="persona-stat-value">￥520</div>
-                                    <div class="persona-stat-label">平均价值</div>
+                                    <div class="persona-stat-label">Average Value</div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="persona-card" onclick="viewPersonaDetail('buyer')">
                             <div class="persona-header">
-                                <div class="persona-avatar" style="background: linear-gradient(135deg, #F59E0B, #D97706);">购</div>
+                                <div class="persona-avatar" style="background: linear-gradient(135deg, #F59E0B, #D97706);">BU</div>
                                 <div class="persona-info">
-                                    <div class="persona-name">快速购买者</div>
-                                    <div class="persona-desc">明确需求，快速决策</div>
+                                    <div class="persona-name">Quick Buyer</div>
+                                    <div class="persona-desc">Clear needs, fast decision-making</div>
                                 </div>
                             </div>
                             <div class="persona-traits">
-                                <span class="trait-chip">目标明确</span>
-                                <span class="trait-chip">快速决策</span>
-                                <span class="trait-chip">重视效率</span>
-                                <span class="trait-chip">品牌忠诚</span>
+                                <span class="trait-chip">Clear Goals</span>
+                                <span class="trait-chip">Fast Decision</span>
+                                <span class="trait-chip">Values Efficiency</span>
+                                <span class="trait-chip">Brand Loyalty</span>
                             </div>
                             <div class="persona-stats">
                                 <div class="persona-stat">
                                     <div class="persona-stat-value">22%</div>
-                                    <div class="persona-stat-label">用户占比</div>
+                                    <div class="persona-stat-label">User Percentage</div>
                                 </div>
                                 <div class="persona-stat">
                                     <div class="persona-stat-value">12.3%</div>
-                                    <div class="persona-stat-label">转化率</div>
+                                    <div class="persona-stat-label">Conversion Rate</div>
                                 </div>
                                 <div class="persona-stat">
                                     <div class="persona-stat-value">￥890</div>
-                                    <div class="persona-stat-label">平均价值</div>
+                                    <div class="persona-stat-label">Average Value</div>
                                 </div>
                             </div>
                         </div>
@@ -1245,14 +1245,14 @@
                 <!-- Attribution Model Analysis -->
                 <div class="attribution-container">
                     <div class="section-header">
-                        <h2 class="section-title">归因分析模型</h2>
+                        <h2 class="section-title">Attribution Analytics Model</h2>
                     </div>
                     <div class="model-selector">
-                        <div class="model-option selected" onclick="selectModel('last-click')">末次点击</div>
-                        <div class="model-option" onclick="selectModel('first-click')">首次点击</div>
-                        <div class="model-option" onclick="selectModel('linear')">线性归因</div>
-                        <div class="model-option" onclick="selectModel('time-decay')">时间衰减</div>
-                        <div class="model-option" onclick="selectModel('data-driven')">数据驱动</div>
+                        <div class="model-option selected" onclick="selectModel('last-click')">Last Click</div>
+                        <div class="model-option" onclick="selectModel('first-click')">First Click</div>
+                        <div class="model-option" onclick="selectModel('linear')">Linear Attribution</div>
+                        <div class="model-option" onclick="selectModel('time-decay')">Time Decay</div>
+                        <div class="model-option" onclick="selectModel('data-driven')">Data Driven</div>
                     </div>
                     <div class="attribution-chart" id="attributionChart"></div>
                 </div>
@@ -1260,26 +1260,26 @@
                 <!-- Personalization Configuration -->
                 <div class="personalization-panel">
                     <div class="section-header">
-                        <h2 class="section-title">个性化推荐配置</h2>
+                        <h2 class="section-title">Personalization Recommendation Configuration</h2>
                     </div>
                     
                     <div class="config-section">
-                        <div class="config-title">内容个性化</div>
+                        <div class="config-title">Content Personalization</div>
                         <div class="config-options">
                             <div class="config-option">
-                                <span class="config-label">基于浏览历史推荐</span>
+                                <span class="config-label">Recommend Based on View History</span>
                                 <div class="toggle-switch active" onclick="toggleSwitch(this)">
                                     <div class="toggle-slider"></div>
                                 </div>
                             </div>
                             <div class="config-option">
-                                <span class="config-label">基于用户画像推荐</span>
+                                <span class="config-label">Recommend Based on User Persona</span>
                                 <div class="toggle-switch active" onclick="toggleSwitch(this)">
                                     <div class="toggle-slider"></div>
                                 </div>
                             </div>
                             <div class="config-option">
-                                <span class="config-label">基于相似用户推荐</span>
+                                <span class="config-label">Recommend Based on Similar Users</span>
                                 <div class="toggle-switch" onclick="toggleSwitch(this)">
                                     <div class="toggle-slider"></div>
                                 </div>
@@ -1288,22 +1288,22 @@
                     </div>
                     
                     <div class="config-section">
-                        <div class="config-title">触达策略</div>
+                        <div class="config-title">Engagement Strategy</div>
                         <div class="config-options">
                             <div class="config-option">
-                                <span class="config-label">智能触达时机</span>
+                                <span class="config-label">Smart Engagement Timing</span>
                                 <div class="toggle-switch active" onclick="toggleSwitch(this)">
                                     <div class="toggle-slider"></div>
                                 </div>
                             </div>
                             <div class="config-option">
-                                <span class="config-label">多渠道协同</span>
+                                <span class="config-label">Multi-Channel Coordination</span>
                                 <div class="toggle-switch" onclick="toggleSwitch(this)">
                                     <div class="toggle-slider"></div>
                                 </div>
                             </div>
                             <div class="config-option">
-                                <span class="config-label">频次控制</span>
+                                <span class="config-label">Frequency Control</span>
                                 <div class="toggle-switch active" onclick="toggleSwitch(this)">
                                     <div class="toggle-slider"></div>
                                 </div>
@@ -1312,22 +1312,22 @@
                     </div>
                     
                     <div class="config-section">
-                        <div class="config-title">转化优化</div>
+                        <div class="config-title">Conversion Optimization</div>
                         <div class="config-options">
                             <div class="config-option">
-                                <span class="config-label">动态定价策略</span>
+                                <span class="config-label">Dynamic Pricing Strategy</span>
                                 <div class="toggle-switch" onclick="toggleSwitch(this)">
                                     <div class="toggle-slider"></div>
                                 </div>
                             </div>
                             <div class="config-option">
-                                <span class="config-label">个性化优惠券</span>
+                                <span class="config-label">Personalized Coupons</span>
                                 <div class="toggle-switch active" onclick="toggleSwitch(this)">
                                     <div class="toggle-slider"></div>
                                 </div>
                             </div>
                             <div class="config-option">
-                                <span class="config-label">智能客服引导</span>
+                                <span class="config-label">Smart Customer Service Guidance</span>
                                 <div class="toggle-switch active" onclick="toggleSwitch(this)">
                                     <div class="toggle-slider"></div>
                                 </div>
@@ -1342,39 +1342,39 @@
     <!-- Insights Panel -->
     <div class="insight-panel" id="insightPanel">
         <div class="panel-header">
-            <h3 class="panel-title">智能洞察</h3>
+            <h3 class="panel-title">Smart Insights</h3>
             <button class="panel-close" onclick="hideInsights()">×</button>
         </div>
         <div class="panel-body">
             <div class="insight-item">
-                <div class="insight-title">🔥 转化瓶颈发现</div>
+                <div class="insight-title">🔥 Conversion Bottleneck Discovery</div>
                 <div class="insight-desc">
-                    从"产品页浏览"到"加入购物车"的转化率仅为12%，远低于行业平均水平(18%)。
-                    建议优化产品页面的CTA按钮位置和文案。
+                    The conversion rate from "Product Page Views" to "Add to Cart" is only 12%, significantly lower than industry average (18%).
+                    Recommend optimizing product page CTA button placement and copy.
                 </div>
             </div>
             
             <div class="insight-item">
-                <div class="insight-title">📈 高价值路径识别</div>
+                <div class="insight-title">📈 High-Value Path Identification</div>
                 <div class="insight-desc">
-                    通过"搜索引擎→博客文章→产品页→注册"路径的用户，转化率高达8.5%，
-                    是平均转化率的2.5倍。建议加大内容营销投入。
+                    Users following the "Search Engine → Blog Articles → Product Page → Registration" path have a conversion rate of 8.5%,
+                    which is 2.5 times the average conversion rate. Recommend increasing content marketing investment.
                 </div>
             </div>
             
             <div class="insight-item">
-                <div class="insight-title">👥 用户行为模式</div>
+                <div class="insight-title">👥 User Behavior Patterns</div>
                 <div class="insight-desc">
-                    研究者类型用户通常需要7-9个触点才会转化，但他们的客单价是探索者的1.8倍。
-                    建议为这类用户提供更详细的产品对比和案例研究。
+                    Researcher-type users typically require 7-9 touchpoints before conversion, but their average order value is 1.8 times that of explorers.
+                    Recommend providing more detailed product comparisons and case studies for this user type.
                 </div>
             </div>
             
             <div class="insight-item">
-                <div class="insight-title">⏰ 最佳触达时机</div>
+                <div class="insight-title">⏰ Optimal Engagement Timing</div>
                 <div class="insight-desc">
-                    数据显示，在用户第3次访问后的24小时内发送个性化邮件，
-                    转化率可提升45%。建议启用智能触达系统。
+                    Data shows that sending personalized emails within 24 hours after a user's third visit
+                    can increase conversion rate by 45%. Recommend enabling smart engagement system.
                 </div>
             </div>
         </div>
@@ -1411,41 +1411,41 @@
                         focus: 'adjacency'
                     },
                     data: [
-                        {name: '搜索引擎'},
-                        {name: '社交媒体'},
-                        {name: '直接访问'},
-                        {name: '邮件营销'},
-                        {name: '首页'},
-                        {name: '产品页'},
-                        {name: '博客'},
-                        {name: '价格页'},
-                        {name: '注册'},
-                        {name: '试用'},
-                        {name: '购买'},
-                        {name: '流失'}
+                        {name: 'Search Engine'},
+                        {name: 'Social Media'},
+                        {name: 'Direct Visits'},
+                        {name: 'Email Marketing'},
+                        {name: 'Homepage'},
+                        {name: 'Product Page'},
+                        {name: 'Blog'},
+                        {name: 'Pricing Page'},
+                        {name: 'Registration'},
+                        {name: 'Trial'},
+                        {name: 'Purchase'},
+                        {name: 'Churn'}
                     ],
                     links: [
-                        {source: '搜索引擎', target: '首页', value: 5000},
-                        {source: '搜索引擎', target: '产品页', value: 2000},
-                        {source: '搜索引擎', target: '博客', value: 1500},
-                        {source: '社交媒体', target: '首页', value: 3000},
-                        {source: '社交媒体', target: '产品页', value: 1200},
-                        {source: '直接访问', target: '首页', value: 2500},
-                        {source: '邮件营销', target: '产品页', value: 800},
-                        {source: '首页', target: '产品页', value: 4000},
-                        {source: '首页', target: '博客', value: 2000},
-                        {source: '首页', target: '流失', value: 4500},
-                        {source: '产品页', target: '价格页', value: 3000},
-                        {source: '产品页', target: '注册', value: 1500},
-                        {source: '产品页', target: '流失', value: 3500},
-                        {source: '博客', target: '产品页', value: 2000},
-                        {source: '博客', target: '流失', value: 1500},
-                        {source: '价格页', target: '注册', value: 1200},
-                        {source: '价格页', target: '流失', value: 1800},
-                        {source: '注册', target: '试用', value: 2000},
-                        {source: '注册', target: '流失', value: 700},
-                        {source: '试用', target: '购买', value: 1500},
-                        {source: '试用', target: '流失', value: 500}
+                        {source: 'Search Engine', target: 'Homepage', value: 5000},
+                        {source: 'Search Engine', target: 'Product Page', value: 2000},
+                        {source: 'Search Engine', target: 'Blog', value: 1500},
+                        {source: 'Social Media', target: 'Homepage', value: 3000},
+                        {source: 'Social Media', target: 'Product Page', value: 1200},
+                        {source: 'Direct Visits', target: 'Homepage', value: 2500},
+                        {source: 'Email Marketing', target: 'Product Page', value: 800},
+                        {source: 'Homepage', target: 'Product Page', value: 4000},
+                        {source: 'Homepage', target: 'Blog', value: 2000},
+                        {source: 'Homepage', target: 'Churn', value: 4500},
+                        {source: 'Product Page', target: 'Pricing Page', value: 3000},
+                        {source: 'Product Page', target: 'Registration', value: 1500},
+                        {source: 'Product Page', target: 'Churn', value: 3500},
+                        {source: 'Blog', target: 'Product Page', value: 2000},
+                        {source: 'Blog', target: 'Churn', value: 1500},
+                        {source: 'Pricing Page', target: 'Registration', value: 1200},
+                        {source: 'Pricing Page', target: 'Churn', value: 1800},
+                        {source: 'Registration', target: 'Trial', value: 2000},
+                        {source: 'Registration', target: 'Churn', value: 700},
+                        {source: 'Trial', target: 'Purchase', value: 1500},
+                        {source: 'Trial', target: 'Churn', value: 500}
                     ],
                     lineStyle: {
                         color: 'gradient',
@@ -1474,11 +1474,11 @@
                     formatter: '{a} <br/>{b} : {c} ({d}%)'
                 },
                 legend: {
-                    data: ['访问', '浏览', '点击', '注册', '试用', '购买'],
+                    data: ['Visits', 'Views', 'Clicks', 'Registration', 'Trial', 'Purchase'],
                     bottom: 10
                 },
                 series: [{
-                    name: '转化漏斗',
+                    name: 'Conversion Funnel',
                     type: 'funnel',
                     left: '10%',
                     top: 60,
@@ -1493,7 +1493,7 @@
                     label: {
                         show: true,
                         position: 'inside',
-                        formatter: '{b}\n{c} 人\n转化率 {d}%'
+                        formatter: '{b}\n{c} People\nConversion Rate {d}%'
                     },
                     labelLine: {
                         length: 10,
@@ -1512,12 +1512,12 @@
                         }
                     },
                     data: [
-                        {value: 10000, name: '访问', itemStyle: {color: '#5046E5'}},
-                        {value: 7500, name: '浏览', itemStyle: {color: '#7C3AED'}},
-                        {value: 5000, name: '点击', itemStyle: {color: '#8B5CF6'}},
-                        {value: 2500, name: '注册', itemStyle: {color: '#A78BFA'}},
-                        {value: 1500, name: '试用', itemStyle: {color: '#C4B5FD'}},
-                        {value: 800, name: '购买', itemStyle: {color: '#10B981'}}
+                        {value: 10000, name: 'Visits', itemStyle: {color: '#5046E5'}},
+                        {value: 7500, name: 'Views', itemStyle: {color: '#7C3AED'}},
+                        {value: 5000, name: 'Clicks', itemStyle: {color: '#8B5CF6'}},
+                        {value: 2500, name: 'Registration', itemStyle: {color: '#A78BFA'}},
+                        {value: 1500, name: 'Trial', itemStyle: {color: '#C4B5FD'}},
+                        {value: 800, name: 'Purchase', itemStyle: {color: '#10B981'}}
                     ]
                 }]
             };
@@ -1536,7 +1536,7 @@
                     }
                 },
                 legend: {
-                    data: ['归因价值'],
+                    data: ['Attribution Value'],
                     bottom: 10
                 },
                 grid: {
@@ -1547,7 +1547,7 @@
                 },
                 xAxis: {
                     type: 'category',
-                    data: ['搜索引擎', '社交媒体', '直接访问', '邮件营销', '付费广告', '内容营销', '推荐流量'],
+                    data: ['Search Engine', 'Social Media', 'Direct Visits', 'Email Marketing', 'Paid Ads', 'Content Marketing', 'Referral Traffic'],
                     axisLabel: {
                         interval: 0,
                         rotate: 30
@@ -1555,10 +1555,10 @@
                 },
                 yAxis: {
                     type: 'value',
-                    name: '转化贡献值'
+                    name: 'Conversion Contribution Value'
                 },
                 series: [{
-                    name: '归因价值',
+                    name: 'Attribution Value',
                     type: 'bar',
                     data: [320, 280, 220, 180, 160, 140, 100],
                     itemStyle: {
@@ -1652,22 +1652,22 @@
             console.log('Refreshing data...');
             
             // Show loading state
-            showNotification('正在刷新数据...', 'info');
+            showNotification('Refreshing data...', 'info');
             
             // Simulate data refresh
             setTimeout(() => {
                 loadJourneyData();
-                showNotification('数据已更新', 'success');
+                showNotification('Data updated', 'success');
             }, 1500);
         }
 
         // Export report
         function exportReport() {
             console.log('Exporting journey report...');
-            showNotification('正在生成报告...', 'info');
+            showNotification('Generating report...', 'info');
             
             setTimeout(() => {
-                showNotification('报告已生成并下载', 'success');
+                showNotification('Report generated and downloaded', 'success');
             }, 2000);
         }
 
@@ -1675,13 +1675,13 @@
         function analyzeIssue() {
             console.log('Analyzing conversion issue...');
             showInsights();
-            showNotification('正在分析问题原因...', 'info');
+            showNotification('Analyzing issue causes...', 'info');
         }
 
         // View persona detail
         function viewPersonaDetail(personaType) {
             console.log('Viewing persona detail:', personaType);
-            showNotification(`查看${personaType}用户画像详情`, 'info');
+            showNotification(`Viewing ${personaType} user persona details`, 'info');
         }
 
         // Select attribution model

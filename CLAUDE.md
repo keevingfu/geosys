@@ -4,105 +4,100 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**leapgeo-sys** is a Generative Engine Optimization (GEO) Operations Platform for Leap Company. It's a collection of standalone HTML pages that form a comprehensive content management and monitoring system for managing brand visibility across AI-powered search engines and platforms.
+**leapgeo-sys** is a Generative Engine Optimization (GEO) Operations Platform for Leap Company. It's a collection of standalone HTML pages that form a comprehensive content management and monitoring system for managing brand visibility across AI-powered search engines and platforms. The system is designed for monitoring and optimizing brand presence across AI platforms including ChatGPT, Perplexity, Claude, Gemini, You.com, and Bing Chat.
 
-## Architecture
+## Running the Project
 
-This is a static HTML-based project with no build process. Each HTML file is a self-contained single-page application that represents a different module of the GEO platform. The system is designed to monitor and optimize brand presence across AI-powered search engines like ChatGPT, Perplexity, Claude, and others.
-
-### Core Modules
-- `index.html` - Main dashboard and navigation hub
-- `geo-platform-Intr.html` - Platform introduction and overview page
-
-### Operational Tools
-- `00a-geo-channel-diagnostic.html` - Channel diagnostics and health monitoring
-- `00b-geo-strategy.html` - GEO strategy planning and management
-- `01a-question-collector.html` - User question discovery and collection system
-- `02a-content-orchestration-center.html` - Content planning and orchestration
-- `03a-channel-config-manager.html` - Channel configuration management
-- `04c-user-journey-tracker.html` - User journey tracking and analysis
-
-### Analytics Dashboards
-- `05a-realtime-monitoring.html` - Real-time system monitoring
-- `05b_brand-performance.html` - Brand performance metrics
-- `05c_visibility-analytics.html` - Visibility analytics
-- `05d_perception-analytics.html` - Brand perception analytics
-- `05e_citations-analytics.html` - Citations and references analytics
-- `05f_questions-analytics.html` - Questions analytics
-- `05g_seo_performance.html` - SEO performance tracking
-- `05h-reddit-youtube-monitor.html` - Social media monitoring for Reddit and YouTube
-
-## Technology Stack
-
-- **Frontend**: Pure HTML5, CSS3, and vanilla JavaScript
-- **Charts**: ECharts v5.4.3 for data visualization
-- **Icons**: Font Awesome 6.4.0
-- **Animations**: AOS (Animate On Scroll) library (in some pages)
-- **Styling**: CSS custom properties for theming, responsive design
-
-## Development Guidelines
-
-### Running the Project
-Since this is a static HTML project, simply open any HTML file in a web browser. For better development experience with live reload:
+Since this is a static HTML project with no build process:
 ```bash
 # Using Python's built-in server
 python3 -m http.server 8000
 
-# Or using Node.js http-server (if available)
+# Or using Node.js http-server
 npx http-server -p 8000
+
+# Then open http://localhost:8000/index.html in your browser
 ```
 
-### Code Structure
-- Each HTML file contains inline CSS and JavaScript
-- Common design patterns include:
-  - CSS custom properties for consistent theming
-  - Responsive grid layouts
-  - Interactive charts using ECharts
-  - Mock data for demonstration purposes
+## Architecture
 
-### Navigation System
-The main `index.html` serves as the navigation hub with:
-- Collapsible sidebar menu with categorized sections
-- iframe-based content loading for individual modules
-- Mobile-responsive hamburger menu
-- Active state management for navigation items
+This is a static HTML-based project where each HTML file is a self-contained single-page application. Key architectural patterns:
 
-### Styling Conventions
-- CSS variables defined in `:root` for consistent theming
-- Primary gradient: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
-- Color scheme includes primary, success, warning, error, purple, and cyan variants
-- Responsive design with mobile-first approach
-- Consistent shadow variables: `--shadow-sm`, `--shadow-md`, `--shadow-lg`
+1. **Main Navigation Hub**: `index.html` serves as the central dashboard with:
+   - Collapsible sidebar navigation with categorized sections
+   - iframe-based content loading for individual modules
+   - Real-time monitoring widgets displaying key metrics (AVI, Coverage Rate, Share of Voice)
+   - Mobile-responsive hamburger menu
 
-### Key Features to Maintain
-- All pages are standalone and don't require external dependencies beyond CDN libraries
-- Chinese language UI (zh-CN) is the primary language
-- Mock data and simulations are used for demonstrations
-- Interactive elements include filters, search functionality, and data visualizations
-- Real-time monitoring dashboard on the main page displays key metrics like AVI (AI Visibility Index), Coverage Rate, Share of Voice, etc.
+2. **Module Structure**: Each module is numbered with a prefix indicating its category:
+   - `00x-` - Diagnostic and strategy tools
+   - `01x-` - Content creation and management tools  
+   - `02x-` - Content orchestration
+   - `03x-` - Channel configuration
+   - `04x-` - User journey tracking
+   - `05x-` - Analytics dashboards
+
+3. **Data Flow**: All modules use mock/demo data defined inline within JavaScript. No server-side API integration.
 
 ## Common Development Tasks
 
-### Adding a New Module
-1. Create a new HTML file following the naming convention: `XX-module-name.html`
-2. Include standard CDN dependencies (ECharts, Font Awesome)
-3. Follow the existing CSS variable system for consistent theming
-4. Add the module to the navigation in `index.html`
+### Adding New Modules
+When creating a new module:
+1. Follow the naming convention: `XXx-module-name.html` (where XX is the category number)
+2. Copy the basic structure from an existing module to ensure consistency
+3. Add navigation entry in `index.html` under the appropriate category section
+4. Include standard dependencies:
+   ```html
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+   ```
 
-### Modifying Chart Data
-1. Charts use ECharts v5.4.3
-2. Chart configurations are typically found in `<script>` tags within each HTML file
-3. Mock data is usually defined as JavaScript objects/arrays near the chart initialization
+### Working with Charts
+All data visualizations use ECharts v5.4.3:
+- Chart instances are typically initialized with `echarts.init(document.getElementById('chart-id'))`
+- Mock data is defined as JavaScript objects/arrays near chart initialization
+- Common chart types: line, bar, pie, scatter, heatmap
+- Charts should be responsive: use `window.addEventListener('resize', () => myChart.resize())`
 
-### Testing Responsive Design
-- Test at common breakpoints: 768px (tablet), 1024px (desktop)
-- Mobile menu toggle is handled in `index.html` for navigation
-- Individual pages should maintain their own responsive layouts
+### Maintaining Consistent Styling
+The platform uses CSS custom properties for theming. Key variables to maintain:
+```css
+:root {
+    --primary: #667eea;
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+}
+```
 
-## Important Notes
+### Language and Localization
+- The UI is primarily in Chinese (zh-CN)
+- Key terminology: GEO (生成式引擎优化), AVI (AI能见度指数), Share of Voice (声量份额)
+- Maintain bilingual labels where appropriate (e.g., "GEO Strategy 策略规划")
 
-- No build process or package management required
-- No server-side functionality - all features are client-side
-- Data shown in the interfaces is typically mock/demo data
-- The platform focuses on GEO (Generative Engine Optimization) for AI-powered search visibility
-- Platform is designed for monitoring brand presence across AI platforms (ChatGPT, Perplexity, Claude, Gemini, You.com, Bing Chat)
+## Key Technical Patterns
+
+### Navigation System Integration
+To add a new page to the navigation:
+1. Locate the appropriate category in `index.html` (e.g., `.nav-category[data-category="analytics"]`)
+2. Add a new `.nav-link` entry with the correct `data-page` attribute
+3. Ensure the iframe loading mechanism will work: `document.getElementById('contentFrame').src = 'your-page.html'`
+
+### Mock Data Structure
+Mock data typically follows these patterns:
+- Time series data: Arrays of objects with `date` and metric values
+- Category data: Objects with labels and corresponding values
+- Real-time data: Simulated with `setInterval()` updating chart data
+
+### Responsive Design Breakpoints
+- Mobile: < 768px (sidebar hidden, hamburger menu visible)
+- Tablet: 768px - 1024px
+- Desktop: > 1024px (full sidebar visible)
+
+## Important Constraints
+
+- **No Build Process**: Direct file editing only, no compilation or bundling
+- **No Backend**: All data is mock/simulated, no API calls
+- **Browser Compatibility**: Modern browsers only (ES6+ JavaScript)
+- **External Dependencies**: Only CDN-hosted libraries (no npm/node_modules)

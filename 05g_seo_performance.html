@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semrush SEO监控仪表板</title>
+    <title>Semrush SEOMonitoring仪表板</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
@@ -179,7 +179,7 @@
 <body>
     <div class="dashboard">
         <div class="header">
-            <h1>🚀 SEO实时监控仪表板</h1>
+            <h1>🚀 SEOReal-timeMonitoring仪表板</h1>
             <div class="status-indicator">
                 <span class="status-dot"></span>
                 <span>系统运行中</span>
@@ -187,26 +187,26 @@
         </div>
         
         <div class="controls">
-            <button class="btn" onclick="refreshData()">🔄 刷新数据</button>
-            <button class="btn" onclick="runAnalysis()">📊 运行分析</button>
-            <button class="btn" onclick="generateReport()">📄 生成报告</button>
+            <button class="btn" onclick="refreshData()">🔄 RefreshData</button>
+            <button class="btn" onclick="runAnalysis()">📊 运行Analytics</button>
+            <button class="btn" onclick="generateReport()">📄 生成Report</button>
         </div>
         
         <div class="metrics-grid">
             <div class="metric-card">
-                <div class="metric-label">总有机流量</div>
+                <div class="metric-label">总有机Traffic</div>
                 <div class="metric-value" id="totalTraffic">0</div>
                 <div class="metric-change positive">+0%</div>
             </div>
             
             <div class="metric-card">
-                <div class="metric-label">关键词数量</div>
+                <div class="metric-label">Keywords数量</div>
                 <div class="metric-value" id="totalKeywords">0</div>
                 <div class="metric-change positive">+0</div>
             </div>
             
             <div class="metric-card">
-                <div class="metric-label">平均排名</div>
+                <div class="metric-label">平均Ranking</div>
                 <div class="metric-value" id="avgPosition">0</div>
                 <div class="metric-change negative">-0</div>
             </div>
@@ -232,17 +232,17 @@
         
         <div class="charts-grid">
             <div class="chart-container">
-                <div class="chart-title">📈 流量趋势（最近30天）</div>
+                <div class="chart-title">📈 TrafficTrend（最近30Days）</div>
                 <div id="trafficChart" class="chart"></div>
             </div>
             
             <div class="chart-container">
-                <div class="chart-title">🎯 关键词排名分布</div>
+                <div class="chart-title">🎯 KeywordsRanking分布</div>
                 <div id="keywordChart" class="chart"></div>
             </div>
             
             <div class="chart-container">
-                <div class="chart-title">🤖 AI平台可见性</div>
+                <div class="chart-title">🤖 AIPlatform可见性</div>
                 <div id="aiChart" class="chart"></div>
             </div>
             
@@ -258,8 +258,8 @@
                 <div class="alert-item">
                     <span class="alert-icon">📉</span>
                     <div>
-                        <strong>排名下降警告</strong>
-                        <p>15个关键词在过去7天内排名下降超过5位</p>
+                        <strong>RankingDeclineWarning</strong>
+                        <p>15个Keywords在过去7Days内RankingDecline超过5位</p>
                     </div>
                 </div>
             </div>
@@ -271,7 +271,7 @@
     </div>
     
     <script>
-        // 模拟数据（实际应该从API获取）
+        // 模拟Data（实际应该从API获取）
         const mockData = {
             metrics: {
                 totalTraffic: 125340,
@@ -316,7 +316,7 @@
         
         // 初始化图表
         function initCharts() {
-            // 流量趋势图
+            // TrafficTrend图
             const trafficChart = echarts.init(document.getElementById('trafficChart'));
             trafficChart.setOption({
                 color: ['#4f46e5'],
@@ -347,7 +347,7 @@
                 }]
             });
             
-            // 关键词分布图
+            // Keywords分布图
             const keywordChart = echarts.init(document.getElementById('keywordChart'));
             keywordChart.setOption({
                 color: ['#4f46e5', '#7c3aed', '#2563eb', '#0891b2', '#059669'],
@@ -365,7 +365,7 @@
                 }]
             });
             
-            // AI平台可见性
+            // AIPlatform可见性
             const aiChart = echarts.init(document.getElementById('aiChart'));
             aiChart.setOption({
                 color: ['#10b981'],
@@ -402,7 +402,7 @@
                 color: ['#4f46e5', '#ef4444'],
                 tooltip: { trigger: 'axis' },
                 legend: { 
-                    data: ['流量', '关键词'],
+                    data: ['Traffic', 'Keywords'],
                     textStyle: { color: '#94a3b8' }
                 },
                 grid: { left: '10%', right: '10%', bottom: '15%' },
@@ -415,26 +415,26 @@
                 yAxis: [
                     {
                         type: 'value',
-                        name: '流量',
+                        name: 'Traffic',
                         axisLine: { lineStyle: { color: '#475569' } },
                         axisLabel: { color: '#94a3b8' },
                         splitLine: { lineStyle: { color: '#334155' } }
                     },
                     {
                         type: 'value',
-                        name: '关键词',
+                        name: 'Keywords',
                         axisLine: { lineStyle: { color: '#475569' } },
                         axisLabel: { color: '#94a3b8' }
                     }
                 ],
                 series: [
                     {
-                        name: '流量',
+                        name: 'Traffic',
                         type: 'bar',
                         data: mockData.competitors.map(c => c.traffic)
                     },
                     {
-                        name: '关键词',
+                        name: 'Keywords',
                         type: 'line',
                         yAxisIndex: 1,
                         data: mockData.competitors.map(c => c.keywords)
@@ -451,7 +451,7 @@
             });
         }
         
-        // 更新指标
+        // 更新Metrics
         function updateMetrics() {
             document.getElementById('totalTraffic').textContent = mockData.metrics.totalTraffic.toLocaleString();
             document.getElementById('totalKeywords').textContent = mockData.metrics.totalKeywords.toLocaleString();
@@ -472,25 +472,25 @@
             document.getElementById('lastUpdate').textContent = new Date().toLocaleString('zh-CN');
         }
         
-        // 刷新数据
+        // RefreshData
         function refreshData() {
             console.log('Refreshing data...');
             updateMetrics();
-            // 实际应该调用API获取新数据
+            // 实际应该调用API获取新Data
         }
         
-        // 运行分析
+        // Run analytics
         function runAnalysis() {
-            if (confirm('确定要运行完整的SEO分析吗？这可能需要几分钟时间。')) {
+            if (confirm('Are you sure you want to run a complete SEO analysis? This may take several minutes.')) {
                 console.log('Running analysis...');
-                // 实际应该调用后端API
+                // Should call backend API in production
             }
         }
         
-        // 生成报告
+        // Generate report
         function generateReport() {
             console.log('Generating report...');
-            // 实际应该调用后端API
+            // Should call backend API in production
         }
         
         // 初始化
@@ -498,7 +498,7 @@
             updateMetrics();
             initCharts();
             
-            // 自动刷新（每5分钟）
+            // 自动Refresh（每5Minutes）
             setInterval(refreshData, 5 * 60 * 1000);
         });
     </script>
