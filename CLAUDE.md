@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**leapgeo-sys** is the GEO (Generative Engine Optimization) Operations Platform for Leap Company. It's a comprehensive content management and monitoring system designed to manage brand visibility across AI-powered search engines and platforms including ChatGPT, Perplexity, Claude, Gemini, You.com, and Bing Chat.
+**leapgeo-sys** is now the **Dymesty AI Glasses Intelligence Center** - a comprehensive content management and monitoring system specifically designed for the Dymesty AI Glasses product. It's a Content Intelligence Center for managing and optimizing the Dymesty AI Glasses brand presence across AI-powered search engines and platforms including ChatGPT, Perplexity, Claude, Gemini, You.com, and Bing Chat.
+
+The platform focuses on monitoring and optimizing content related to Dymesty's AI glasses features such as real-time translation, privacy protection, AR display capabilities, and developer tools.
 
 ## Running the Project
 
@@ -62,11 +64,12 @@ The platform uses CSS custom properties for theming:
 ```
 
 ### Language and Localization
-- Primary language: Chinese (zh-CN)
-- Key terminology maintained: 
-  - GEO (生成式引擎优化)
-  - AVI (AI能见度指数) 
-  - Share of Voice (声量份额)
+- Primary language: English
+- Key terminology: 
+  - AI Platform Optimization (formerly GEO)
+  - AVI (AI Visibility Index) 
+  - Share of Voice
+  - Content Intelligence Center
 
 ## Development Workflow
 
@@ -91,3 +94,29 @@ To add a module to the navigation:
 - **No Backend API**: All data is mock/demo data defined inline
 - **External Dependencies**: CDN-hosted libraries only (no npm/node_modules)
 - **Browser Support**: Modern browsers with ES6+ support required
+
+## Dymesty AI Glasses Focus
+
+The entire platform has been transformed to focus on the Dymesty AI Glasses product as a case study. Key changes include:
+
+### Product Context
+- **Brand**: Dymesty (formerly Leap Company)
+- **Product**: AI Glasses with real-time translation capabilities
+- **Features**: AR display, privacy protection, developer SDK, battery optimization
+- **Competitors**: Meta Ray-Ban, Google Glass, Vuzix, Apple Vision, Magic Leap
+
+### Channel Adaptations
+- Developer Forums (replacing Social Media focus)
+- Tech Reviews (specialized for AR/VR products)
+- YouTube Demos (product demonstrations)
+- Reddit Communities (tech enthusiast discussions)
+- GitHub/Documentation (developer resources)
+
+### Content Types
+- Technical documentation for developers
+- Product feature highlights
+- Privacy and security whitepapers
+- SDK integration guides
+- User testimonials and case studies
+
+All mock data and examples throughout the platform reflect AI glasses use cases and metrics relevant to the AR/VR industry.

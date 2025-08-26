@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brand Performance Dashboard - GEO Monitoring System</title>
+    <title>Brand Performance Dashboard - AI Platform Monitoring System</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <script src="js/geo-monitoring.js"></script>
     <style>
@@ -382,10 +382,10 @@
                 <div id="trafficChart" class="chart" style="height: 300px;"></div>
             </div>
 
-            <!-- Social Media Performance -->
+            <!-- Developer Forums Performance -->
             <div class="chart-container">
                 <div class="chart-header">
-                    <h2 class="chart-title">Social Media Engagement</h2>
+                    <h2 class="chart-title">Developer Forums Engagement</h2>
                 </div>
                 <div id="socialChart" class="chart" style="height: 300px;"></div>
             </div>
@@ -638,7 +638,7 @@
                     data: [
                         {value: 35, name: 'Organic Search'},
                         {value: 28, name: 'Direct'},
-                        {value: 20, name: 'Social Media'},
+                        {value: 20, name: 'Developer Forums'},
                         {value: 12, name: 'Referral'},
                         {value: 5, name: 'Email'}
                     ],
@@ -652,7 +652,7 @@
             };
             trafficChart.setOption(trafficOption);
 
-            // Social Media Chart
+            // Developer Forums Chart
             socialChart = echarts.init(document.getElementById('socialChart'));
             const socialOption = {
                 tooltip: {

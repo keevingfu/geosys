@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GEO Intelligent Orchestration Center - Create Once, Distribute Everywhere</title>
+  <title>AI Platform Intelligent Orchestration Center - Create Once, Distribute Everywhere</title>
   <style>
     /* Design philosophy of the Intelligent Orchestration Center:
            Through a visual orchestration interface, content can intelligently adapt to the characteristics of each channel,
@@ -1027,7 +1027,7 @@ Please provide:
         if (recommendMatch) {
           const recommendedIds = recommendMatch[1].split(',').map(id => id.trim());
           
-          // Clear当前编排区
+          // Clear当前Orchestration区
           const compositionArea = document.getElementById('compositionArea');
           compositionArea.innerHTML = '';
           
@@ -1069,7 +1069,7 @@ Please provide:
           </div>
         </div>
         <div style="font-size: 13px; color: var(--text-secondary);">
-          已Add到编排序列
+          已Add到Orchestration序列
         </div>
       `;
       compositionArea.appendChild(assetElement);
@@ -1081,7 +1081,7 @@ Please provide:
       const composedAssets = document.querySelectorAll('.composed-asset');
 
       if (composedAssets.length === 0) {
-        alert('请先Add资产到编排区');
+        alert('请先Add资产到Orchestration区');
         return;
       }
 
@@ -1220,7 +1220,7 @@ ${assetsText}
                     <p>每Month至少检查一次过滤器的状态。如果你发现...</p>
                     <br>
                     <p><strong>第二步：清洁预过滤器</strong></p>
-                    <p>预过滤器可以用吸尘器清理...</p>
+                    <p>预过滤器可以用smart glasses清理...</p>
                     <br>
                     <p><strong>关于HEPA过滤器更换时机：</strong></p>
                     <p>一般来说，HEPA过滤器需要每6-12个Month更换一次，但具体要看...</p>
@@ -1514,7 +1514,7 @@ Optimization顺序：2,1,3
       showLoadingState(true);
       
       try {
-        // 获取当前已编排的资产
+        // 获取当前已Orchestration的资产
         const currentAssets = [];
         document.querySelectorAll('.composed-asset').forEach(asset => {
           const title = asset.querySelector('.composed-asset-title').textContent.trim();
@@ -1665,7 +1665,7 @@ ${currentAssets.join('\n')}
       const templateName = prompt('Please enter模板名称：');
       if (!templateName) return;
       
-      // Save当前的编排Configuration
+      // Save当前的OrchestrationConfiguration
       const template = {
         name: templateName,
         intent: document.querySelector('.intent-input').value,
