@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 - Content Intelligence Center</title>
+    <title>Login - Content Intelligence Center</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -34,7 +34,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--gray-100);
             min-height: 100vh;
             display: flex;
@@ -351,8 +351,8 @@
             <div class="login-logo">
                 <i class="fas fa-chart-network"></i>
             </div>
-            <h1 class="login-title">欢迎回来</h1>
-            <p class="login-subtitle">登录到 GEO Operations Platform</p>
+            <h1 class="login-title">Welcome Back</h1>
+            <p class="login-subtitle">Sign in to Content Intelligence Center</p>
         </div>
 
         <div class="alert alert-error" id="alertMessage">
@@ -362,7 +362,7 @@
 
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
-                <label class="form-label" for="username">用户名</label>
+                <label class="form-label" for="username">Username</label>
                 <div class="input-group">
                     <i class="fas fa-user input-icon"></i>
                     <input 
@@ -370,19 +370,19 @@
                         id="username" 
                         name="username" 
                         class="form-control" 
-                        placeholder="请输入用户名"
+                        placeholder="Enter your username"
                         autocomplete="username"
                         required
                     >
                 </div>
                 <div class="error-message" id="usernameError">
                     <i class="fas fa-exclamation-circle"></i>
-                    <span>请输入用户名</span>
+                    <span>Please enter username</span>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="password">密码</label>
+                <label class="form-label" for="password">Password</label>
                 <div class="input-group">
                     <i class="fas fa-lock input-icon"></i>
                     <input 
@@ -390,7 +390,7 @@
                         id="password" 
                         name="password" 
                         class="form-control" 
-                        placeholder="请输入密码"
+                        placeholder="Enter your password"
                         autocomplete="current-password"
                         required
                     >
@@ -398,37 +398,33 @@
                 </div>
                 <div class="error-message" id="passwordError">
                     <i class="fas fa-exclamation-circle"></i>
-                    <span>请输入密码</span>
+                    <span>Please enter password</span>
                 </div>
             </div>
 
             <div class="remember-me">
                 <input type="checkbox" id="rememberMe" name="rememberMe">
-                <label for="rememberMe">记住我</label>
+                <label for="rememberMe">Remember me</label>
             </div>
 
             <button type="submit" class="login-button" id="loginButton">
-                <span id="buttonText">登录</span>
+                <span id="buttonText">Sign In</span>
                 <i class="fas fa-spinner" style="display: none;" id="loadingIcon"></i>
             </button>
         </form>
 
         <div class="login-footer">
-            <div class="copyright">
-                <i class="fas fa-copyright"></i>
-                <span>2024 Leap Company. All rights reserved.</span>
-            </div>
         </div>
     </div>
 
     <script>
-        // 默认用户凭证 (在实际应用中应该使用后端验证)
+        // Default credentials (use backend validation in production)
         const VALID_CREDENTIALS = [
             { username: 'admin', password: 'admin123' },
             { username: 'user', password: 'user123' }
         ];
 
-        // 检查是否已登录
+        // Check if already logged in
         window.addEventListener('DOMContentLoaded', () => {
             const authToken = localStorage.getItem('authToken');
             const sessionExpiry = localStorage.getItem('sessionExpiry');
@@ -437,7 +433,7 @@
                 window.location.href = 'index.html';
             }
 
-            // 检查记住我
+            // Check remember me
             const savedUsername = localStorage.getItem('savedUsername');
             if (savedUsername) {
                 document.getElementById('username').value = savedUsername;
@@ -482,11 +478,11 @@
             const buttonText = document.getElementById('buttonText');
             const loadingIcon = document.getElementById('loadingIcon');
             
-            // 清除之前的错误
+            // Clear previous errors
             document.querySelectorAll('.form-control').forEach(el => el.classList.remove('error'));
             document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
             
-            // 验证输入
+            // Validate inputs
             let hasError = false;
             
             if (!username) {
@@ -503,43 +499,43 @@
             
             if (hasError) return;
             
-            // 显示加载状态
+            // Show loading state
             button.classList.add('loading');
             buttonText.style.display = 'none';
             loadingIcon.style.display = 'inline-block';
             
-            // 模拟异步验证
+            // Simulate async validation
             setTimeout(() => {
-                // 验证凭证
+                // Validate credentials
                 const isValid = VALID_CREDENTIALS.some(
                     cred => cred.username === username && cred.password === password
                 );
                 
                 if (isValid) {
-                    // 生成认证令牌
+                    // Generate auth token
                     const authToken = btoa(`${username}:${Date.now()}`);
-                    const sessionExpiry = new Date().getTime() + (24 * 60 * 60 * 1000); // 24小时
+                    const sessionExpiry = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 hours
                     
-                    // 保存认证信息
+                    // Save authentication info
                     localStorage.setItem('authToken', authToken);
                     localStorage.setItem('sessionExpiry', sessionExpiry.toString());
                     localStorage.setItem('currentUser', username);
                     
-                    // 记住用户名
+                    // Remember username
                     if (rememberMe) {
                         localStorage.setItem('savedUsername', username);
                     } else {
                         localStorage.removeItem('savedUsername');
                     }
                     
-                    // 显示成功消息并跳转
-                    showAlert('登录成功，正在跳转...', 'success');
+                    // Show success message and redirect
+                    showAlert('Login successful, redirecting...', 'success');
                     setTimeout(() => {
                         window.location.href = 'index.html';
                     }, 1000);
                 } else {
-                    // 显示错误消息
-                    showAlert('用户名或密码错误');
+                    // Show error message
+                    showAlert('Invalid username or password');
                     button.classList.remove('loading');
                     buttonText.style.display = 'inline';
                     loadingIcon.style.display = 'none';
@@ -547,7 +543,7 @@
             }, 1000);
         }
 
-        // 清除错误状态
+        // Clear error state
         document.querySelectorAll('.form-control').forEach(input => {
             input.addEventListener('input', () => {
                 input.classList.remove('error');

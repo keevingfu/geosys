@@ -7,17 +7,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <script>
-        // 认证检查
+        // Authentication check
         (function() {
             const authToken = localStorage.getItem('authToken');
             const sessionExpiry = localStorage.getItem('sessionExpiry');
             
             if (!authToken || !sessionExpiry || new Date().getTime() > parseInt(sessionExpiry)) {
-                // 清除过期的认证信息
+                // Clear expired auth info
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('sessionExpiry');
                 localStorage.removeItem('currentUser');
-                // 重定向到登录页
+                // Redirect to login page
                 window.location.href = 'login.html';
             }
         })();
@@ -474,7 +474,7 @@
                 </div>
                 <button class="logout-btn" onclick="handleLogout()">
                     <i class="fas fa-sign-out-alt"></i>
-                    <span>退出</span>
+                    <span>Logout</span>
                 </button>
             </div>
         </header>
@@ -803,7 +803,7 @@
         
         // Initialize monitoring system
         document.addEventListener('DOMContentLoaded', function() {
-            // 显示当前用户
+            // Display current user
             const currentUser = localStorage.getItem('currentUser');
             if (currentUser) {
                 document.getElementById('currentUserDisplay').textContent = currentUser;
@@ -1083,14 +1083,14 @@
             });
         });
 
-        // 登出功能
+        // Logout function
         function handleLogout() {
-            if (confirm('确定要退出登录吗？')) {
-                // 清除认证信息
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear authentication info
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('sessionExpiry');
                 localStorage.removeItem('currentUser');
-                // 重定向到登录页
+                // Redirect to login page
                 window.location.href = 'login.html';
             }
         }
