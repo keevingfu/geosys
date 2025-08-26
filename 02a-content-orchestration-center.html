@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GEO Intelligent Orchestration Center - Create Once, Distribute Everywhere</title>
+  <style>
+    /* Design philosophy of the Intelligent Orchestration Center:
+           Through a visual orchestration interface, content can intelligently adapt to the characteristics of each channel,
+           achieving true "create once, use everywhere" */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --primary-light: #a78bfa;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --background: #f9fafb;
+      --surface: #ffffff;
+      --hover: #f3f4f6;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background);
+      color: var(--text-primary);
+    }
+
+    /* Top control bar */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 20px 24px;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .header-content {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-title h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Main layout: divided into three areas */
+    .main-container {
+      max-width: 1600px;
+      margin: 24px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 320px 1fr 360px;
+      gap: 24px;
+      height: calc(100vh - 120px);
+    }
+
+    /* Left side: Asset selector */
+    .asset-selector-panel {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--hover);
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .asset-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .asset-item {
+      padding: 12px;
+      background: var(--hover);
+      border-radius: 8px;
+      cursor: move;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+
+    .asset-item:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+
+    .asset-item.selected {
+      background: var(--primary);
+      color: white;
+    }
+
+    .asset-type-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .type-faq {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .type-howto {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .type-compare {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    /* Middle: Orchestration canvas */
+    .orchestration-canvas {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 24px;
+      overflow-y: auto;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    .canvas-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .intent-selector {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .intent-input {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      width: 300px;
+    }
+
+    .composition-area {
+      min-height: 400px;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .composition-area.drag-over {
+      border-color: var(--primary);
+      background: rgba(124, 58, 237, 0.05);
+    }
+
+    .drop-hint {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 40px;
+    }
+
+    .composed-asset {
+      background: var(--hover);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .composed-asset-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .composed-asset-title {
+      font-weight: 600;
+    }
+
+    .asset-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: none;
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Right side: Channel configuration panel */
+    .channel-config-panel {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    .channel-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .channel-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      transition: all 0.3s;
+    }
+
+    .channel-card.active {
+      border-color: var(--primary);
+      background: rgba(124, 58, 237, 0.05);
+    }
+
+    .channel-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .channel-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+    }
+
+    .channel-reddit {
+      background: #ff4500;
+    }
+
+    .channel-quora {
+      background: #a82400;
+    }
+
+    .channel-medium {
+      background: #000000;
+    }
+
+    .channel-youtube {
+      background: #ff0000;
+    }
+
+    .channel-linkedin {
+      background: #0077b5;
+    }
+
+    .channel-name {
+      font-weight: 600;
+    }
+
+    .channel-toggle {
+      margin-left: auto;
+    }
+
+    .channel-config {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .config-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .config-label {
+      color: var(--text-secondary);
+    }
+
+    .config-value {
+      font-weight: 500;
+    }
+
+    /* Preview modal */
+    .preview-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .preview-modal.show {
+      display: flex;
+    }
+
+    .preview-content {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 800px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .preview-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-tab {
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .preview-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .preview-body {
+      background: var(--hover);
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 300px;
+    }
+
+    /* Button styles */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--hover);
+    }
+
+    /* Rules configuration area */
+    .rules-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .rule-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .rule-input {
+      flex: 1;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    /* Progress indicator */
+    .progress-bar {
+      height: 4px;
+      background: var(--hover);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+
+    /* Statistics information */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: var(--hover);
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top control bar -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-title">
+        <span style="font-size: 28px;">🎭</span>
+        <h1>Intelligent Orchestration Center</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary"
+          style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white;">
+          <span>📋</span>
+          <span>Template Library</span>
+        </button>
+        <button class="btn btn-secondary"
+          style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white;">
+          <span>⚙️</span>
+          <span>Rule Settings</span>
+        </button>
+        <button class="btn" style="background: white; color: var(--primary);" onclick="generateContent()">
+          <span>✨</span>
+          <span>Generate Content</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content area -->
+  <div class="main-container">
+    <!-- Left side: Asset selector -->
+    <aside class="asset-selector-panel">
+      <div class="panel-header">
+        <h3 class="panel-title">Asset Library</h3>
+        <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">
+          Refresh
+        </button>
+      </div>
+
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" class="search-input" placeholder="Search assets...">
+      </div>
+
+      <div class="asset-list" id="assetList">
+        <!-- FAQ asset -->
+        <div class="asset-item" draggable="true" data-asset-id="1">
+          <span class="asset-type-badge type-faq">FAQ</span>
+          <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">
+            How to determine HEPA filter replacement timing?
+          </div>
+          <div style="font-size: 12px; color: var(--text-secondary);">
+            Created 2 hours ago • 186 words
+          </div>
+        </div>
+
+        <!-- How-to asset -->
+        <div class="asset-item" draggable="true" data-asset-id="2">
+          <span class="asset-type-badge type-howto">HOW-TO</span>
+          <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">
+            5-Step Air Purifier Maintenance Guide
+          </div>
+          <div style="font-size: 12px; color: var(--text-secondary);">
+            Created 1 day ago • 342 words
+          </div>
+        </div>
+
+        <!-- Comparison asset -->
+        <div class="asset-item" draggable="true" data-asset-id="3">
+          <span class="asset-type-badge type-compare">COMPARE</span>
+          <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">
+            HEPA vs Activated Carbon Filter Comparison
+          </div>
+          <div style="font-size: 12px; color: var(--text-secondary);">
+            Created 3 days ago • 428 words
+          </div>
+        </div>
+
+        <!-- Data card -->
+        <div class="asset-item" draggable="true" data-asset-id="4">
+          <span class="asset-type-badge" style="background: #e0e7ff; color: #3730a3;">DATA</span>
+          <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">
+            Indoor Air Quality Improvement Data
+          </div>
+          <div style="font-size: 12px; color: var(--text-secondary);">
+            Created 1 week ago • 156 words
+          </div>
+        </div>
+
+        <!-- TL;DR card -->
+        <div class="asset-item" draggable="true" data-asset-id="5">
+          <span class="asset-type-badge" style="background: #fce7f3; color: #9f1239;">TL;DR</span>
+          <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">
+            Air Purifier Selection Key Points Summary
+          </div>
+          <div style="font-size: 12px; color: var(--text-secondary);">
+            Created 2 weeks ago • 98 words
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Middle: Orchestration canvas -->
+    <main class="orchestration-canvas">
+      <div class="canvas-header">
+        <div class="intent-selector">
+          <label style="font-weight: 500;">User Intent:</label>
+          <input type="text" class="intent-input" placeholder="e.g.: Learn about air purifier maintenance" value="Air Purifier Maintenance Guide">
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-secondary" onclick="autoCompose()">
+            <span>🤖</span>
+            <span>Smart Compose</span>
+          </button>
+          <button class="btn btn-secondary" onclick="optimizeSequence()">
+            <span>⚡</span>
+            <span>Optimize Sequence</span>
+          </button>
+          <button class="btn btn-secondary" onclick="suggestMore()">
+            <span>💡</span>
+            <span>Suggest More</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="composition-area" id="compositionArea">
+        <!-- Composed assets -->
+        <div class="composed-asset">
+          <div class="composed-asset-header">
+            <span class="composed-asset-title">
+              <span class="asset-type-badge type-howto">HOW-TO</span>
+              5-Step Air Purifier Maintenance Guide
+            </span>
+            <div class="asset-actions">
+              <button class="action-btn" title="Move Up">↑</button>
+              <button class="action-btn" title="Move Down">↓</button>
+              <button class="action-btn" title="Delete">×</button>
+            </div>
+          </div>
+          <div style="font-size: 13px; color: var(--text-secondary);">
+            Main content: Detailed maintenance steps instructions
+          </div>
+        </div>
+
+        <div class="composed-asset">
+          <div class="composed-asset-header">
+            <span class="composed-asset-title">
+              <span class="asset-type-badge type-faq">FAQ</span>
+              How to determine HEPA filter replacement timing?
+            </span>
+            <div class="asset-actions">
+              <button class="action-btn" title="Move Up">↑</button>
+              <button class="action-btn" title="Move Down">↓</button>
+              <button class="action-btn" title="Delete">×</button>
+            </div>
+          </div>
+          <div style="font-size: 13px; color: var(--text-secondary);">
+            Additional notes: Specific criteria for filter replacement
+          </div>
+        </div>
+
+        <div class="drop-hint" style="display: none;">
+          Drag assets here to compose and arrange
+        </div>
+      </div>
+
+      <!-- Statistics information -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">528</div>
+          <div class="stat-label">Total Words</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">2</div>
+          <div class="stat-label">Asset Count</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">5</div>
+          <div class="stat-label">Adapted Channels</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right side: Channel configuration panel -->
+    <aside class="channel-config-panel">
+      <div class="panel-header">
+        <h3 class="panel-title">Channel Adaptation</h3>
+        <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="selectAllChannels()">
+          Select All
+        </button>
+      </div>
+
+      <div class="channel-list">
+        <!-- RedditConfiguration -->
+        <div class="channel-card active">
+          <div class="channel-header">
+            <div class="channel-icon channel-reddit">R</div>
+            <div>
+              <div class="channel-name">Reddit</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">r/airpurifiers</div>
+            </div>
+            <input type="checkbox" class="channel-toggle" checked>
+          </div>
+          <div class="channel-config">
+            <div class="config-item">
+              <span class="config-label">Word Limit</span>
+              <span class="config-value">40,000 words</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">Format</span>
+              <span class="config-value">Markdown</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">Tone</span>
+              <span class="config-value">Conversational</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- QuoraConfiguration -->
+        <div class="channel-card active">
+          <div class="channel-header">
+            <div class="channel-icon channel-quora">Q</div>
+            <div>
+              <div class="channel-name">Quora</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">Air Purification Topics</div>
+            </div>
+            <input type="checkbox" class="channel-toggle" checked>
+          </div>
+          <div class="channel-config">
+            <div class="config-item">
+              <span class="config-label">Word Count Suggestion</span>
+              <span class="config-value">300-1000 words</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">Format</span>
+              <span class="config-value">Rich Text</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">Tone</span>
+              <span class="config-value">Professional & Authoritative</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MediumConfiguration -->
+        <div class="channel-card">
+          <div class="channel-header">
+            <div class="channel-icon channel-medium">M</div>
+            <div>
+              <div class="channel-name">Medium</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">Healthy Living</div>
+            </div>
+            <input type="checkbox" class="channel-toggle">
+          </div>
+        </div>
+
+        <!-- YouTubeConfiguration -->
+        <div class="channel-card active">
+          <div class="channel-header">
+            <div class="channel-icon channel-youtube">Y</div>
+            <div>
+              <div class="channel-name">YouTube</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">Video Description</div>
+            </div>
+            <input type="checkbox" class="channel-toggle" checked>
+          </div>
+          <div class="channel-config">
+            <div class="config-item">
+              <span class="config-label">Word Limit</span>
+              <span class="config-value">5,000 words</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">Include Elements</span>
+              <span class="config-value">Chapter Timeline</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- LinkedInConfiguration -->
+        <div class="channel-card">
+          <div class="channel-header">
+            <div class="channel-icon channel-linkedin">in</div>
+            <div>
+              <div class="channel-name">LinkedIn</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">Professional Articles</div>
+            </div>
+            <input type="checkbox" class="channel-toggle">
+          </div>
+        </div>
+      </div>
+
+      <!-- Rules Configuration -->
+      <div class="rules-section">
+        <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">General Rules</h4>
+        <div class="rule-item">
+          <label style="font-size: 13px;">Minimum Words</label>
+          <input type="number" class="rule-input" value="100">
+        </div>
+        <div class="rule-item">
+          <label style="font-size: 13px;">Maximum Words</label>
+          <input type="number" class="rule-input" value="2000">
+        </div>
+        <div class="rule-item">
+          <label style="font-size: 13px;">Include CTA</label>
+          <input type="checkbox" checked>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Preview Modal -->
+  <div class="preview-modal" id="previewModal">
+    <div class="preview-content">
+      <div class="preview-header">
+        <h3>AI-Generated Multi-Channel Content Preview</h3>
+        <button class="btn btn-secondary" onclick="closePreview()">Close</button>
+      </div>
+      <div class="preview-channels" id="previewChannels">
+        <!-- AI-generated content for each channel will be displayed here -->
+      </div>
+      <div class="preview-actions" style="margin-top: 20px; display: flex; gap: 8px; justify-content: center;">
+        <button class="btn btn-primary" onclick="exportAllContent()">
+          <span>📥</span> Export All
+        </button>
+        <button class="btn btn-secondary" onclick="regenerateContent()">
+          <span>🔄</span> Regenerate
+        </button>
+        <button class="btn btn-secondary" onclick="saveAsTemplate()">
+          <span>💾</span> Save as Template
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // JavaScript logic for Intelligent Orchestration Center
+    // Implements drag-and-drop, smart composition, channel adaptation and other core features
+
+    // Gemini APIConfiguration
+    const GEMINI_API_KEY = 'AIzaSyCdO7tYgdJRDj0HQeGifTASNZQ1mQnwDI0';
+    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+
+    let composedAssets = [];
+    let selectedChannels = ['reddit', 'quora', 'youtube'];
+
+    // Initialize drag and drop functionality
+    function initDragAndDrop() {
+      const assetItems = document.querySelectorAll('.asset-item');
+      const compositionArea = document.getElementById('compositionArea');
+
+      assetItems.forEach(item => {
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dragend', handleDragEnd);
+      });
+
+      compositionArea.addEventListener('dragover', handleDragOver);
+      compositionArea.addEventListener('drop', handleDrop);
+      compositionArea.addEventListener('dragleave', handleDragLeave);
+    }
+
+    let draggedElement = null;
+
+    function handleDragStart(e) {
+      draggedElement = e.target;
+      e.target.style.opacity = '0.5';
+    }
+
+    function handleDragEnd(e) {
+      e.target.style.opacity = '';
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.getElementById('compositionArea').classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      document.getElementById('compositionArea').classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('compositionArea').classList.remove('drag-over');
+
+      if (draggedElement) {
+        addAssetToComposition(draggedElement);
+      }
+    }
+
+    // Add asset to composition area
+    function addAssetToComposition(assetElement) {
+      const assetId = assetElement.getAttribute('data-asset-id');
+      const assetTitle = assetElement.querySelector('div:nth-child(2)').textContent;
+      const assetType = assetElement.querySelector('.asset-type-badge').textContent;
+
+      // Create composed asset card
+      const composedAsset = document.createElement('div');
+      composedAsset.className = 'composed-asset';
+      composedAsset.innerHTML = `
+                <div class="composed-asset-header">
+                    <span class="composed-asset-title">
+                        <span class="asset-type-badge type-${assetType.toLowerCase()}">${assetType}</span>
+                        ${assetTitle}
+                    </span>
+                    <div class="asset-actions">
+                        <button class="action-btn" title="Move Up" onclick="moveAssetUp(this)">↑</button>
+                        <button class="action-btn" title="Move Down" onclick="moveAssetDown(this)">↓</button>
+                        <button class="action-btn" title="Delete" onclick="removeAsset(this)">×</button>
+                    </div>
+                </div>
+                <div style="font-size: 13px; color: var(--text-secondary);">
+                    Added to composition sequence
+                </div>
+            `;
+
+      // Remove info text
+      const dropHint = document.querySelector('.drop-hint');
+      if (dropHint) {
+        dropHint.style.display = 'none';
+      }
+
+      // Add to composition area
+      document.getElementById('compositionArea').appendChild(composedAsset);
+
+      // Update statistics
+      updateStats();
+    }
+
+    // Smart composition function
+    async function autoCompose() {
+      const intent = document.querySelector('.intent-input').value;
+
+      if (!intent) {
+        alert('Please enter user intent first');
+        return;
+      }
+
+      showLoadingState(true);
+
+      try {
+        // Get all available assets
+        const assetItems = document.querySelectorAll('.asset-item');
+        const assets = [];
+        
+        assetItems.forEach(item => {
+          const title = item.querySelector('div:nth-child(2)').textContent.trim();
+          const type = item.querySelector('.asset-type-badge').textContent;
+          const id = item.getAttribute('data-asset-id');
+          assets.push({ id, title, type });
+        });
+
+        // Get selected channels
+        const activeChannels = [];
+        document.querySelectorAll('.channel-card input:checked').forEach(input => {
+          const channelName = input.closest('.channel-card').querySelector('.channel-name').textContent;
+          activeChannels.push(channelName);
+        });
+
+        const prompt = `As a content orchestration expert, intelligently select and sequence assets based on user intent.
+
+User Intent: ${intent}
+Target Channels: ${activeChannels.length > 0 ? activeChannels.join(', ') : 'General'}
+
+Available Assets:
+${assets.map(a => `${a.id}. ${a.type}: ${a.title}`).join('\n')}
+
+Please provide:
+1. Recommended asset combination (list by ID, comma-separated, e.g.: 2,1,3)
+2. Recommendation reason (brief explanation)
+3. Content structure suggestions
+
+格式示例：
+推荐组合：2,1,3
+理由：先通过操作指南建立框架，再用FAQ解答细节问题，最后用对比加深理解
+结构：引导式学习路径，从实践到理论`;
+
+        const response = await fetch(GEMINI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 400
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('API请求Failed');
+        }
+
+        const data = await response.json();
+        const aiResponse = data.candidates[0].content.parts[0].text;
+        
+        // 解析AI推荐
+        const recommendMatch = aiResponse.match(/推荐组合[：:]\s*([0-9,\s]+)/);
+        if (recommendMatch) {
+          const recommendedIds = recommendMatch[1].split(',').map(id => id.trim());
+          
+          // Clear当前编排区
+          const compositionArea = document.getElementById('compositionArea');
+          compositionArea.innerHTML = '';
+          
+          // 按推荐顺序Add资产
+          recommendedIds.forEach(id => {
+            const asset = assets.find(a => a.id === id);
+            if (asset) {
+              addAssetToComposition(asset);
+            }
+          });
+          
+          // 显示AI推荐理由
+          showNotification('✨ AI智能组合完成！' + (aiResponse.match(/理由[：:]\s*(.+)/)?.[1] || ''), 'success');
+        }
+        
+      } catch (error) {
+        console.error('智能组合Failed:', error);
+        alert('AI智能组合Failed，Please try again later');
+      } finally {
+        showLoadingState(false);
+      }
+    }
+
+    // Add asset to composition area
+    function addAssetToComposition(asset) {
+      const compositionArea = document.getElementById('compositionArea');
+      const assetElement = document.createElement('div');
+      assetElement.className = 'composed-asset';
+      assetElement.innerHTML = `
+        <div class="composed-asset-header">
+          <span class="composed-asset-title">
+            <span class="asset-type-badge type-${asset.type.toLowerCase()}">${asset.type}</span>
+            ${asset.title}
+          </span>
+          <div class="asset-actions">
+            <button class="action-btn" onclick="moveAsset(this, -1)" title="上移">↑</button>
+            <button class="action-btn" onclick="moveAsset(this, 1)" title="下移">↓</button>
+            <button class="action-btn" onclick="removeAsset(this)" title="Delete">×</button>
+          </div>
+        </div>
+        <div style="font-size: 13px; color: var(--text-secondary);">
+          已Add到编排序列
+        </div>
+      `;
+      compositionArea.appendChild(assetElement);
+      updateStats();
+    }
+
+    // 生成多Channel内容
+    async function generateContent() {
+      const composedAssets = document.querySelectorAll('.composed-asset');
+
+      if (composedAssets.length === 0) {
+        alert('请先Add资产到编排区');
+        return;
+      }
+
+      // 收集所有已选Channel
+      const activeChannels = [];
+      document.querySelectorAll('.channel-card input:checked').forEach(input => {
+        const channelName = input.closest('.channel-card').querySelector('.channel-name').textContent;
+        activeChannels.push(channelName);
+      });
+
+      if (activeChannels.length === 0) {
+        alert('请至少选择一个Channel');
+        return;
+      }
+
+      // 显示加载状态
+      showLoadingState(true);
+
+      try {
+        // 收集资产内容
+        const assetContents = [];
+        composedAssets.forEach(asset => {
+          const title = asset.querySelector('div:nth-child(2)').textContent;
+          const type = asset.querySelector('.asset-type-badge').textContent;
+          assetContents.push({ title, type });
+        });
+
+        // 为每个Channel生成AI适配内容
+        const generatedContent = {};
+        
+        for (const channel of activeChannels) {
+          const adaptedContent = await generateChannelContent(assetContents, channel);
+          generatedContent[channel] = adaptedContent;
+        }
+
+        // 更新Preview内容
+        updatePreviewContent(generatedContent);
+        
+        // 显示Preview
+        showPreview();
+      } catch (error) {
+        console.error('生成内容Failed:', error);
+        alert('AI生成内容Failed，Please try again later');
+      } finally {
+        showLoadingState(false);
+      }
+    }
+
+    // 使用AI生成特定Channel的内容
+    async function generateChannelContent(assets, channel) {
+      const channelPrompts = {
+        'Reddit': `基于以下资产内容，生成适合RedditPlatform的内容。Reddit内容特点：
+- 使用第一人称，分享个人经验
+- 语气友好、真诚、乐于助人
+- 适当使用Reddit术语（如TL;DR）
+- 内容结构清晰，使用段落分隔
+- 可以包含相关子版块推荐`,
+        
+        'Quora': `基于以下资产内容，生成适合QuoraPlatform的内容。Quora内容特点：
+- 专业且详细的回答
+- Citations可靠来源和Data
+- 结构化的内容（使用编号或要点）
+- 教育性和信息性强
+- 结尾可以包含相关问题推荐`,
+        
+        'YouTube': `基于以下资产内容，生成适合YouTube的视频描述。YouTube内容特点：
+- 吸引人的开场白
+- 包含时间戳章节
+- 使用表情符号增加视觉吸引力
+- 包含相关标签建议
+- CTA（行动号召）如订阅、点赞等`,
+        
+        'LinkedIn': `基于以下资产内容，生成适合LinkedIn的专业内容。LinkedIn内容特点：
+- 专业且有洞察力
+- 包含行业Trend和Data
+- 使用专业术语
+- 结构化的内容Impressions
+- 包含相关话题标签`
+      };
+
+      const assetsText = assets.map(a => `${a.type}: ${a.title}`).join('\n');
+      
+      const prompt = `${channelPrompts[channel] || '生成适合' + channel + 'Platform的内容'}
+
+资产内容：
+${assetsText}
+
+请基于以上资产内容，生成一篇适合${channel}Platform的完整内容。`;
+
+      try {
+        const response = await fetch(GEMINI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.8,
+              maxOutputTokens: 800
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('API请求Failed');
+        }
+
+        const data = await response.json();
+        return data.candidates[0].content.parts[0].text;
+      } catch (error) {
+        console.error(`生成${channel}内容Failed:`, error);
+        return `生成${channel}内容时出错，Please try again later`;
+      }
+    }
+
+    // 显示Preview
+    function showPreview() {
+      document.getElementById('previewModal').classList.add('show');
+
+      // 生成Preview内容
+      const previewBody = document.getElementById('previewBody');
+      previewBody.innerHTML = `
+                <h3>Reddit版本</h3>
+                <div style="background: white; padding: 16px; border-radius: 8px; margin-top: 12px;">
+                    <p><strong>空气净化器维护完整指南 [详细教程]</strong></p>
+                    <br>
+                    <p>大家好！看到很多朋友问关于空气净化器维护的问题，我整理了一份详细的指南...</p>
+                    <br>
+                    <p><strong>第一步：定期检查过滤器状态</strong></p>
+                    <p>每Month至少检查一次过滤器的状态。如果你发现...</p>
+                    <br>
+                    <p><strong>第二步：清洁预过滤器</strong></p>
+                    <p>预过滤器可以用吸尘器清理...</p>
+                    <br>
+                    <p><strong>关于HEPA过滤器更换时机：</strong></p>
+                    <p>一般来说，HEPA过滤器需要每6-12个Month更换一次，但具体要看...</p>
+                    <br>
+                    <p><em>希望这个指南对大家有帮助！如果有其他问题，欢迎在评论区讨论。</em></p>
+                </div>
+            `;
+    }
+
+    // ClosePreview
+    function closePreview() {
+      document.getElementById('previewModal').classList.remove('show');
+    }
+
+    // Select AllChannel
+    function selectAllChannels() {
+      document.querySelectorAll('.channel-toggle').forEach(checkbox => {
+        checkbox.checked = true;
+        checkbox.closest('.channel-card').classList.add('active');
+      });
+    }
+
+    // 移除资产
+    function removeAsset(button) {
+      button.closest('.composed-asset').remove();
+      updateStats();
+    }
+
+    // 上移资产
+    function moveAssetUp(button) {
+      const asset = button.closest('.composed-asset');
+      const previous = asset.previousElementSibling;
+      if (previous && previous.classList.contains('composed-asset')) {
+        asset.parentNode.insertBefore(asset, previous);
+      }
+    }
+
+    // 下移资产
+    function moveAssetDown(button) {
+      const asset = button.closest('.composed-asset');
+      const next = asset.nextElementSibling;
+      if (next && next.classList.contains('composed-asset')) {
+        asset.parentNode.insertBefore(next, asset);
+      }
+    }
+
+    // 更新Statistics信息
+    function updateStats() {
+      const assetCount = document.querySelectorAll('.composed-asset').length;
+      const channelCount = document.querySelectorAll('.channel-toggle:checked').length;
+
+      // Update statistics显示
+      document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = assetCount;
+      document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = channelCount;
+
+      // 模拟计算总字数
+      const totalWords = assetCount * 264;
+      document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = totalWords;
+    }
+
+    // 处理Channel切换
+    document.querySelectorAll('.channel-toggle').forEach(checkbox => {
+      checkbox.addEventListener('change', function () {
+        const card = this.closest('.channel-card');
+        if (this.checked) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+        updateStats();
+      });
+    });
+
+    // 显示加载状态
+    function showLoadingState(show) {
+      if (show) {
+        // 创建加载Coverage层
+        const loader = document.createElement('div');
+        loader.id = 'loadingOverlay';
+        loader.innerHTML = `
+          <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                      background: rgba(0,0,0,0.3); display: flex; align-items: center; 
+                      justify-content: center; z-index: 9999;">
+            <div style="background: white; padding: 20px; border-radius: 8px; 
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="spinner" style="width: 24px; height: 24px; border: 2px solid #e5e7eb; 
+                            border-top-color: #7c3aed; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                <span>AI正在处理中...</span>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(loader);
+      } else {
+        const loader = document.getElementById('loadingOverlay');
+        if (loader) loader.remove();
+      }
+    }
+
+    // 显示通知
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+      `;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // 更新Preview内容
+    function updatePreviewContent(generatedContent) {
+      const previewContainer = document.querySelector('.preview-channels');
+      if (!previewContainer) return;
+      
+      previewContainer.innerHTML = '';
+      
+      Object.entries(generatedContent).forEach(([channel, content]) => {
+        const channelPreview = document.createElement('div');
+        channelPreview.className = 'channel-preview';
+        channelPreview.innerHTML = `
+          <h4 style="margin-bottom: 12px; color: var(--primary);">${channel}</h4>
+          <div style="background: var(--hover); padding: 16px; border-radius: 8px; 
+                      max-height: 300px; overflow-y: auto; white-space: pre-wrap;">
+            ${content}
+          </div>
+          <div style="margin-top: 12px; display: flex; gap: 8px;">
+            <button class="btn btn-secondary" onclick="copyContent('${channel}')">
+              <span>📋</span> 复制
+            </button>
+            <button class="btn btn-secondary" onclick="editContent('${channel}')">
+              <span>✏️</span> Edit
+            </button>
+          </div>
+        `;
+        previewContainer.appendChild(channelPreview);
+      });
+      
+      // Save到全局变量供后续使用
+      window.generatedChannelContent = generatedContent;
+    }
+
+    // 复制内容到剪贴板
+    function copyContent(channel) {
+      const content = window.generatedChannelContent[channel];
+      navigator.clipboard.writeText(content).then(() => {
+        showNotification(`${channel}内容已复制到剪贴板`, 'success');
+      });
+    }
+
+    // 移动资产
+    function moveAsset(button, direction) {
+      const asset = button.closest('.composed-asset');
+      const sibling = direction === -1 ? asset.previousElementSibling : asset.nextElementSibling;
+      
+      if (sibling && sibling.classList.contains('composed-asset')) {
+        if (direction === -1) {
+          asset.parentNode.insertBefore(asset, sibling);
+        } else {
+          asset.parentNode.insertBefore(sibling, asset);
+        }
+        updateStats();
+      }
+    }
+
+    // Delete资产
+    function removeAsset(button) {
+      const asset = button.closest('.composed-asset');
+      asset.remove();
+      updateStats();
+    }
+
+    // AIOptimization资产顺序
+    async function optimizeSequence() {
+      const composedAssets = document.querySelectorAll('.composed-asset');
+      
+      if (composedAssets.length < 2) {
+        alert('需要至少2个资产才能Optimization顺序');
+        return;
+      }
+      
+      showLoadingState(true);
+      
+      try {
+        // 收集当前资产信息
+        const assets = [];
+        composedAssets.forEach((asset, index) => {
+          const title = asset.querySelector('.composed-asset-title').textContent.trim();
+          const type = asset.querySelector('.asset-type-badge').textContent;
+          assets.push({ index, title, type });
+        });
+        
+        const intent = document.querySelector('.intent-input').value;
+        
+        const prompt = `作为内容Strategy专家，请Optimization以下资产的Impressions顺序，以达到最佳的User体验和信息传递效果。
+
+User Intent: ${intent}
+
+当前资产顺序：
+${assets.map((a, i) => `${i + 1}. ${a.type}: ${a.title}`).join('\n')}
+
+请提供：
+1. Optimization后的顺序（用数字表示，如：2,1,3）
+2. Optimization理由
+3. 预期效果
+
+格式示例：
+Optimization顺序：2,1,3
+理由：先Impressions操作步骤建立实践基础，再解答常见问题，最后对比不同方案
+效果：循序渐进的学习路径，提高理解和接受度`;
+
+        const response = await fetch(GEMINI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 400
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('API请求Failed');
+        }
+
+        const data = await response.json();
+        const aiResponse = data.candidates[0].content.parts[0].text;
+        
+        // 解析Optimization顺序
+        const orderMatch = aiResponse.match(/Optimization顺序[：:]\s*([0-9,\s]+)/);
+        if (orderMatch) {
+          const newOrder = orderMatch[1].split(',').map(n => parseInt(n.trim()) - 1);
+          
+          // 重新排序资产
+          const compositionArea = document.getElementById('compositionArea');
+          const assetsArray = Array.from(composedAssets);
+          compositionArea.innerHTML = '';
+          
+          newOrder.forEach(index => {
+            if (assetsArray[index]) {
+              compositionArea.appendChild(assetsArray[index]);
+            }
+          });
+          
+          // 显示Optimization理由
+          const reason = aiResponse.match(/理由[：:]\s*(.+)/)?.[1] || '';
+          showNotification('✨ 顺序Optimization完成！' + reason, 'success');
+        }
+        
+      } catch (error) {
+        console.error('Optimization顺序Failed:', error);
+        alert('AIOptimizationFailed，Please try again later');
+      } finally {
+        showLoadingState(false);
+      }
+    }
+
+    // AI推荐More相关资产
+    async function suggestMore() {
+      const intent = document.querySelector('.intent-input').value;
+      
+      if (!intent) {
+        alert('Please enter user intent first');
+        return;
+      }
+      
+      showLoadingState(true);
+      
+      try {
+        // 获取当前已编排的资产
+        const currentAssets = [];
+        document.querySelectorAll('.composed-asset').forEach(asset => {
+          const title = asset.querySelector('.composed-asset-title').textContent.trim();
+          currentAssets.push(title);
+        });
+        
+        const prompt = `作为内容Strategy专家，基于User意图推荐More相关的内容资产。
+
+User Intent: ${intent}
+
+已选资产：
+${currentAssets.join('\n')}
+
+请推荐3-5个额外的内容资产，这些资产应该：
+1. 补充现有内容的不足
+2. 提供不同角度的信息
+3. 增强User理解
+
+对每个推荐，请提供：
+- 资产类型（FAQ/HOW-TO/COMPARE/GUIDE等）
+- 标题
+- 推荐理由
+
+格式示例：
+1. FAQ: 如何处理净化器异味问题？
+   理由：解决User在维护过程中可能遇到的常见问题`;
+
+        const response = await fetch(GEMINI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.8,
+              maxOutputTokens: 600
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('API请求Failed');
+        }
+
+        const data = await response.json();
+        const suggestions = data.candidates[0].content.parts[0].text;
+        
+        // 显示推荐结果
+        showAIRecommendations(suggestions);
+        
+      } catch (error) {
+        console.error('获取推荐Failed:', error);
+        alert('AI推荐Failed，Please try again later');
+      } finally {
+        showLoadingState(false);
+      }
+    }
+
+    // 显示AI推荐
+    function showAIRecommendations(recommendations) {
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        max-width: 600px;
+        max-height: 70vh;
+        overflow-y: auto;
+        z-index: 10000;
+      `;
+      
+      modal.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin: 0; color: var(--primary);">💡 AI推荐的相关资产</h3>
+          <button onclick="this.closest('div').parentElement.remove()" 
+                  style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+        </div>
+        <div style="white-space: pre-wrap; line-height: 1.6;">
+          ${recommendations}
+        </div>
+        <div style="margin-top: 20px; display: flex; gap: 8px; justify-content: flex-end;">
+          <button class="btn btn-primary" onclick="createRecommendedAssets(this)">
+            创建推荐资产
+          </button>
+          <button class="btn btn-secondary" onclick="this.closest('div').parentElement.remove()">
+            Close
+          </button>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+    }
+
+    // 创建推荐的资产
+    function createRecommendedAssets(button) {
+      showNotification('正在创建推荐的资产...', 'info');
+      button.closest('div').parentElement.remove();
+      // 这里可以进一步实现创建资产的功能
+    }
+
+    // Export所有内容
+    function exportAllContent() {
+      if (!window.generatedChannelContent) {
+        alert('没有可Export的内容');
+        return;
+      }
+      
+      let exportText = '# AI生成的多Channel内容\n\n';
+      exportText += `生成时间：${new Date().toLocaleString()}\n\n`;
+      
+      Object.entries(window.generatedChannelContent).forEach(([channel, content]) => {
+        exportText += `## ${channel}\n\n`;
+        exportText += content + '\n\n';
+        exportText += '---\n\n';
+      });
+      
+      // 创建Download链接
+      const blob = new Blob([exportText], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `multi-channel-content-${Date.now()}.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      showNotification('内容已Export', 'success');
+    }
+
+    // 重新生成内容
+    async function regenerateContent() {
+      closePreview();
+      await generateContent();
+    }
+
+    // Save为模板
+    function saveAsTemplate() {
+      const templateName = prompt('Please enter模板名称：');
+      if (!templateName) return;
+      
+      // Save当前的编排Configuration
+      const template = {
+        name: templateName,
+        intent: document.querySelector('.intent-input').value,
+        assets: [],
+        channels: []
+      };
+      
+      // 收集资产信息
+      document.querySelectorAll('.composed-asset').forEach(asset => {
+        const title = asset.querySelector('.composed-asset-title').textContent.trim();
+        const type = asset.querySelector('.asset-type-badge').textContent;
+        template.assets.push({ title, type });
+      });
+      
+      // 收集Channel信息
+      document.querySelectorAll('.channel-card input:checked').forEach(input => {
+        const channelName = input.closest('.channel-card').querySelector('.channel-name').textContent;
+        template.channels.push(channelName);
+      });
+      
+      // Save到本地存储
+      const templates = JSON.parse(localStorage.getItem('orchestrationTemplates') || '[]');
+      templates.push(template);
+      localStorage.setItem('orchestrationTemplates', JSON.stringify(templates));
+      
+      showNotification(`模板"${templateName}"已Save`, 'success');
+    }
+
+    // ClosePreview
+    function closePreview() {
+      document.getElementById('previewModal').classList.remove('show');
+    }
+
+    // Edit内容
+    function editContent(channel) {
+      const content = window.generatedChannelContent[channel];
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        width: 600px;
+        max-height: 80vh;
+        z-index: 10001;
+      `;
+      
+      modal.innerHTML = `
+        <h3 style="margin-bottom: 16px;">Edit${channel}内容</h3>
+        <textarea id="editContentArea" style="width: 100%; height: 300px; padding: 12px; 
+                  border: 1px solid var(--border); border-radius: 8px; font-family: inherit; 
+                  font-size: 14px; resize: vertical;">${content}</textarea>
+        <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end;">
+          <button class="btn btn-primary" onclick="saveEditedContent('${channel}', this)">Save</button>
+          <button class="btn btn-secondary" onclick="this.closest('div').parentElement.remove()">Cancel</button>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+    }
+
+    // SaveEdit的内容
+    function saveEditedContent(channel, button) {
+      const editedContent = document.getElementById('editContentArea').value;
+      window.generatedChannelContent[channel] = editedContent;
+      updatePreviewContent(window.generatedChannelContent);
+      button.closest('div').parentElement.remove();
+      showNotification(`${channel}内容已更新`, 'success');
+    }
+
+    // AddCSS动画
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+      .channel-preview {
+        margin-bottom: 24px;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+    `;
+    document.head.appendChild(style);
+
+    // 页面加载时初始化
+    window.onload = function () {
+      initDragAndDrop();
+      updateStats();
+    };
+  </script>
+</body>
+
+</html>

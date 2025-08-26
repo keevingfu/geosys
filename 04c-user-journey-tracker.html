@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Journey Tracker - User Journey Tracker</title>
+    <!-- Import ECharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        /* Global Design System - Creating a data-driven yet human-centered interface */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Journey-focused color palette - representing progression and insights */
+            --journey-primary: #5046E5;      /* Deep purple - main brand */
+            --journey-secondary: #7C3AED;    /* Violet - secondary actions */
+            --journey-success: #10B981;      /* Green - successful conversions */
+            --journey-warning: #F59E0B;      /* Amber - attention points */
+            --journey-danger: #EF4444;       /* Red - drop-off points */
+            --journey-info: #0EA5E9;         /* Sky blue - information */
+            
+            /* Neutral colors for data visualization */
+            --gray-900: #111827;
+            --gray-800: #1F2937;
+            --gray-700: #374151;
+            --gray-600: #4B5563;
+            --gray-500: #6B7280;
+            --gray-400: #9CA3AF;
+            --gray-300: #D1D5DB;
+            --gray-200: #E5E7EB;
+            --gray-100: #F3F4F6;
+            --gray-50: #F9FAFB;
+            --white: #FFFFFF;
+            
+            /* Gradient definitions for visual hierarchy */
+            --gradient-journey: linear-gradient(135deg, #5046E5 0%, #7C3AED 100%);
+            --gradient-success: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            --gradient-warning: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(180deg, #F9FAFB 0%, #F3F4F6 100%);
+            min-height: 100vh;
+            color: var(--gray-900);
+        }
+
+        /* Main Application Layout */
+        .tracker-container {
+            display: flex;
+            height: 100vh;
+            background: var(--gray-50);
+        }
+
+        /* Left Sidebar for Navigation and Filters */
+        .sidebar {
+            width: 260px;
+            background: white;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            background: var(--gradient-journey);
+            color: white;
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .app-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Time Range Selector */
+        .time-selector {
+            padding: 16px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .time-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .time-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+
+        .time-btn {
+            padding: 6px 8px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .time-btn.active {
+            background: var(--journey-primary);
+            color: white;
+            border-color: var(--journey-primary);
+        }
+
+        /* Filter Section */
+        .filter-section {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 10px;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .filter-item:hover {
+            background: var(--gray-50);
+        }
+
+        .filter-checkbox {
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+        }
+
+        .filter-label {
+            flex: 1;
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        .filter-count {
+            font-size: 12px;
+            color: var(--gray-400);
+            background: var(--gray-100);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            color: var(--gray-900);
+        }
+
+        .nav-tab.active {
+            color: var(--journey-primary);
+            border-bottom-color: var(--journey-primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--gray-700);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--gray-50);
+        }
+
+        .nav-btn.primary {
+            background: var(--journey-primary);
+            color: white;
+            border-color: var(--journey-primary);
+        }
+
+        /* Content Wrapper */
+        .content-wrapper {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: var(--gray-50);
+        }
+
+        /* Key Metrics Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-100);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .metric-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .metric-change {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .change-positive {
+            color: var(--journey-success);
+        }
+
+        .change-negative {
+            color: var(--journey-danger);
+        }
+
+        /* Journey Visualization Section */
+        .journey-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .section-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            padding: 6px 12px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .control-btn.active {
+            background: var(--journey-primary);
+            color: white;
+            border-color: var(--journey-primary);
+        }
+
+        /* Journey Path Visualization */
+        .journey-canvas {
+            height: 400px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        /* Touchpoint Cards */
+        .touchpoint-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .touchpoint-card {
+            background: var(--gray-50);
+            padding: 16px;
+            border-radius: 10px;
+            border-left: 4px solid var(--journey-primary);
+        }
+
+        .touchpoint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .touchpoint-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .touchpoint-badge {
+            padding: 2px 8px;
+            background: var(--journey-primary);
+            color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .touchpoint-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .touchpoint-metric {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .touchpoint-metric-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .touchpoint-metric-label {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        /* Conversion Funnel */
+        .funnel-container {
+            height: 350px;
+            margin-bottom: 24px;
+        }
+
+        /* User Persona Section */
+        .persona-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .persona-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .persona-card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .persona-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .persona-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-journey);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .persona-info {
+            flex: 1;
+        }
+
+        .persona-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .persona-desc {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+
+        .persona-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .trait-chip {
+            padding: 4px 10px;
+            background: var(--gray-100);
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+
+        .persona-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .persona-stat {
+            text-align: center;
+        }
+
+        .persona-stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .persona-stat-label {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        /* Attribution Model Section */
+        .attribution-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .model-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .model-option {
+            padding: 10px 16px;
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .model-option:hover {
+            background: var(--gray-100);
+        }
+
+        .model-option.selected {
+            background: var(--journey-primary);
+            color: white;
+            border-color: var(--journey-primary);
+        }
+
+        .attribution-chart {
+            height: 300px;
+        }
+
+        /* Personalization Config Panel */
+        .personalization-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .config-section {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .config-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .config-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 12px;
+        }
+
+        .config-options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .config-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+
+        .config-label {
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--gray-300);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--journey-primary);
+        }
+
+        .toggle-slider {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            left: 22px;
+        }
+
+        /* Floating Insight Panel */
+        .insight-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            bottom: 0;
+            width: 400px;
+            background: white;
+            box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .insight-panel.show {
+            right: 0;
+        }
+
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .panel-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: 8px;
+            color: var(--gray-500);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .panel-close:hover {
+            background: var(--gray-200);
+        }
+
+        .panel-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .insight-item {
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .insight-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .insight-desc {
+            font-size: 13px;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            background: var(--gradient-warning);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-icon {
+            font-size: 20px;
+        }
+
+        .alert-text {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .alert-action {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .alert-action:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--journey-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                z-index: 1001;
+                height: 100vh;
+                transition: left 0.3s;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .persona-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .touchpoint-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tracker-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="app-title">
+                    <div class="app-icon">🛤️</div>
+                    <span>User Journey Tracker</span>
+                </div>
+            </div>
+
+            <!-- Time Range Selector -->
+            <div class="time-selector">
+                <div class="time-label">Time Range</div>
+                <div class="time-options">
+                    <button class="time-btn" onclick="setTimeRange('1d')">Today</button>
+                    <button class="time-btn active" onclick="setTimeRange('7d')">7Days</button>
+                    <button class="time-btn" onclick="setTimeRange('30d')">30Days</button>
+                    <button class="time-btn" onclick="setTimeRange('90d')">90Days</button>
+                    <button class="time-btn" onclick="setTimeRange('6m')">6 Months</button>
+                    <button class="time-btn" onclick="setTimeRange('1y')">1Year</button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-section">
+                <!-- Source Channel Filter -->
+                <div class="filter-group">
+                    <div class="filter-title">Traffic Source</div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">Search Engine</span>
+                        <span class="filter-count">2,456</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">Social Media</span>
+                        <span class="filter-count">1,823</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">Direct Visits</span>
+                        <span class="filter-count">1,234</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox">
+                        <span class="filter-label">Email Marketing</span>
+                        <span class="filter-count">567</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox">
+                        <span class="filter-label">Paid Advertising</span>
+                        <span class="filter-count">892</span>
+                    </div>
+                </div>
+
+                <!-- User Segment Filter -->
+                <div class="filter-group">
+                    <div class="filter-title">User Segments</div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">New Users</span>
+                        <span class="filter-count">3,456</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">Returning Users</span>
+                        <span class="filter-count">2,789</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox">
+                        <span class="filter-label">Paid Users</span>
+                        <span class="filter-count">456</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox">
+                        <span class="filter-label">VIPUser</span>
+                        <span class="filter-count">123</span>
+                    </div>
+                </div>
+
+                <!-- Device Type Filter -->
+                <div class="filter-group">
+                    <div class="filter-title">Device Type</div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">Desktop</span>
+                        <span class="filter-count">4,123</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox" checked>
+                        <span class="filter-label">Mobile</span>
+                        <span class="filter-count">2,845</span>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" class="filter-checkbox">
+                        <span class="filter-label">Tablet</span>
+                        <span class="filter-count">234</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navigation -->
+            <nav class="top-nav">
+                <div class="nav-tabs">
+                    <div class="nav-tab active" onclick="switchTab('journey')">Journey Path</div>
+                    <div class="nav-tab" onclick="switchTab('funnel')">Conversion Funnel</div>
+                    <div class="nav-tab" onclick="switchTab('touchpoint')">Touchpoint Analytics</div>
+                    <div class="nav-tab" onclick="switchTab('persona')">User Persona</div>
+                    <div class="nav-tab" onclick="switchTab('attribution')">Attribution Analytics</div>
+                    <div class="nav-tab" onclick="switchTab('personalization')">Personalization Configuration</div>
+                </div>
+                <div class="nav-actions">
+                    <button class="nav-btn" onclick="refreshData()">
+                        <span>🔄</span>
+                        <span>Refresh</span>
+                    </button>
+                    <button class="nav-btn" onclick="exportReport()">
+                        <span>📤</span>
+                        <span>Export</span>
+                    </button>
+                    <button class="nav-btn primary" onclick="showInsights()">
+                        <span>💡</span>
+                        <span>Insights</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Content Wrapper -->
+            <div class="content-wrapper">
+                <!-- Alert Banner for Important Insights -->
+                <div class="alert-banner">
+                    <span class="alert-icon">⚠️</span>
+                    <span class="alert-text">Abnormality detected: In the past 24 hours, social media channel conversion rate declined by 35%, needs immediate attention</span>
+                    <button class="alert-action" onclick="analyzeIssue()">Analyze Cause</button>
+                </div>
+
+                <!-- Key Metrics Overview -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">Total Visitors</span>
+                            <div class="metric-icon" style="background: rgba(80, 70, 229, 0.1); color: var(--journey-primary);">
+                                👥
+                            </div>
+                        </div>
+                        <div class="metric-value">23,456</div>
+                        <div class="metric-change change-positive">
+                            <span>↑</span>
+                            <span>12.3% Growth from Last Period</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">Average Conversion Rate</span>
+                            <div class="metric-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--journey-success);">
+                                🎯
+                            </div>
+                        </div>
+                        <div class="metric-value">3.45%</div>
+                        <div class="metric-change change-positive">
+                            <span>↑</span>
+                            <span>Increased 0.23%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">Average Journey Length</span>
+                            <div class="metric-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--journey-warning);">
+                                ⏱️
+                            </div>
+                        </div>
+                        <div class="metric-value">5.2 Days</div>
+                        <div class="metric-change change-negative">
+                            <span>↓</span>
+                            <span>Shortened by 0.8 Days</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">Private Domain Conversions</span>
+                            <div class="metric-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--journey-danger);">
+                                🔐
+                            </div>
+                        </div>
+                        <div class="metric-value">1,234</div>
+                        <div class="metric-change change-positive">
+                            <span>↑</span>
+                            <span>Added 156 New Users</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">Average Touchpoints</span>
+                            <div class="metric-icon" style="background: rgba(14, 165, 233, 0.1); color: var(--journey-info);">
+                                📍
+                            </div>
+                        </div>
+                        <div class="metric-value">7.8</div>
+                        <div class="metric-change change-positive">
+                            <span>↑</span>
+                            <span>Increased by 1.2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Journey Path Visualization -->
+                <div class="journey-section">
+                    <div class="section-header">
+                        <h2 class="section-title">User Journey Visualization</h2>
+                        <div class="section-controls">
+                            <button class="control-btn active" onclick="setJourneyView('sankey')">Sankey Diagram</button>
+                            <button class="control-btn" onclick="setJourneyView('flow')">Flow Chart</button>
+                            <button class="control-btn" onclick="setJourneyView('heatmap')">Heat Map</button>
+                        </div>
+                    </div>
+                    <div class="journey-canvas" id="journeyChart"></div>
+                    
+                    <!-- Touchpoint Performance Cards -->
+                    <div class="touchpoint-grid">
+                        <div class="touchpoint-card">
+                            <div class="touchpoint-header">
+                                <span class="touchpoint-name">Homepage Visits</span>
+                                <span class="touchpoint-badge">Entry</span>
+                            </div>
+                            <div class="touchpoint-metrics">
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">8,234</span>
+                                    <span class="touchpoint-metric-label">Visit Count</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">45%</span>
+                                    <span class="touchpoint-metric-label">Bounce Rate</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">2.3 min</span>
+                                    <span class="touchpoint-metric-label">Avg. Duration</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">67%</span>
+                                    <span class="touchpoint-metric-label">Continue Rate</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="touchpoint-card">
+                            <div class="touchpoint-header">
+                                <span class="touchpoint-name">Product Page Views</span>
+                                <span class="touchpoint-badge">Key</span>
+                            </div>
+                            <div class="touchpoint-metrics">
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">5,123</span>
+                                    <span class="touchpoint-metric-label">Visit Count</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">23%</span>
+                                    <span class="touchpoint-metric-label">Bounce Rate</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">4.5 min</span>
+                                    <span class="touchpoint-metric-label">Avg. Duration</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">78%</span>
+                                    <span class="touchpoint-metric-label">Continue Rate</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="touchpoint-card">
+                            <div class="touchpoint-header">
+                                <span class="touchpoint-name">RegisterConversion</span>
+                                <span class="touchpoint-badge">Conversion</span>
+                            </div>
+                            <div class="touchpoint-metrics">
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">1,234</span>
+                                    <span class="touchpoint-metric-label">Conversion Count</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">15%</span>
+                                    <span class="touchpoint-metric-label">Conversion Rate</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">1.2 min</span>
+                                    <span class="touchpoint-metric-label">Completion Time</span>
+                                </div>
+                                <div class="touchpoint-metric">
+                                    <span class="touchpoint-metric-value">89%</span>
+                                    <span class="touchpoint-metric-label">Success Rate</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conversion Funnel Analysis -->
+                <div class="journey-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Conversion Funnel Analytics</h2>
+                        <div class="section-controls">
+                            <button class="control-btn" onclick="filterFunnel('all')">All</button>
+                            <button class="control-btn" onclick="filterFunnel('new')">New Users</button>
+                            <button class="control-btn" onclick="filterFunnel('return')">Returning Users</button>
+                        </div>
+                    </div>
+                    <div class="funnel-container" id="funnelChart"></div>
+                </div>
+
+                <!-- User Persona Cards -->
+                <div class="journey-section">
+                    <div class="section-header">
+                        <h2 class="section-title">User Persona Analytics</h2>
+                    </div>
+                    <div class="persona-grid">
+                        <div class="persona-card" onclick="viewPersonaDetail('explorer')">
+                            <div class="persona-header">
+                                <div class="persona-avatar">EX</div>
+                                <div class="persona-info">
+                                    <div class="persona-name">Explorer</div>
+                                    <div class="persona-desc">Curious about new features, willing to try</div>
+                                </div>
+                            </div>
+                            <div class="persona-traits">
+                                <span class="trait-chip">Tech Enthusiast</span>
+                                <span class="trait-chip">Early Adopter</span>
+                                <span class="trait-chip">Active Sharer</span>
+                                <span class="trait-chip">High Engagement</span>
+                            </div>
+                            <div class="persona-stats">
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">35%</div>
+                                    <div class="persona-stat-label">User Percentage</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">4.2%</div>
+                                    <div class="persona-stat-label">Conversion Rate</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">￥280</div>
+                                    <div class="persona-stat-label">Average Value</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="persona-card" onclick="viewPersonaDetail('researcher')">
+                            <div class="persona-header">
+                                <div class="persona-avatar" style="background: linear-gradient(135deg, #10B981, #059669);">RE</div>
+                                <div class="persona-info">
+                                    <div class="persona-name">Researcher</div>
+                                    <div class="persona-desc">Deep comparison, cautious decision-making</div>
+                                </div>
+                            </div>
+                            <div class="persona-traits">
+                                <span class="trait-chip">Detailed Comparison</span>
+                                <span class="trait-chip">Documentation Reader</span>
+                                <span class="trait-chip">Multiple Visits</span>
+                                <span class="trait-chip">Slow Decision</span>
+                            </div>
+                            <div class="persona-stats">
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">28%</div>
+                                    <div class="persona-stat-label">User Percentage</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">6.8%</div>
+                                    <div class="persona-stat-label">Conversion Rate</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">￥520</div>
+                                    <div class="persona-stat-label">Average Value</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="persona-card" onclick="viewPersonaDetail('buyer')">
+                            <div class="persona-header">
+                                <div class="persona-avatar" style="background: linear-gradient(135deg, #F59E0B, #D97706);">BU</div>
+                                <div class="persona-info">
+                                    <div class="persona-name">Quick Buyer</div>
+                                    <div class="persona-desc">Clear needs, fast decision-making</div>
+                                </div>
+                            </div>
+                            <div class="persona-traits">
+                                <span class="trait-chip">Clear Goals</span>
+                                <span class="trait-chip">Fast Decision</span>
+                                <span class="trait-chip">Values Efficiency</span>
+                                <span class="trait-chip">Brand Loyalty</span>
+                            </div>
+                            <div class="persona-stats">
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">22%</div>
+                                    <div class="persona-stat-label">User Percentage</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">12.3%</div>
+                                    <div class="persona-stat-label">Conversion Rate</div>
+                                </div>
+                                <div class="persona-stat">
+                                    <div class="persona-stat-value">￥890</div>
+                                    <div class="persona-stat-label">Average Value</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attribution Model Analysis -->
+                <div class="attribution-container">
+                    <div class="section-header">
+                        <h2 class="section-title">Attribution Analytics Model</h2>
+                    </div>
+                    <div class="model-selector">
+                        <div class="model-option selected" onclick="selectModel('last-click')">Last Click</div>
+                        <div class="model-option" onclick="selectModel('first-click')">First Click</div>
+                        <div class="model-option" onclick="selectModel('linear')">Linear Attribution</div>
+                        <div class="model-option" onclick="selectModel('time-decay')">Time Decay</div>
+                        <div class="model-option" onclick="selectModel('data-driven')">Data Driven</div>
+                    </div>
+                    <div class="attribution-chart" id="attributionChart"></div>
+                </div>
+
+                <!-- Personalization Configuration -->
+                <div class="personalization-panel">
+                    <div class="section-header">
+                        <h2 class="section-title">Personalization Recommendation Configuration</h2>
+                    </div>
+                    
+                    <div class="config-section">
+                        <div class="config-title">Content Personalization</div>
+                        <div class="config-options">
+                            <div class="config-option">
+                                <span class="config-label">Recommend Based on View History</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">Recommend Based on User Persona</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">Recommend Based on Similar Users</span>
+                                <div class="toggle-switch" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <div class="config-title">Engagement Strategy</div>
+                        <div class="config-options">
+                            <div class="config-option">
+                                <span class="config-label">Smart Engagement Timing</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">Multi-Channel Coordination</span>
+                                <div class="toggle-switch" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">Frequency Control</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <div class="config-title">Conversion Optimization</div>
+                        <div class="config-options">
+                            <div class="config-option">
+                                <span class="config-label">Dynamic Pricing Strategy</span>
+                                <div class="toggle-switch" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">Personalized Coupons</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="config-option">
+                                <span class="config-label">Smart Customer Service Guidance</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Insights Panel -->
+    <div class="insight-panel" id="insightPanel">
+        <div class="panel-header">
+            <h3 class="panel-title">Smart Insights</h3>
+            <button class="panel-close" onclick="hideInsights()">×</button>
+        </div>
+        <div class="panel-body">
+            <div class="insight-item">
+                <div class="insight-title">🔥 Conversion Bottleneck Discovery</div>
+                <div class="insight-desc">
+                    The conversion rate from "Product Page Views" to "Add to Cart" is only 12%, significantly lower than industry average (18%).
+                    Recommend optimizing product page CTA button placement and copy.
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-title">📈 High-Value Path Identification</div>
+                <div class="insight-desc">
+                    Users following the "Search Engine → Blog Articles → Product Page → Registration" path have a conversion rate of 8.5%,
+                    which is 2.5 times the average conversion rate. Recommend increasing content marketing investment.
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-title">👥 User Behavior Patterns</div>
+                <div class="insight-desc">
+                    Researcher-type users typically require 7-9 touchpoints before conversion, but their average order value is 1.8 times that of explorers.
+                    Recommend providing more detailed product comparisons and case studies for this user type.
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-title">⏰ Optimal Engagement Timing</div>
+                <div class="insight-desc">
+                    Data shows that sending personalized emails within 24 hours after a user's third visit
+                    can increase conversion rate by 45%. Recommend enabling smart engagement system.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize charts
+        let journeyChart, funnelChart, attributionChart;
+        let currentView = 'journey';
+        let currentTimeRange = '7d';
+
+        // Initialize the application when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadJourneyData();
+        });
+
+        // Initialize all chart instances
+        function initializeCharts() {
+            // Initialize Journey Visualization Chart
+            const journeyDom = document.getElementById('journeyChart');
+            journeyChart = echarts.init(journeyDom);
+            
+            // Create a Sankey diagram to show user flow between touchpoints
+            const journeyOption = {
+                tooltip: {
+                    trigger: 'item',
+                    triggerOn: 'mousemove'
+                },
+                series: [{
+                    type: 'sankey',
+                    layout: 'none',
+                    emphasis: {
+                        focus: 'adjacency'
+                    },
+                    data: [
+                        {name: 'Search Engine'},
+                        {name: 'Social Media'},
+                        {name: 'Direct Visits'},
+                        {name: 'Email Marketing'},
+                        {name: 'Homepage'},
+                        {name: 'Product Page'},
+                        {name: 'Blog'},
+                        {name: 'Pricing Page'},
+                        {name: 'Registration'},
+                        {name: 'Trial'},
+                        {name: 'Purchase'},
+                        {name: 'Churn'}
+                    ],
+                    links: [
+                        {source: 'Search Engine', target: 'Homepage', value: 5000},
+                        {source: 'Search Engine', target: 'Product Page', value: 2000},
+                        {source: 'Search Engine', target: 'Blog', value: 1500},
+                        {source: 'Social Media', target: 'Homepage', value: 3000},
+                        {source: 'Social Media', target: 'Product Page', value: 1200},
+                        {source: 'Direct Visits', target: 'Homepage', value: 2500},
+                        {source: 'Email Marketing', target: 'Product Page', value: 800},
+                        {source: 'Homepage', target: 'Product Page', value: 4000},
+                        {source: 'Homepage', target: 'Blog', value: 2000},
+                        {source: 'Homepage', target: 'Churn', value: 4500},
+                        {source: 'Product Page', target: 'Pricing Page', value: 3000},
+                        {source: 'Product Page', target: 'Registration', value: 1500},
+                        {source: 'Product Page', target: 'Churn', value: 3500},
+                        {source: 'Blog', target: 'Product Page', value: 2000},
+                        {source: 'Blog', target: 'Churn', value: 1500},
+                        {source: 'Pricing Page', target: 'Registration', value: 1200},
+                        {source: 'Pricing Page', target: 'Churn', value: 1800},
+                        {source: 'Registration', target: 'Trial', value: 2000},
+                        {source: 'Registration', target: 'Churn', value: 700},
+                        {source: 'Trial', target: 'Purchase', value: 1500},
+                        {source: 'Trial', target: 'Churn', value: 500}
+                    ],
+                    lineStyle: {
+                        color: 'gradient',
+                        curveness: 0.5
+                    },
+                    itemStyle: {
+                        color: '#5046E5',
+                        borderColor: '#5046E5'
+                    },
+                    label: {
+                        color: 'rgba(0,0,0,0.7)',
+                        fontSize: 12
+                    }
+                }]
+            };
+            
+            journeyChart.setOption(journeyOption);
+
+            // Initialize Conversion Funnel Chart
+            const funnelDom = document.getElementById('funnelChart');
+            funnelChart = echarts.init(funnelDom);
+            
+            const funnelOption = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b} : {c} ({d}%)'
+                },
+                legend: {
+                    data: ['Visits', 'Views', 'Clicks', 'Registration', 'Trial', 'Purchase'],
+                    bottom: 10
+                },
+                series: [{
+                    name: 'Conversion Funnel',
+                    type: 'funnel',
+                    left: '10%',
+                    top: 60,
+                    bottom: 60,
+                    width: '80%',
+                    min: 0,
+                    max: 10000,
+                    minSize: '0%',
+                    maxSize: '100%',
+                    sort: 'descending',
+                    gap: 2,
+                    label: {
+                        show: true,
+                        position: 'inside',
+                        formatter: '{b}\n{c} People\nConversion Rate {d}%'
+                    },
+                    labelLine: {
+                        length: 10,
+                        lineStyle: {
+                            width: 1,
+                            type: 'solid'
+                        }
+                    },
+                    itemStyle: {
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    },
+                    emphasis: {
+                        label: {
+                            fontSize: 20
+                        }
+                    },
+                    data: [
+                        {value: 10000, name: 'Visits', itemStyle: {color: '#5046E5'}},
+                        {value: 7500, name: 'Views', itemStyle: {color: '#7C3AED'}},
+                        {value: 5000, name: 'Clicks', itemStyle: {color: '#8B5CF6'}},
+                        {value: 2500, name: 'Registration', itemStyle: {color: '#A78BFA'}},
+                        {value: 1500, name: 'Trial', itemStyle: {color: '#C4B5FD'}},
+                        {value: 800, name: 'Purchase', itemStyle: {color: '#10B981'}}
+                    ]
+                }]
+            };
+            
+            funnelChart.setOption(funnelOption);
+
+            // Initialize Attribution Model Chart
+            const attributionDom = document.getElementById('attributionChart');
+            attributionChart = echarts.init(attributionDom);
+            
+            const attributionOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['Attribution Value'],
+                    bottom: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Search Engine', 'Social Media', 'Direct Visits', 'Email Marketing', 'Paid Ads', 'Content Marketing', 'Referral Traffic'],
+                    axisLabel: {
+                        interval: 0,
+                        rotate: 30
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Conversion Contribution Value'
+                },
+                series: [{
+                    name: 'Attribution Value',
+                    type: 'bar',
+                    data: [320, 280, 220, 180, 160, 140, 100],
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {offset: 0, color: '#5046E5'},
+                            {offset: 1, color: '#7C3AED'}
+                        ])
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {offset: 0, color: '#7C3AED'},
+                                {offset: 1, color: '#8B5CF6'}
+                            ])
+                        }
+                    }
+                }]
+            };
+            
+            attributionChart.setOption(attributionOption);
+
+            // Make charts responsive
+            window.addEventListener('resize', function() {
+                journeyChart.resize();
+                funnelChart.resize();
+                attributionChart.resize();
+            });
+        }
+
+        // Load journey data based on filters
+        function loadJourneyData() {
+            console.log('Loading journey data for time range:', currentTimeRange);
+            // In a real application, this would fetch data from an API
+        }
+
+        // Set time range filter
+        function setTimeRange(range) {
+            currentTimeRange = range;
+            
+            // Update button states
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reload data with new time range
+            loadJourneyData();
+        }
+
+        // Switch between main navigation tabs
+        function switchTab(tab) {
+            currentView = tab;
+            
+            // Update tab states
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            console.log('Switching to tab:', tab);
+            
+            // In a real application, this would show/hide different content sections
+            // and potentially load different data
+        }
+
+        // Toggle switch functionality
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+            
+            // Get the configuration label
+            const label = element.previousElementSibling.textContent;
+            const isActive = element.classList.contains('active');
+            
+            console.log(`Configuration "${label}" is now ${isActive ? 'enabled' : 'disabled'}`);
+            
+            // In a real application, this would update the personalization settings
+        }
+
+        // Show insights panel
+        function showInsights() {
+            document.getElementById('insightPanel').classList.add('show');
+        }
+
+        // Hide insights panel
+        function hideInsights() {
+            document.getElementById('insightPanel').classList.remove('show');
+        }
+
+        // Refresh data
+        function refreshData() {
+            console.log('Refreshing data...');
+            
+            // Show loading state
+            showNotification('Refreshing data...', 'info');
+            
+            // Simulate data refresh
+            setTimeout(() => {
+                loadJourneyData();
+                showNotification('Data updated', 'success');
+            }, 1500);
+        }
+
+        // Export report
+        function exportReport() {
+            console.log('Exporting journey report...');
+            showNotification('Generating report...', 'info');
+            
+            setTimeout(() => {
+                showNotification('Report generated and downloaded', 'success');
+            }, 2000);
+        }
+
+        // Analyze issue from alert
+        function analyzeIssue() {
+            console.log('Analyzing conversion issue...');
+            showInsights();
+            showNotification('Analyzing issue causes...', 'info');
+        }
+
+        // View persona detail
+        function viewPersonaDetail(personaType) {
+            console.log('Viewing persona detail:', personaType);
+            showNotification(`Viewing ${personaType} user persona details`, 'info');
+        }
+
+        // Select attribution model
+        function selectModel(model) {
+            // Update button states
+            document.querySelectorAll('.model-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            console.log('Selected attribution model:', model);
+            
+            // Update chart data based on selected model
+            updateAttributionChart(model);
+        }
+
+        // Update attribution chart based on model
+        function updateAttributionChart(model) {
+            // Different data for different attribution models
+            const modelData = {
+                'last-click': [320, 280, 220, 180, 160, 140, 100],
+                'first-click': [420, 180, 320, 120, 200, 160, 80],
+                'linear': [250, 250, 250, 200, 180, 170, 150],
+                'time-decay': [280, 260, 240, 200, 170, 150, 120],
+                'data-driven': [350, 290, 210, 190, 170, 145, 95]
+            };
+            
+            attributionChart.setOption({
+                series: [{
+                    data: modelData[model] || modelData['last-click']
+                }]
+            });
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                animation: slideIn 0.3s;
+            `;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            notification.innerHTML = `
+                <span style="font-size: 20px;">${icons[type]}</span>
+                <span style="font-size: 14px; color: #374151;">${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

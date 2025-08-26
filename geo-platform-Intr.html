@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEO Content Asset Library and Project Monitoring Platform - Leap Company</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --danger-color: #f56565;
+            --dark-color: #2d3748;
+            --light-color: #f7fafc;
+            --gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .hero-quote {
+            font-size: 1.25rem;
+            font-style: italic;
+            margin-bottom: 3rem;
+            opacity: 0.85;
+            animation: fadeInUp 1s ease-out 0.4s;
+            animation-fill-mode: both;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.6s;
+            animation-fill-mode: both;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            cursor: pointer;
+            border: none;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav.scrolled {
+            background: white;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--dark-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Sections */
+        .section {
+            padding: 5rem 0;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--dark-color);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.25rem;
+            color: #718096;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Comparison Table */
+        .comparison-container {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .comparison-table th {
+            background: var(--gradient);
+            color: white;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .comparison-table td:first-child {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .feature-description {
+            color: #718096;
+            line-height: 1.8;
+        }
+
+        /* Workflow Section */
+        .workflow-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .workflow-step {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+            position: relative;
+        }
+
+        .workflow-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .workflow-number {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+
+        .workflow-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .workflow-description {
+            color: #718096;
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+
+        /* Value Cards */
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .value-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .value-card:hover {
+            transform: scale(1.05);
+        }
+
+        .value-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .value-label {
+            font-size: 1.1rem;
+            color: #718096;
+        }
+
+        /* Success Cases */
+        .case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .case-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .case-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .case-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .case-info {
+            margin-bottom: 1rem;
+        }
+
+        .case-info strong {
+            color: var(--dark-color);
+        }
+
+        .case-results {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .case-results li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .case-results li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: 700;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 3rem auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: var(--primary-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+            width: 50%;
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+            padding-right: 3rem;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+            padding-left: 3rem;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 0 4px var(--primary-color);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-marker {
+            right: -10px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-marker {
+            left: -10px;
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .timeline-phase {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Pricing Cards */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card.featured {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .pricing-card.featured::before {
+            content: 'Recommended';
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: var(--gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .pricing-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-price del {
+            font-size: 1.5rem;
+            color: #cbd5e0;
+            font-weight: 400;
+        }
+
+        .pricing-period {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: 700;
+        }
+
+        /* Contact Section */
+        .contact-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-item {
+            text-align: center;
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-value {
+            color: #718096;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .workflow-step:not(:last-child)::after {
+                display: none;
+            }
+
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-item {
+                width: 100%;
+                left: 0 !important;
+                padding-left: 4rem !important;
+                padding-right: 0 !important;
+                text-align: left !important;
+            }
+
+            .timeline-marker {
+                left: 20px !important;
+            }
+
+            .section {
+                padding: 3rem 0;
+            }
+        }
+
+        /* Scroll to Top Button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" id="navbar">
+        <div class="container">
+            <div class="nav-container">
+                <div class="logo">GEO Platform</div>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About GEO</a></li>
+                    <li><a href="#features">Core Features</a></li>
+                    <li><a href="#value">Business Value</a></li>
+                    <li><a href="#cases">Success Cases</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h1>GEO Content Asset Library and Project Monitoring Platform</h1>
+                <p class="hero-subtitle">Leap Company - Pioneering the New Era of AI Search Optimization</p>
+                <p class="hero-quote">"Make every piece of content visible, understood, and recommended in the AI era"</p>
+                <div class="cta-buttons">
+                    <a href="#demo" class="btn btn-primary">Schedule Demo</a>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About GEO Section -->
+    <section class="section" id="about">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">What is GEO?</h2>
+            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                Generative Engine Optimization - Content optimization technology designed for the AI search era
+            </p>
+            
+            <div class="comparison-container" data-aos="fade-up" data-aos-delay="200">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Dimension</th>
+                            <th>Traditional SEO</th>
+                            <th>GEO Generative Engine Optimization</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Optimization Target</td>
+                            <td>Google, Baidu and other search engines</td>
+                            <td>ChatGPT, Claude, Gemini and other AIs</td>
+                        </tr>
+                        <tr>
+                            <td>User Behavior</td>
+                            <td>Keyword search → Click links</td>
+                            <td>Natural language questions → Direct answers</td>
+                        </tr>
+                        <tr>
+                            <td>Optimization Focus</td>
+                            <td>Keyword density, backlinks</td>
+                            <td>Content quality, structure, authority</td>
+                        </tr>
+                        <tr>
+                            <td>Result Display</td>
+                            <td>Search result rankings</td>
+                            <td>Citations and recommendations in AI responses</td>
+                        </tr>
+                        <tr>
+                            <td>Traffic Source</td>
+                            <td>Search result page clicks</td>
+                            <td>Brand mentions in AI conversations</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- GEO Flow Chart -->
+            <div class="chart-container" style="margin-top: 3rem;" data-aos="fade-up" data-aos-delay="300">
+                <h3 style="text-align: center; margin-bottom: 2rem;">How GEO Works</h3>
+                <div id="flowChart" class="chart"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features" style="background: #f8f9fa;">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Core Features</h2>
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">AI Content Optimization Engine</h3>
+                    <p class="feature-description">
+                        Deep analysis of content structure, intelligent rewriting to AI-friendly format, automatic structured markup, real-time optimization feedback
+                    </p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Intelligent Analytics Dashboard</h3>
+                    <p class="feature-description">
+                        AI visibility scoring, citation frequency tracking, competitive analysis, trend prediction, comprehensive content performance monitoring
+                    </p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">🔗</div>
+                    <h3 class="feature-title">Omnichannel Content Distribution</h3>
+                    <p class="feature-description">
+                        One-click publishing to corporate websites, knowledge base systems, API interfaces, third-party platforms, maximizing content value
+                    </p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Enterprise Security</h3>
+                    <p class="feature-description">
+                        End-to-end encryption, granular role control, complete audit logs, automatic backup mechanisms, ensuring data security
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workflow Section -->
+    <section class="section" id="workflow">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Business Application Process</h2>
+            <div class="workflow-container">
+                <div class="workflow-step" data-aos="fade-up" data-aos-delay="100">
+                    <div class="workflow-number">1</div>
+                    <h3 class="workflow-title">Content Import</h3>
+                    <p class="workflow-description">Supports Word, PDF, HTML, Markdown and other formats</p>
+                </div>
+                <div class="workflow-step" data-aos="fade-up" data-aos-delay="200">
+                    <div class="workflow-number">2</div>
+                    <h3 class="workflow-title">Intelligent Optimization</h3>
+                    <p class="workflow-description">Automatic analysis and optimization suggestions</p>
+                </div>
+                <div class="workflow-step" data-aos="fade-up" data-aos-delay="300">
+                    <div class="workflow-number">3</div>
+                    <h3 class="workflow-title">Publishing Management</h3>
+                    <p class="workflow-description">Multi-channel publishing and version control</p>
+                </div>
+                <div class="workflow-step" data-aos="fade-up" data-aos-delay="400">
+                    <div class="workflow-number">4</div>
+                    <h3 class="workflow-title">Performance Monitoring</h3>
+                    <p class="workflow-description">Real-time data analysis and continuous improvement</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Value Section -->
+    <section class="section" id="value" style="background: #f8f9fa;">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Business Value Analysis</h2>
+            
+            <!-- Performance Chart -->
+            <div class="chart-container" data-aos="fade-up" data-aos-delay="100">
+                <h3 style="text-align: center; margin-bottom: 2rem;">Optimization Results Comparison</h3>
+                <div id="performanceChart" class="chart"></div>
+            </div>
+
+            <div class="value-grid">
+                <div class="value-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="value-number">+54%</div>
+                    <div class="value-label">AI Search Visibility Increase</div>
+                </div>
+                <div class="value-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="value-number">+62%</div>
+                    <div class="value-label">Brand Mention Rate Growth</div>
+                </div>
+                <div class="value-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="value-number">+73%</div>
+                    <div class="value-label">Lead Inquiries Increase</div>
+                </div>
+                <div class="value-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="value-number">80%</div>
+                    <div class="value-label">Content Optimization Labor Savings</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Cases Section -->
+    <section class="section" id="cases">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Success Cases</h2>
+            <div class="case-grid">
+                <div class="case-card" data-aos="fade-up" data-aos-delay="100">
+                    <h3 class="case-title">Tech Company A</h3>
+                    <div class="case-info">
+                        <p><strong>Background:</strong> B2B software service provider, declining traditional SEO effectiveness</p>
+                        <p><strong>Solution:</strong> Used GEO to optimize technical documentation and product descriptions</p>
+                    </div>
+                    <ul class="case-results">
+                        <li>AI search visibility increased by 350%</li>
+                        <li>Monthly leads grew by 280%</li>
+                        <li>Sales conversion rate improved by 45%</li>
+                    </ul>
+                </div>
+                <div class="case-card" data-aos="fade-up" data-aos-delay="200">
+                    <h3 class="case-title">E-commerce Brand B</h3>
+                    <div class="case-info">
+                        <p><strong>Background:</strong> Consumer brand needing to improve brand awareness</p>
+                        <p><strong>Solution:</strong> Optimized product descriptions and user reviews</p>
+                    </div>
+                    <ul class="case-results">
+                        <li>ChatGPT recommendation rate increased by 500%</li>
+                        <li>Brand search volume grew by 200%</li>
+                        <li>User purchase intent improved by 60%</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ROI Chart -->
+            <div class="chart-container" style="margin-top: 3rem;" data-aos="fade-up" data-aos-delay="300">
+                <h3 style="text-align: center; margin-bottom: 2rem;">ROI Analysis</h3>
+                <div id="roiChart" class="chart"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Timeline -->
+    <section class="section" id="timeline" style="background: #f8f9fa;">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Implementation Roadmap</h2>
+            <div class="timeline">
+                <div class="timeline-item" data-aos="fade-right">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 1: Basic Deployment</div>
+                        <p>Week 1-2: System deployment, account configuration, team training</p>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos="fade-left">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 2: Optimization Implementation</div>
+                        <p>Week 3-8: Batch content optimization, multi-channel publishing, preliminary data analysis</p>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos="fade-right">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 3: Performance Optimization</div>
+                        <p>Week 9-12: Data-driven strategy adjustment, expand application scenarios, establish best practices</p>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos="fade-left">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 4: Scaled Application</div>
+                        <p>After 3 months: Comprehensive content coverage, automated processes, continuous iterative optimization</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Contact Section -->
+    <section class="section" id="contact" style="background: #f8f9fa;">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Contact Us</h2>
+            <div class="contact-container" data-aos="fade-up" data-aos-delay="100">
+                <div class="contact-grid">
+                    <div class="contact-item">
+                        <div class="contact-icon">🌐</div>
+                        <div class="contact-label">Website</div>
+                        <div class="contact-value">www.leapunion.com</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📧</div>
+                        <div class="contact-label">Email</div>
+                        <div class="contact-value">contact@leapunion.com</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📱</div>
+                        <div class="contact-label">Phone</div>
+                        <div class="contact-value">139-1743-0851</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div class="contact-label">Address</div>
+                        <div class="contact-value">Langham Place Office Tower, 8 Argyle Street, Mongkok, Kowloon, Hong Kong</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="#demo" class="btn btn-primary">Schedule Product Demo</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">GEO White Paper</a>
+                <a href="#">Product Demo Video</a>
+                <a href="#">ROI Calculator</a>
+                <a href="#">Customer Case Studies</a>
+                <a href="#">GEO Best Practices Guide</a>
+            </div>
+            <p>© 2025 Leap Company | Pioneering the GEO Era</p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <div class="scroll-top" id="scrollTop">
+        <span>↑</span>
+    </div>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            // Scroll to top button
+            const scrollTop = document.getElementById('scrollTop');
+            if (window.scrollY > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll to top
+        document.getElementById('scrollTop').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Initialize Charts
+        // Flow Chart
+        const flowChart = echarts.init(document.getElementById('flowChart'));
+        const flowOption = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}'
+            },
+            series: [{
+                type: 'graph',
+                layout: 'force',
+                data: [
+                    {name: 'User asks AI', x: 100, y: 200, itemStyle: {color: '#667eea'}},
+                    {name: 'AI searches content', x: 300, y: 200, itemStyle: {color: '#764ba2'}},
+                    {name: 'Is content GEO optimized?', x: 500, y: 200, itemStyle: {color: '#f59e0b'}},
+                    {name: 'Prioritized by AI', x: 700, y: 100, itemStyle: {color: '#10b981'}},
+                    {name: 'Ignored or deprioritized', x: 700, y: 300, itemStyle: {color: '#ef4444'}},
+                    {name: 'Becomes AI answer source', x: 900, y: 100, itemStyle: {color: '#10b981'}},
+                    {name: 'Gets brand exposure and traffic', x: 1100, y: 100, itemStyle: {color: '#667eea'}}
+                ],
+                links: [
+                    {source: 'User asks AI', target: 'AI searches content'},
+                    {source: 'AI searches content', target: 'Is content GEO optimized?'},
+                    {source: 'Is content GEO optimized?', target: 'Prioritized by AI', label: {show: true, formatter: 'Yes'}},
+                    {source: 'Is content GEO optimized?', target: 'Ignored or deprioritized', label: {show: true, formatter: 'No'}},
+                    {source: 'Prioritized by AI', target: 'Becomes AI answer source'},
+                    {source: 'Becomes AI answer source', target: 'Gets brand exposure and traffic'}
+                ],
+                roam: true,
+                label: {
+                    show: true,
+                    position: 'bottom',
+                    formatter: '{b}'
+                },
+                force: {
+                    repulsion: 500,
+                    gravity: 0.1,
+                    edgeLength: 150
+                }
+            }]
+        };
+        flowChart.setOption(flowOption);
+
+        // Performance Chart
+        const performanceChart = echarts.init(document.getElementById('performanceChart'));
+        const performanceOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                },
+                formatter: function(params) {
+                    return params[0].name + '<br/>' +
+                           params[0].marker + ' Before Optimization: ' + params[0].value + '%<br/>' +
+                           params[1].marker + ' After Optimization: ' + params[1].value + '%<br/>' +
+                           'Increase: +' + (params[1].value - params[0].value) + '%';
+                }
+            },
+            legend: {
+                data: ['Before Optimization', 'After Optimization']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['AI Search Visibility', 'Brand Mention Rate', 'Lead Inquiries', 'Content Conversion Rate']
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    formatter: '{value}%'
+                }
+            },
+            series: [
+                {
+                    name: 'Before Optimization',
+                    type: 'bar',
+                    data: [15, 8, 100, 2.3],
+                    itemStyle: {
+                        color: '#cbd5e0'
+                    }
+                },
+                {
+                    name: 'After Optimization',
+                    type: 'bar',
+                    data: [78, 45, 483, 8.7],
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {offset: 0, color: '#667eea'},
+                            {offset: 1, color: '#764ba2'}
+                        ])
+                    }
+                }
+            ]
+        };
+        performanceChart.setOption(performanceOption);
+
+        // ROI Chart
+        const roiChart = echarts.init(document.getElementById('roiChart'));
+        const roiOption = {
+            tooltip: {
+                trigger: 'axis',
+                formatter: function(params) {
+                    return params[0].name + '<br/>' +
+                           'ROI: ' + params[0].value + '%';
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6']
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    formatter: '{value}%'
+                }
+            },
+            series: [{
+                name: 'ROI',
+                type: 'line',
+                smooth: true,
+                data: [50, 120, 200, 320, 450, 580],
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {offset: 0, color: 'rgba(102, 126, 234, 0.3)'},
+                        {offset: 1, color: 'rgba(102, 126, 234, 0.05)'}
+                    ])
+                },
+                itemStyle: {
+                    color: '#667eea'
+                },
+                lineStyle: {
+                    width: 3
+                }
+            }]
+        };
+        roiChart.setOption(roiOption);
+
+        // Responsive charts
+        window.addEventListener('resize', function() {
+            flowChart.resize();
+            performanceChart.resize();
+            roiChart.resize();
+        });
+    </script>
+</body>
+</html>

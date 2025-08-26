@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GEO Asset Creation Studio - Intelligent Content Production Platform</title>
+  <style>
+    /* Design philosophy: Create a professional and efficient content creation environment,
+           making content creation simple and precise through structured editing interface and AI assistance */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Professional color system, creating a focused creative atmosphere */
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #60a5fa;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --purple: #8b5cf6;
+      --indigo: #6366f1;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --background: #f9fafb;
+      --surface: #ffffff;
+      --hover: #f3f4f6;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    /* Top navigation bar: Provides quick access and status information */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-content {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .asset-selector {
+      display: flex;
+      gap: 8px;
+      padding: 4px;
+      background: var(--hover);
+      border-radius: 8px;
+    }
+
+    .asset-type-btn {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .asset-type-btn:hover {
+      background: var(--surface);
+    }
+
+    .asset-type-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* Main layout: Three-column design */
+    .main-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 300px 1fr 320px;
+      height: calc(100vh - 65px);
+    }
+
+    /* Left panel: Asset structure and properties */
+    .left-panel {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .panel-section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    /* Middle editor area: Core creative space */
+    .editor-panel {
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--hover);
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .toolbar-btn {
+      padding: 6px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .toolbar-btn:hover {
+      background: var(--hover);
+      border-color: var(--primary);
+    }
+
+    /* Dropdown menu styles */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-toggle {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: none;
+      min-width: 150px;
+      z-index: 1000;
+      margin-top: 4px;
+    }
+
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .dropdown-menu a:hover {
+      background: var(--hover);
+      color: var(--primary);
+    }
+
+    .editor-content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    /* Notification styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .notification.error {
+      border-left: 4px solid var(--error);
+    }
+
+    .notification.info {
+      border-left: 4px solid var(--primary);
+    }
+
+    .notification-icon {
+      font-size: 20px;
+    }
+
+    .notification.success .notification-icon {
+      color: var(--success);
+    }
+
+    .notification.error .notification-icon {
+      color: var(--error);
+    }
+
+    .notification.info .notification-icon {
+      color: var(--primary);
+    }
+
+    /* AI loading animation */
+    .ai-loading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      color: var(--text-secondary);
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* FAQ card editor styles */
+    .faq-editor {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .faq-question {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      padding: 16px;
+      background: var(--hover);
+      border-radius: 8px;
+      margin-bottom: 16px;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+      cursor: text;
+    }
+
+    .faq-question:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--surface);
+    }
+
+    .faq-answer {
+      min-height: 200px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.8;
+      background: var(--surface);
+    }
+
+    .faq-answer:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    /* Evidence citations card */
+    .evidence-card {
+      background: var(--hover);
+      border-left: 4px solid var(--info);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-top: 16px;
+    }
+
+    .evidence-source {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .evidence-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    /* Right panel: AI assistant and preview */
+    .right-panel {
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-tab {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all 0.3s;
+    }
+
+    .panel-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    /* AI assistant interface */
+    .ai-assistant {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .ai-suggestions {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    /* Quick prompt buttons */
+    .ai-quick-prompts {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .quick-prompt {
+      padding: 6px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quick-prompt:hover {
+      background: var(--hover);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .suggestion-card {
+      background: var(--hover);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+
+    .suggestion-card:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+
+    .suggestion-label {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .suggestion-text {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .ai-prompt-box {
+      display: flex;
+      gap: 8px;
+    }
+
+    .ai-prompt-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    /* Channel preview styles */
+    .preview-container {
+      background: var(--hover);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .preview-channel {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .preview-content {
+      background: var(--surface);
+      border-radius: 4px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* Button style system */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--hover);
+      border-color: var(--primary);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      background: var(--hover);
+      color: var(--primary);
+    }
+
+    /* Status indicator */
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-draft {
+      background: var(--hover);
+      color: var(--text-secondary);
+    }
+
+    .status-review {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-approved {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-published {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    /* Tag system */
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      background: var(--hover);
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .tag-remove {
+      margin-left: 4px;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+
+    .tag-remove:hover {
+      opacity: 1;
+    }
+
+    /* Word count statistics */
+    .word-counter {
+      position: fixed;
+      bottom: 20px;
+      right: 340px;
+      background: var(--surface);
+      padding: 8px 16px;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .counter-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .counter-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Loading animation */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Responsive design */
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+
+      .left-panel,
+      .right-panel {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top navigation bar -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">
+          <span>✍️</span>
+          <span>Asset Creation Studio</span>
+        </div>
+        <!-- Asset type selector -->
+        <div class="asset-selector">
+          <button class="asset-type-btn active" onclick="switchAssetType('faq')">FAQ Card</button>
+          <button class="asset-type-btn" onclick="switchAssetType('howto')">How-to Card</button>
+          <button class="asset-type-btn" onclick="switchAssetType('compare')">Compare Card</button>
+          <button class="asset-type-btn" onclick="switchAssetType('tldr')">TL;DR Card</button>
+          <button class="asset-type-btn" onclick="switchAssetType('data')">Data Card</button>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="status-indicator status-draft">
+          <span>●</span>
+          <span>Draft</span>
+        </span>
+        <button class="btn btn-ghost">
+          <span>💾</span>
+          <span>Save</span>
+        </button>
+        <button class="btn btn-secondary">
+          <span>👁️</span>
+          <span>Preview</span>
+        </button>
+        <button class="btn btn-primary" onclick="publishAsset()">
+          <span>🚀</span>
+          <span>Publish</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content area -->
+  <div class="main-container">
+    <!-- Left panel: Asset properties configuration -->
+    <aside class="left-panel">
+      <div class="panel-section">
+        <h3 class="section-title">Basic Information</h3>
+        <div class="form-group">
+          <label class="form-label">Asset Title</label>
+          <input type="text" class="form-input" id="assetTitle" placeholder="e.g., HEPA Filter Replacement Guide">
+        </div>
+        <div class="form-group">
+          <label class="form-label">User Intent</label>
+          <select class="form-select" id="userIntent">
+            <option value="">Select intent type</option>
+            <option value="research">Purchase Research</option>
+            <option value="troubleshoot">Problem Solving</option>
+            <option value="learn">Learning</option>
+            <option value="compare">Comparison</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Keyword Tags</label>
+          <div class="tags-container" id="keywordTags">
+            <span class="tag">
+              Air Purifier
+              <span class="tag-remove" onclick="removeTag(this)">×</span>
+            </span>
+            <span class="tag">
+              HEPA Filter
+              <span class="tag-remove" onclick="removeTag(this)">×</span>
+            </span>
+          </div>
+          <input type="text" class="form-input" style="margin-top: 8px;" placeholder="Press Enter to add"
+            onkeypress="addTag(event)">
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3 class="section-title">Channel Configuration</h3>
+        <div class="form-group">
+          <label style="display: flex; align-items: center; margin-bottom: 8px;">
+            <input type="checkbox" checked style="margin-right: 8px;">
+            <span>Reddit</span>
+          </label>
+          <label style="display: flex; align-items: center; margin-bottom: 8px;">
+            <input type="checkbox" checked style="margin-right: 8px;">
+            <span>Quora</span>
+          </label>
+          <label style="display: flex; align-items: center; margin-bottom: 8px;">
+            <input type="checkbox" style="margin-right: 8px;">
+            <span>Medium</span>
+          </label>
+          <label style="display: flex; align-items: center; margin-bottom: 8px;">
+            <input type="checkbox" checked style="margin-right: 8px;">
+            <span>Website FAQ</span>
+          </label>
+          <label style="display: flex; align-items: center; margin-bottom: 8px;">
+            <input type="checkbox" style="margin-right: 8px;">
+            <span>YouTube Description</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3 class="section-title">Evidence Management</h3>
+        <button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;">
+          <span>📎</span>
+          <span>Add Data Source</span>
+        </button>
+        <button class="btn btn-secondary" style="width: 100%;">
+          <span>🔗</span>
+          <span>Link Citations</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Middle editor area: Core content creation area -->
+    <main class="editor-panel">
+      <div class="editor-toolbar">
+        <div class="toolbar-group">
+          <button class="toolbar-btn" title="Bold">
+            <strong>B</strong>
+          </button>
+          <button class="toolbar-btn" title="Italic">
+            <em>I</em>
+          </button>
+          <button class="toolbar-btn" title="Underline">
+            <u>U</u>
+          </button>
+          <span style="width: 1px; height: 20px; background: var(--border); margin: 0 8px;"></span>
+          <button class="toolbar-btn" title="Heading">
+            H
+          </button>
+          <button class="toolbar-btn" title="List">
+            ☰
+          </button>
+          <button class="toolbar-btn" title="Link">
+            🔗
+          </button>
+          <button class="toolbar-btn" title="Image">
+            🖼️
+          </button>
+        </div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn" onclick="requestAISuggestion()">
+            <span>✨</span>
+            <span>AIOptimization</span>
+          </button>
+          <button class="toolbar-btn" onclick="generateContent()">
+            <span>🤖</span>
+            <span>AI Generate</span>
+          </button>
+          <button class="toolbar-btn" onclick="improveContent()">
+            <span>📝</span>
+            <span>Rewrite</span>
+          </button>
+          <button class="toolbar-btn" onclick="expandContent()">
+            <span>➕</span>
+            <span>Expand</span>
+          </button>
+        </div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn" onclick="optimizeForSEO()">
+            <span>🔍</span>
+            <span>SEOOptimization</span>
+          </button>
+          <button class="toolbar-btn" onclick="improveReadability()">
+            <span>📖</span>
+            <span>Readability</span>
+          </button>
+          <div class="dropdown">
+            <button class="toolbar-btn dropdown-toggle">
+              <span>🎭</span>
+              <span>Tone Adjustment</span>
+            </button>
+            <div class="dropdown-menu">
+              <a href="#" onclick="adjustTone('professional'); return false;">Professional Formal</a>
+              <a href="#" onclick="adjustTone('friendly'); return false;">Friendly</a>
+              <a href="#" onclick="adjustTone('casual'); return false;">Casual</a>
+              <a href="#" onclick="adjustTone('technical'); return false;">Technical Precise</a>
+            </div>
+          </div>
+        </div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn" onclick="validateContent()">
+            <span>✓</span>
+            <span>Validate Content</span>
+          </button>
+          <button class="toolbar-btn" onclick="optimizeBatch()">
+            <span>⚡</span>
+            <span>One-Click Optimization</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="editor-content">
+        <!-- FAQ Editor Example -->
+        <div class="faq-editor" id="faqEditor">
+          <div contenteditable="true" class="faq-question" id="faqQuestion">
+            When should I replace my HEPA filter?
+          </div>
+          <div contenteditable="true" class="faq-answer" id="faqAnswer">
+            The replacement timing for HEPA filters depends on multiple factors, including usage frequency, environmental pollution levels, and filter quality. Generally, it's recommended to replace HEPA filters every 6-12 months.
+
+            Here are the key indicators for determining when replacement is needed:
+
+            1. Usage time: Most manufacturers recommend replacement every 6-12 months
+            2. Visual inspection: If the filter appears noticeably dark or has significant dust accumulation
+            3. Performance decline: Air purification effectiveness noticeably decreases, odors cannot be effectively removed
+            4. Increased noise: Device operating noise increases significantly, indicating possible filter clogging
+            5. Worsening allergy symptoms: Indoor allergy symptoms don't improve or worsen
+          </div>
+
+          <div class="evidence-card">
+            <div class="evidence-source">Source: EPA Indoor Air Quality Guidelines</div>
+            <div class="evidence-text">"Regular replacement of HEPA filters is crucial for maintaining air purifier efficiency. Clogged filters not only reduce purification effectiveness but may also increase energy consumption."</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right panel: AI assistant and preview -->
+    <aside class="right-panel">
+      <div class="panel-tabs">
+        <button class="panel-tab active" onclick="switchPanelTab('ai')">AI Assistant</button>
+        <button class="panel-tab" onclick="switchPanelTab('preview')">ChannelPreview</button>
+        <button class="panel-tab" onclick="switchPanelTab('history')">Version History</button>
+      </div>
+
+      <div class="tab-content">
+        <!-- AI Assistant Tab -->
+        <div id="aiTab" class="ai-assistant">
+          <div class="ai-suggestions">
+            <div class="suggestion-card" onclick="applySuggestion(this)">
+              <div class="suggestion-label">Optimization Suggestion</div>
+              <div class="suggestion-text">
+                Suggest adding specific time ranges, for example "In areas with poor air quality, replacement may be needed every 3-6 months"
+              </div>
+            </div>
+            <div class="suggestion-card" onclick="applySuggestion(this)">
+              <div class="suggestion-label">Data Supplement</div>
+              <div class="suggestion-text">
+                Can cite research data: According to studies, regular replacement of HEPA filters can maintain 99.97% filtration efficiency
+              </div>
+            </div>
+            <div class="suggestion-card" onclick="applySuggestion(this)">
+              <div class="suggestion-label">Structure Optimization</div>
+              <div class="suggestion-text">
+                Suggest changing the judgment metrics to a numbered list format for easier reading and understanding
+              </div>
+            </div>
+          </div>
+          <div class="ai-prompt-box">
+            <input type="text" class="ai-prompt-input" placeholder="Ask AI assistant..." id="aiPrompt" onkeypress="if(event.key === 'Enter') askAI()">
+            <button class="btn btn-primary" onclick="askAI()">
+              Send
+            </button>
+          </div>
+          <div class="ai-quick-prompts">
+            <button class="quick-prompt" onclick="setQuickPrompt('How to make this answer more professional?')">Professionalize</button>
+            <button class="quick-prompt" onclick="setQuickPrompt('What improvements can be made to this answer?')">Improvement Suggestions</button>
+            <button class="quick-prompt" onclick="setQuickPrompt('Help me add some specific examples')">Add Examples</button>
+            <button class="quick-prompt" onclick="setQuickPrompt('How to make the answer better for SEO?')">SEO Suggestions</button>
+          </div>
+        </div>
+
+        <!-- Channel Preview Tab -->
+        <div id="previewTab" style="display: none;">
+          <div class="preview-container">
+            <div class="preview-channel">Reddit Preview</div>
+            <div class="preview-content">
+              <strong>Q: When should I replace my HEPA filter?</strong><br><br>
+              Based on my experience, HEPA filters typically need to be replaced every 6-12 months. Methods for determining this include...<br><br>
+              <em>Source: EPA Indoor Air Quality Guidelines</em>
+            </div>
+          </div>
+          <div class="preview-container">
+            <div class="preview-channel">Website FAQ Preview</div>
+            <div class="preview-content">
+              <h3>When should I replace my HEPA filter?</h3>
+              <p>The replacement timing for HEPA filters depends on multiple factors...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Version History Tab -->
+        <div id="historyTab" style="display: none;">
+          <div style="padding: 12px 0;">
+            <div
+              style="padding: 12px; background: var(--hover); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
+              <div style="font-size: 14px; font-weight: 500;">Version 3 (Current)</div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                2024-01-15 14:30 - Added EPA Citations
+              </div>
+            </div>
+            <div
+              style="padding: 12px; background: var(--hover); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
+              <div style="font-size: 14px; font-weight: 500;">Version 2</div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                2024-01-15 13:45 - Optimized answer structure
+              </div>
+            </div>
+            <div
+              style="padding: 12px; background: var(--hover); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
+              <div style="font-size: 14px; font-weight: 500;">Version 1</div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                2024-01-15 13:00 - Initial creation
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Word count statistics -->
+  <div class="word-counter">
+    <div class="counter-item">
+      <span>Words:</span>
+      <span class="counter-value" id="wordCount">186</span>
+    </div>
+    <div class="counter-item">
+      <span>Characters:</span>
+      <span class="counter-value" id="charCount">298</span>
+    </div>
+    <div class="counter-item">
+      <span>Reading time:</span>
+      <span class="counter-value" id="readTime">~1 min</span>
+    </div>
+  </div>
+
+  <script>
+    // Core JavaScript logic for Asset Creation Studio
+    // This implements the main functionality of the editor, including content editing, AI assistance, preview, etc.
+
+    let currentAssetType = 'faq';
+    let assetData = {
+      id: generateId(),
+      type: 'faq',
+      title: '',
+      content: {},
+      metadata: {
+        intent: '',
+        keywords: [],
+        channels: [],
+        evidence: []
+      },
+      status: 'draft',
+      version: 1,
+      created: new Date().toISOString(),
+      modified: new Date().toISOString()
+    };
+
+    // Initialize editor
+    function initializeEditor() {
+      // Set up auto-save
+      setInterval(autoSave, 30000); // Auto-save every 30 seconds
+
+      // Listen for content changes
+      document.getElementById('faqAnswer').addEventListener('input', function () {
+        updateWordCount();
+        // Trigger AI suggestions update
+        setTimeout(updateAISuggestions, 1000);
+      });
+
+      // Initialize word count statistics
+      updateWordCount();
+    }
+
+    // Switch asset type
+    function switchAssetType(type) {
+      currentAssetType = type;
+
+      // Update button states
+      document.querySelectorAll('.asset-type-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // Load different editor templates based on type
+      loadEditorTemplate(type);
+    }
+
+    // Load editor template
+    function loadEditorTemplate(type) {
+      const editorContent = document.querySelector('.editor-content');
+
+      switch (type) {
+        case 'faq':
+          // FAQ editor is already displayed by default
+          break;
+        case 'howto':
+          editorContent.innerHTML = `
+                        <div class="howto-editor">
+                            <h2>How-to Card Editor</h2>
+                            <div class="step-list" id="stepList">
+                                <div class="step-item">
+                                    <span class="step-number">1</span>
+                                    <input type="text" placeholder="Step description...">
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addStep()">+ Add Step</button>
+                        </div>
+                    `;
+          break;
+        case 'compare':
+          editorContent.innerHTML = `
+                        <div class="compare-editor">
+                            <h2>Compare Card Editor</h2>
+                            <table class="compare-table">
+                                <thead>
+                                    <tr>
+                                        <th>Feature</th>
+                                        <th>Product A</th>
+                                        <th>Product B</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="text" placeholder="Feature name"></td>
+                                        <td><input type="text" placeholder="Product A Data"></td>
+                                        <td><input type="text" placeholder="Product B Data"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button class="btn btn-secondary" onclick="addCompareRow()">+ Add Comparison Item</button>
+                        </div>
+                    `;
+          break;
+      }
+    }
+
+    // Update word count statistics
+    function updateWordCount() {
+      const content = document.getElementById('faqAnswer').innerText;
+      const wordCount = content.trim().split(/\s+/).length;
+      const charCount = content.length;
+      const readTime = Math.ceil(wordCount / 200); // Assume 200 words per minute reading speed
+
+      document.getElementById('wordCount').textContent = wordCount;
+      document.getElementById('charCount').textContent = charCount;
+      document.getElementById('readTime').textContent = `~${readTime} min`;
+    }
+
+    // Gemini APIConfiguration
+    const GEMINI_API_KEY = 'AIzaSyCdO7tYgdJRDj0HQeGifTASNZQ1mQnwDI0';
+    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+
+    // AI assistance functions
+    async function requestAISuggestion() {
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+      const assetType = currentAssetType;
+      
+      if (!question && !answer) {
+        addAISuggestion('Info', 'Please enter some content first so I can provide suggestions');
+        return;
+      }
+
+      // Show loading state
+      showAILoading(true);
+
+      try {
+        // Build different prompts based on asset type
+        const prompt = buildAIPrompt(assetType, question, answer);
+        
+        // Call Gemini API
+        const response = await fetch(GEMINI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 500
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('API request failed');
+        }
+
+        const data = await response.json();
+        const aiResponse = data.candidates[0].content.parts[0].text;
+        
+        // Parse AI response and generate suggestions
+        const suggestions = parseAISuggestions(aiResponse);
+        updateAISuggestions(suggestions);
+        
+      } catch (error) {
+        console.error('AI suggestion generation failed:', error);
+        addAISuggestion('Error', 'Unable to generate suggestions, please try again later');
+      } finally {
+        showAILoading(false);
+      }
+    }
+
+    // Build AI prompt
+    function buildAIPrompt(assetType, question, answer) {
+      const prompts = {
+        faq: `As a content optimization expert, please analyze the following FAQ content and provide improvement suggestions:
+Question: ${question || 'Not filled'}
+Answer: ${answer || 'Not filled'}
+
+Please provide 3-5 specific improvement suggestions from the following perspectives:
+1. Content completeness and accuracy
+2. Language clarity and friendliness
+3. SEO optimization and keyword usage
+4. Additional relevant information that can be supplemented
+5. Format and structure optimization
+
+Please return suggestions in JSON format:
+[
+  {"type": "Suggestion type", "text": "Specific suggestion content"},
+  ...
+]`,
+        
+        howto: `As a technical writing expert, please analyze the following step-by-step content and provide optimization suggestions:
+Title: ${question || 'Not filled'}
+Step content: ${answer || 'Not filled'}
+
+Please provide improvement suggestions from the following perspectives:
+1. Logic and completeness of steps
+2. Clarity of operation instructions
+3. Possible missing precautions
+4. Visual assistance suggestions (e.g., where images need to be added)
+
+Please return suggestions in JSON format.`,
+        
+        compare: `As a product analytics expert, please analyze the following comparison content and provide improvement suggestions:
+Comparison topic: ${question || 'Not filled'}
+Comparison content: ${answer || 'Not filled'}
+
+Please provide suggestions from the following perspectives:
+1. Comprehensiveness of comparison dimensions
+2. Objectivity and accuracy of data
+3. Fairness of conclusions
+4. Visualization presentation suggestions
+
+Please return suggestions in JSON format.`
+      };
+      
+      return prompts[assetType] || prompts.faq;
+    }
+
+    // Parse AI suggestions
+    function parseAISuggestions(aiResponse) {
+      try {
+        // Try to extract JSON part
+        const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          return JSON.parse(jsonMatch[0]);
+        }
+        
+        // If not JSON format, split by lines as suggestions
+        const lines = aiResponse.split('\n').filter(line => line.trim());
+        return lines.map((line, index) => ({
+          type: `Suggestion ${index + 1}`,
+          text: line.trim()
+        }));
+      } catch (error) {
+        console.error('Failed to parse AI response:', error);
+        return [{
+          type: 'AI Suggestion',
+          text: aiResponse
+        }];
+      }
+    }
+
+    // Update AI suggestions
+    function updateAISuggestions(suggestions) {
+      const suggestionsContainer = document.querySelector('.ai-suggestions');
+      
+      // Clear existing suggestions
+      suggestionsContainer.innerHTML = '';
+      
+      // Add new suggestions
+      suggestions.forEach(suggestion => {
+        addAISuggestion(suggestion.type, suggestion.text);
+      });
+    }
+
+    // Show AI loading state
+    function showAILoading(show) {
+      const suggestionsContainer = document.querySelector('.ai-suggestions');
+      
+      if (show) {
+        suggestionsContainer.innerHTML = `
+          <div class="ai-loading">
+            <div class="spinner"></div>
+            <span>AI is analyzing your content...</span>
+          </div>
+        `;
+      }
+    }
+
+    // Apply AI suggestion
+    function applySuggestion(element) {
+      const suggestionText = element.querySelector('.suggestion-text').textContent;
+      // Here you can apply the suggestion to the editor
+      alert('Apply suggestion: ' + suggestionText);
+    }
+
+    // Ask AI assistant
+    async function askAI() {
+      const prompt = document.getElementById('aiPrompt').value;
+      if (!prompt) return;
+
+      // Show loading state
+      const input = document.getElementById('aiPrompt');
+      input.disabled = true;
+      
+      // Get current content context
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      try {
+        // Build context-aware prompt
+        const contextPrompt = `As a content creation assistant, please answer the following questions.
+Currently editing content:
+Question: ${question || 'Not filled'}
+Answer: ${answer || 'Not filled'}
+
+User's question: ${prompt}
+
+Please provide specific and practical suggestions.`;
+
+        // Call Gemini API
+        const response = await fetch(GEMINI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: contextPrompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.8,
+              maxOutputTokens: 300
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('API request failed');
+        }
+
+        const data = await response.json();
+        const aiResponse = data.candidates[0].content.parts[0].text;
+        
+        // Add AI response to suggestions list
+        addAISuggestion('AI Assistant', aiResponse);
+        
+      } catch (error) {
+        console.error('AI Assistant Error:', error);
+        addAISuggestion('Error', 'Unable to get AI response, please try again later');
+      } finally {
+        input.value = '';
+        input.disabled = false;
+        input.focus();
+      }
+    }
+
+    // Add AI suggestion to list
+    function addAISuggestion(label, text) {
+      const suggestionsContainer = document.querySelector('.ai-suggestions');
+      const suggestionCard = document.createElement('div');
+      suggestionCard.className = 'suggestion-card';
+      suggestionCard.innerHTML = `
+                <div class="suggestion-label">${label}</div>
+                <div class="suggestion-text">${text}</div>
+            `;
+      suggestionCard.onclick = function () { applySuggestion(this); };
+      suggestionsContainer.insertBefore(suggestionCard, suggestionsContainer.firstChild);
+    }
+
+    // Switch right panel tabs
+    function switchPanelTab(tab) {
+      // Update tab states
+      document.querySelectorAll('.panel-tab').forEach(t => {
+        t.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // Show corresponding content
+      document.getElementById('aiTab').style.display = tab === 'ai' ? 'flex' : 'none';
+      document.getElementById('previewTab').style.display = tab === 'preview' ? 'block' : 'none';
+      document.getElementById('historyTab').style.display = tab === 'history' ? 'block' : 'none';
+
+      // If it's the preview tab, update preview content
+      if (tab === 'preview') {
+        updatePreview();
+      }
+    }
+
+    // Update preview
+    function updatePreview() {
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+
+      // Update preview content for each channel
+      // Here you can convert according to different channel format requirements
+      console.log('Updating preview content');
+    }
+
+    // Add tag
+    function addTag(event) {
+      if (event.key === 'Enter') {
+        const input = event.target;
+        const tagValue = input.value.trim();
+        if (tagValue) {
+          const tagsContainer = document.getElementById('keywordTags');
+          const tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.innerHTML = `
+                        ${tagValue}
+                        <span class="tag-remove" onclick="removeTag(this)">×</span>
+                    `;
+          tagsContainer.appendChild(tag);
+          input.value = '';
+        }
+      }
+    }
+
+    // Remove tag
+    function removeTag(element) {
+      element.parentElement.remove();
+    }
+
+    // Auto-save
+    function autoSave() {
+      // Collect all data
+      assetData.title = document.getElementById('assetTitle').value;
+      assetData.content.question = document.getElementById('faqQuestion').innerText;
+      assetData.content.answer = document.getElementById('faqAnswer').innerText;
+      assetData.modified = new Date().toISOString();
+
+      // Save to localStorage
+      localStorage.setItem('currentAsset', JSON.stringify(assetData));
+      console.log('Auto-saved successfully');
+    }
+
+    // Publish asset
+    function publishAsset() {
+      // Validate required fields
+      if (!document.getElementById('assetTitle').value) {
+        alert('Please fill in the asset title');
+        return;
+      }
+
+      // Update status
+      assetData.status = 'published';
+
+      // Show success message
+      alert('Asset published successfully! Added to asset library.');
+
+      // Update status indicator
+      document.querySelector('.status-indicator').className = 'status-indicator status-published';
+      document.querySelector('.status-indicator span:last-child').textContent = 'Published';
+    }
+
+    // Generate unique ID
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    // AI content generation
+    async function generateContent() {
+      const title = document.getElementById('assetTitle').value;
+      const intent = document.getElementById('userIntent').value;
+      
+      if (!title && !intent) {
+        alert('Please first fill in the asset title or user intent for AI to generate relevant content');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `Please generate ${currentAssetType === 'faq' ? 'FAQ' : currentAssetType === 'howto' ? 'how-to steps' : 'comparison'} content for the following topic:
+Topic: ${title || intent}
+Type: ${currentAssetType}
+
+Please generate:
+1. A clear question/title
+2. Detailed answer/content (about 150-200 words)
+3. Include specific examples or data
+
+Format requirements:
+Question: [Generated question]
+Answer: [Generated answer]`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        // Parse generated content
+        const lines = response.split('\n');
+        let question = '';
+        let answer = '';
+        let isAnswer = false;
+        
+        lines.forEach(line => {
+          if (line.startsWith('Question:') || line.startsWith('问题：')) {
+            question = line.replace(/Question:|问题：/, '').trim();
+          } else if (line.startsWith('Answer:') || line.startsWith('答案：')) {
+            answer = line.replace(/Answer:|答案：/, '').trim();
+            isAnswer = true;
+          } else if (isAnswer && line.trim()) {
+            answer += '\n' + line.trim();
+          }
+        });
+        
+        // Fill into editor
+        if (question) {
+          document.getElementById('faqQuestion').innerText = question;
+        }
+        if (answer) {
+          document.getElementById('faqAnswer').innerText = answer;
+        }
+        
+        updateWordCount();
+        showNotification('Content generated! You can continue editing and optimizing.', 'success');
+        
+      } catch (error) {
+        console.error('Content generation failed:', error);
+        showNotification('Generation failed, please try again later', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+    
+    // AI content rewriting
+    async function improveContent() {
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!answer || answer.length < 20) {
+        alert('Please enter some content before rewriting');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `Please rewrite the following content to make it clearer, more professional, and easier to read:
+
+
+Original content:
+${answer}
+
+Rewriting requirements:
+1. Maintain the original meaning
+2. Optimize language expression
+3. Enhance readability
+4. Use more professional terminology
+5. Maintain similar length`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        // Update content
+        document.getElementById('faqAnswer').innerText = response;
+        updateWordCount();
+        
+        showNotification('Content rewritten! Original content saved to version history.', 'success');
+        
+      } catch (error) {
+        console.error('Rewrite failed:', error);
+        showNotification('Rewrite failed, please try again later', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+    
+    // AI content expansion
+    async function expandContent() {
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!answer || answer.length < 20) {
+        alert('Please enter some content first before expanding');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `Please expand the following content by adding more details, examples, and explanations:
+
+Original content:
+${answer}
+
+Expansion requirements:
+1. Add specific examples
+2. Supplement with relevant data or statistics
+3. Add practical suggestions
+4. Explain technical terms
+5. Expand to 1.5-2 times the original length`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        // Update content
+        document.getElementById('faqAnswer').innerText = answer + '\n\n' + response;
+        updateWordCount();
+        
+        showNotification('Content expanded!', 'success');
+        
+      } catch (error) {
+        console.error('Expansion failed:', error);
+        showNotification('Expansion failed, please try again later', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+    
+    // Common Gemini API call function
+    async function callGeminiAPI(prompt) {
+      const response = await fetch(GEMINI_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-goog-api-key': GEMINI_API_KEY
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 800
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    // SEO optimization functions
+    async function optimizeForSEO() {
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!question || !answer) {
+        alert('Please first fill in the question and answer content');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `As an SEO expert, please optimize the following FAQ content to make it more suitable for search engine ranking:
+
+Question: ${question}
+Answer: ${answer}
+
+Optimization requirements:
+1. Naturally include keywords at the beginning of the answer
+2. Use clear paragraph structure
+3. Add relevant semantic keywords
+4. Keep content naturally readable
+5. Ensure the answer completely addresses the question
+6. Appropriately use lists or numbering to organize information`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        // Update answer content
+        document.getElementById('faqAnswer').innerText = response;
+        updateWordCount();
+        
+        // Add SEO optimization suggestions
+        const seoTips = await getSEOTips(question, response);
+        updateAISuggestions(seoTips);
+        
+        showNotification('Content has been SEO optimized!', 'success');
+        
+      } catch (error) {
+        console.error('SEO optimization failed:', error);
+        showNotification('SEO optimization failed, please try again later', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+
+    // Get SEO tips
+    async function getSEOTips(question, answer) {
+      try {
+        const prompt = `Analyze the SEO performance of the following FAQ and provide improvement suggestions:
+
+Question: ${question}
+Answer: ${answer}
+
+Please provide 3-5 specific SEO improvement suggestions.`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        return [{
+          type: 'SEO Suggestions',
+          text: response
+        }];
+      } catch (error) {
+        return [{
+          type: 'SEO Suggestions',
+          text: 'Unable to get SEO suggestions'
+        }];
+      }
+    }
+
+    // Readability optimization
+    async function improveReadability() {
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!answer) {
+        alert('Please first fill in the answer content');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `Please optimize the readability of the following content to make it easier to understand:
+
+
+Original content:
+${answer}
+
+Optimization requirements:
+1. Use simple, clear language
+2. Avoid jargon, or provide explanations when using them
+3. Use short sentences and paragraphs
+4. Add appropriate transition words
+5. Ensure logical flow
+6. Maintain a friendly tone`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        document.getElementById('faqAnswer').innerText = response;
+        updateWordCount();
+        
+        showNotification('Content readability optimized!', 'success');
+        
+      } catch (error) {
+        console.error('Readability optimization failed:', error);
+        showNotification('Readability optimization failed, please try again later', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+
+    // Tone adjustment
+    async function adjustTone(tone) {
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!answer) {
+        alert('Please first fill in the answer content');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      const toneDescriptions = {
+        professional: 'Professional, formal, authoritative',
+        friendly: 'Friendly, approachable, easy-going',
+        casual: 'Casual, relaxed, conversational',
+        technical: 'Technical, precise, detailed'
+      };
+      
+      try {
+        const prompt = `Please adjust the following content to a ${toneDescriptions[tone]} tone:
+
+Original content:
+${answer}
+
+Please maintain the original meaning, only adjust the expression and tone.`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        document.getElementById('faqAnswer').innerText = response;
+        updateWordCount();
+        
+        showNotification(`Tone adjusted to ${toneDescriptions[tone]}!`, 'success');
+        
+      } catch (error) {
+        console.error('Tone adjustment failed:', error);
+        showNotification('Tone adjustment failed, please try again later', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+    
+    // Show content loading state
+    function showContentLoading(show) {
+      const editorContent = document.querySelector('.editor-content');
+      
+      if (show) {
+        editorContent.style.opacity = '0.6';
+        editorContent.style.pointerEvents = 'none';
+      } else {
+        editorContent.style.opacity = '1';
+        editorContent.style.pointerEvents = 'auto';
+      }
+    }
+    
+    // Show notification
+    function showNotification(message, type = 'info') {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      
+      const icons = {
+        success: '✅',
+        error: '❌',
+        info: 'ℹ️'
+      };
+      
+      notification.innerHTML = `
+        <span class="notification-icon">${icons[type]}</span>
+        <span>${message}</span>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 3 seconds
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Set quick prompt
+    function setQuickPrompt(prompt) {
+      document.getElementById('aiPrompt').value = prompt;
+      document.getElementById('aiPrompt').focus();
+    }
+
+    // Content validation
+    async function validateContent() {
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!question || !answer) {
+        showNotification('Please first fill in the question and answer', 'error');
+        return;
+      }
+      
+      showContentLoading(true);
+      
+      try {
+        const prompt = `Please validate the quality of the following FAQ content:
+
+Question: ${question}
+Answer: ${answer}
+
+Please rate (1-10 points) and provide brief evaluation from the following aspects:
+1. Completeness: Does the answer fully address the question
+2. Accuracy: Is the information accurate and reliable
+3. Clarity: Is the expression clear and easy to understand
+4. Practicality: Does it provide actual value
+5. SEO-friendliness: Is it suitable for search engine optimization
+
+Finally, provide an overall score and improvement suggestions.`;
+
+        const response = await callGeminiAPI(prompt);
+        
+        // Show validation results
+        const validationResult = {
+          type: 'Content Quality Assessment',
+          text: response
+        };
+        
+        updateAISuggestions([validationResult]);
+        
+        showNotification('Content validation completed!', 'success');
+        
+      } catch (error) {
+        console.error('Content validation failed:', error);
+        showNotification('Validation failed, please try again later', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+
+    // Batch optimization toolbar
+    function addBatchOptimizationToolbar() {
+      const toolbar = document.createElement('div');
+      toolbar.className = 'batch-optimization-toolbar';
+      toolbar.innerHTML = `
+        <button class="toolbar-btn" onclick="validateContent()">
+          <span>✓</span>
+          <span>Validate Content</span>
+        </button>
+        <button class="toolbar-btn" onclick="optimizeBatch()">
+          <span>⚡</span>
+          <span>One-Click Optimization</span>
+        </button>
+      `;
+      
+      const existingToolbar = document.querySelector('.editor-toolbar');
+      if (existingToolbar) {
+        existingToolbar.appendChild(toolbar);
+      }
+    }
+
+    // One-click optimization function
+    async function optimizeBatch() {
+      const question = document.getElementById('faqQuestion').innerText;
+      const answer = document.getElementById('faqAnswer').innerText;
+      
+      if (!question || !answer) {
+        showNotification('Please first fill in the content', 'error');
+        return;
+      }
+      
+      showContentLoading(true);
+      showNotification('Executing one-click optimization...', 'info');
+      
+      try {
+        // Execute multiple optimizations in sequence
+        await optimizeForSEO();
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Delay to avoid API rate limits
+        
+        await improveReadability();
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        await validateContent();
+        
+        showNotification('One-click optimization completed!', 'success');
+        
+      } catch (error) {
+        console.error('Batch optimization failed:', error);
+        showNotification('Error occurred during optimization', 'error');
+      } finally {
+        showContentLoading(false);
+      }
+    }
+
+    // Initialize on page load
+    window.onload = function () {
+      initializeEditor();
+
+      // Try to load previous draft
+      const savedAsset = localStorage.getItem('currentAsset');
+      if (savedAsset) {
+        assetData = JSON.parse(savedAsset);
+        // Restore content to editor
+        if (assetData.content.question) {
+          document.getElementById('faqQuestion').innerText = assetData.content.question;
+        }
+        if (assetData.content.answer) {
+          document.getElementById('faqAnswer').innerText = assetData.content.answer;
+        }
+      }
+      
+      // Add animation styles
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(100%); opacity: 0; }
+        }
+        .ai-loading {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 40px;
+          gap: 16px;
+        }
+        .spinner {
+          width: 40px;
+          height: 40px;
+          border: 3px solid var(--border);
+          border-top-color: var(--primary);
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    };
+  </script>
+</body>
+
+</html>

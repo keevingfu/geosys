@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Intelligence Center - Leap Company</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 280px;
+            height: calc(100vh - 70px);
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: #4a5568;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 15px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background-color: #f7fafc;
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+
+        .nav-link.active {
+            background-color: #f0f4ff;
+            color: #667eea;
+            border-left-color: #667eea;
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        /* First-level menu styles */
+        .nav-item-parent > .nav-link {
+            font-weight: 600;
+            background-color: #f8f9fa;
+            border-left-width: 4px;
+        }
+
+        .nav-item-parent > .nav-link:hover {
+            background-color: #e9ecef;
+        }
+
+        .nav-item-parent > .nav-link::after {
+            content: '\f107';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item-parent.expanded > .nav-link::after {
+            transform: rotate(180deg);
+        }
+
+        /* Second-level menu styles */
+        .nav-submenu {
+            list-style: none;
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .nav-item-parent.expanded .nav-submenu {
+            max-height: 500px;
+        }
+
+        .nav-submenu .nav-link {
+            padding-left: 55px;
+            font-size: 14px;
+            border-left-width: 2px;
+        }
+
+        .nav-submenu .nav-link:hover {
+            background-color: #f0f4ff;
+        }
+
+        .nav-submenu .nav-link.active {
+            background-color: #e6eaff;
+            color: #5a67d8;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 280px;
+            margin-top: 70px;
+            flex: 1;
+            background-color: #f5f7fa;
+            position: relative;
+            height: calc(100vh - 70px);
+        }
+
+        .iframe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 20px;
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100%;
+            text-align: center;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .welcome-icon {
+            font-size: 80px;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .welcome-subtitle {
+            font-size: 18px;
+            color: #718096;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 36px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        /* Monitoring Widgets */
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 30px 0;
+        }
+
+        .monitoring-widget {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            text-align: left;
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .widget-title {
+            font-size: 14px;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .widget-icon {
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .widget-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .widget-trend {
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .trend-up {
+            color: #48bb78;
+        }
+
+        .trend-down {
+            color: #f56565;
+        }
+
+        .alert-banner {
+            background: #fed7d7;
+            border: 1px solid #fc8181;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 20px 0;
+            width: 100%;
+            max-width: 1200px;
+            text-align: left;
+            display: none;
+        }
+
+        .alert-banner.active {
+            display: block;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            color: #c53030;
+            margin-bottom: 5px;
+        }
+
+        .alert-message {
+            color: #742a2a;
+            font-size: 14px;
+        }
+
+        .last-update {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 20px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                transform: translateX(-100%);
+                transition: all 0.3s ease;
+            }
+
+            .sidebar.active {
+                width: 280px;
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+                font-size: 24px;
+                cursor: pointer;
+                margin-right: 20px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-menu-toggle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <i class="fas fa-bars mobile-menu-toggle" onclick="toggleMobileMenu()"></i>
+            <h1>Content Intelligence Center</h1>
+        </header>
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <ul class="nav-menu">
+                <!-- Introduction -->
+                <li class="nav-item nav-item-parent">
+                    <a class="nav-link" onclick="toggleSubmenu(this)">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Introduction</span>
+                    </a>
+                    <ul class="nav-submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('geo-platform-Intr.html')">
+                                <i class="fas fa-home"></i>
+                                <span>Platform Overview</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Diagnostics -->
+                <li class="nav-item nav-item-parent">
+                    <a class="nav-link" onclick="toggleSubmenu(this)">
+                        <i class="fas fa-stethoscope"></i>
+                        <span>Diagnostics</span>
+                    </a>
+                    <ul class="nav-submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('00a-geo-channel-diagnostic.html')">
+                                <i class="fas fa-diagnoses"></i>
+                                <span>GEO Channel Diagnostic</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('00b-geo-strategy.html')">
+                                <i class="fas fa-chess"></i>
+                                <span>GEO Strategy Center</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Database -->
+                <li class="nav-item nav-item-parent">
+                    <a class="nav-link" onclick="toggleSubmenu(this)">
+                        <i class="fas fa-database"></i>
+                        <span>Database</span>
+                    </a>
+                    <ul class="nav-submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('01a-question-collector.html')">
+                                <i class="fas fa-comments"></i>
+                                <span>Question Collector</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('01b-asset-creation-studio.html')">
+                                <i class="fas fa-palette"></i>
+                                <span>Asset Creation Studio</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('01c-asset-library-management.html')">
+                                <i class="fas fa-archive"></i>
+                                <span>Asset Library Management</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Orchestration -->
+                <li class="nav-item nav-item-parent">
+                    <a class="nav-link" onclick="toggleSubmenu(this)">
+                        <i class="fas fa-tasks"></i>
+                        <span>Orchestration</span>
+                    </a>
+                    <ul class="nav-submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('02a-content-orchestration-center.html')">
+                                <i class="fas fa-project-diagram"></i>
+                                <span>Content Orchestration Center</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Distribution -->
+                <li class="nav-item nav-item-parent">
+                    <a class="nav-link" onclick="toggleSubmenu(this)">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Distribution</span>
+                    </a>
+                    <ul class="nav-submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('03a-channel-config-manager.html')">
+                                <i class="fas fa-cog"></i>
+                                <span>Channel Configuration Manager</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Engagement -->
+                <li class="nav-item nav-item-parent">
+                    <a class="nav-link" onclick="toggleSubmenu(this)">
+                        <i class="fas fa-handshake"></i>
+                        <span>Engagement</span>
+                    </a>
+                    <ul class="nav-submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('04c-user-journey-tracker.html')">
+                                <i class="fas fa-route"></i>
+                                <span>User Journey Tracker</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Monitoring -->
+                <li class="nav-item nav-item-parent">
+                    <a class="nav-link" onclick="toggleSubmenu(this)">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Monitoring</span>
+                    </a>
+                    <ul class="nav-submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('welcome')">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Monitoring Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('05a-realtime-monitoring.html')">
+                                <i class="fas fa-bolt"></i>
+                                <span>Real-time Monitoring</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('05b_brand-performance.html')">
+                                <i class="fas fa-award"></i>
+                                <span>Brand Performance</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('05c_visibility-analytics.html')">
+                                <i class="fas fa-eye"></i>
+                                <span>Visibility Analytics</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('05d_perception-analytics.html')">
+                                <i class="fas fa-brain"></i>
+                                <span>Perception Analytics</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('05e_citations-analytics.html')">
+                                <i class="fas fa-quote-right"></i>
+                                <span>Citations Analytics</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('05f_questions-analytics.html')">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Questions Analytics</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('05g_seo_performance.html')">
+                                <i class="fas fa-globe"></i>
+                                <span>SEO Performance</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('05h-reddit-youtube-monitor.html')">
+                                <i class="fas fa-video"></i>
+                                <span>Reddit/YouTube Monitor</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('05i-reddit-performance-dashboard.html')">
+                                <i class="fab fa-reddit"></i>
+                                <span>Reddit Performance Dashboard</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="iframe-container" id="content-container">
+                <!-- Welcome Screen -->
+                <div class="welcome-screen" id="welcome-content">
+                    <i class="fas fa-rocket welcome-icon"></i>
+                    <h2 class="welcome-title">GEO Monitoring System Dashboard</h2>
+                    <p class="welcome-subtitle">
+                        Real-time monitoring and optimization for AI search engines. Track visibility across ChatGPT, Perplexity, Claude, and other AI platforms.
+                        Monitor KPIs, detect anomalies, and receive actionable insights.
+                    </p>
+                    
+                    <!-- Alert Banner -->
+                    <div class="alert-banner" id="alert-banner">
+                        <div class="alert-title">System Alert</div>
+                        <div class="alert-message" id="alert-message">AI Visibility Index below critical threshold</div>
+                    </div>
+
+                    <!-- Real-time Monitoring Widgets -->
+                    <div class="monitoring-grid">
+                        <div class="monitoring-widget">
+                            <div class="widget-header">
+                                <span class="widget-title">AI Visibility Index (AVI)</span>
+                                <i class="fas fa-chart-line widget-icon"></i>
+                            </div>
+                            <div class="widget-value" id="avi-value">72.5%</div>
+                            <div class="widget-trend trend-up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+2.3% (7d)</span>
+                            </div>
+                        </div>
+
+                        <div class="monitoring-widget">
+                            <div class="widget-header">
+                                <span class="widget-title">Coverage Rate</span>
+                                <i class="fas fa-percentage widget-icon"></i>
+                            </div>
+                            <div class="widget-value" id="coverage-value">68.4%</div>
+                            <div class="widget-trend trend-up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+1.8% (7d)</span>
+                            </div>
+                        </div>
+
+                        <div class="monitoring-widget">
+                            <div class="widget-header">
+                                <span class="widget-title">Share of Voice</span>
+                                <i class="fas fa-microphone widget-icon"></i>
+                            </div>
+                            <div class="widget-value" id="sov-value">18.7%</div>
+                            <div class="widget-trend trend-down">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>-0.5% (7d)</span>
+                            </div>
+                        </div>
+
+                        <div class="monitoring-widget">
+                            <div class="widget-header">
+                                <span class="widget-title">Sentiment Score</span>
+                                <i class="fas fa-smile widget-icon"></i>
+                            </div>
+                            <div class="widget-value" id="sentiment-value">+0.42</div>
+                            <div class="widget-trend trend-up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+0.02 (7d)</span>
+                            </div>
+                        </div>
+
+                        <div class="monitoring-widget">
+                            <div class="widget-header">
+                                <span class="widget-title">Citation Rate</span>
+                                <i class="fas fa-link widget-icon"></i>
+                            </div>
+                            <div class="widget-value" id="citation-value">64.3%</div>
+                            <div class="widget-trend trend-up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+3.2% (7d)</span>
+                            </div>
+                        </div>
+
+                        <div class="monitoring-widget">
+                            <div class="widget-header">
+                                <span class="widget-title">Authority Score</span>
+                                <i class="fas fa-shield-alt widget-icon"></i>
+                            </div>
+                            <div class="widget-value" id="authority-value">72.8</div>
+                            <div class="widget-trend trend-up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+1.5 (7d)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Platform Breakdown Chart -->
+                    <div style="width: 100%; max-width: 1200px; height: 400px; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin: 20px 0;">
+                        <h3 style="margin-bottom: 20px; color: #2d3748;">AI Platform Performance</h3>
+                        <div id="platform-chart" style="width: 100%; height: 350px;"></div>
+                    </div>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-chart-line feature-icon"></i>
+                            <h3 class="feature-title">Brand Performance</h3>
+                            <p class="feature-desc">Comprehensive KPI tracking and analysis</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-eye feature-icon"></i>
+                            <h3 class="feature-title">Visibility Analytics</h3>
+                            <p class="feature-desc">Multi-platform AI visibility monitoring</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-brain feature-icon"></i>
+                            <h3 class="feature-title">Perception Monitoring</h3>
+                            <p class="feature-desc">Real-time sentiment and driver analysis</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-quote-right feature-icon"></i>
+                            <h3 class="feature-title">Citation Tracking</h3>
+                            <p class="feature-desc">Authority and citation source monitoring</p>
+                        </div>
+                    </div>
+
+                    <div class="last-update" id="last-update">Last updated: Just now</div>
+                </div>
+                <!-- iframe will be inserted here dynamically -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentPage = 'geo-platform-Intr.html';
+        let platformChart = null;
+        
+        // Initialize monitoring system
+        document.addEventListener('DOMContentLoaded', function() {
+            // Expand the first menu and load default page
+            const firstParent = document.querySelector('.nav-item-parent');
+            if (firstParent) {
+                firstParent.classList.add('expanded');
+            }
+            
+            // Load default page
+            loadPage('geo-platform-Intr.html');
+            
+            if (typeof geoMonitor !== 'undefined') {
+                initializeMonitoring();
+            }
+            
+            // Initialize platform chart
+            initPlatformChart();
+        });
+        
+        function toggleSubmenu(element) {
+            const parentItem = element.closest('.nav-item-parent');
+            const wasExpanded = parentItem.classList.contains('expanded');
+            
+            // Close all other submenus
+            document.querySelectorAll('.nav-item-parent').forEach(item => {
+                if (item !== parentItem) {
+                    item.classList.remove('expanded');
+                }
+            });
+            
+            // Toggle current submenu
+            if (!wasExpanded) {
+                parentItem.classList.add('expanded');
+            }
+        }
+        
+        function initializeMonitoring() {
+            // Initialize the monitoring system
+            geoMonitor.init();
+            
+            // Listen for data updates
+            geoMonitor.on('dataUpdated', (data) => {
+                updateDashboard(data);
+            });
+            
+            // Listen for alerts
+            geoMonitor.on('alertsUpdated', (alerts) => {
+                showAlerts(alerts);
+            });
+        }
+        
+        function updateDashboard(data) {
+            if (data.metrics.visibility) {
+                document.getElementById('avi-value').textContent = data.metrics.visibility.avi.toFixed(1) + '%';
+                document.getElementById('coverage-value').textContent = data.metrics.visibility.coverageRate.toFixed(1) + '%';
+                document.getElementById('sov-value').textContent = data.metrics.visibility.shareOfVoice.toFixed(1) + '%';
+            }
+            
+            if (data.metrics.sentiment) {
+                const sentimentValue = data.metrics.sentiment.overallSentiment;
+                document.getElementById('sentiment-value').textContent = (sentimentValue > 0 ? '+' : '') + sentimentValue.toFixed(2);
+            }
+            
+            if (data.metrics.citations) {
+                document.getElementById('citation-value').textContent = data.metrics.citations.citationRate.toFixed(1) + '%';
+                document.getElementById('authority-value').textContent = data.metrics.citations.authorityScore.toFixed(1);
+            }
+            
+            // Update last update time
+            document.getElementById('last-update').textContent = 'Last updated: ' + new Date(data.lastUpdate).toLocaleTimeString();
+            
+            // Update platform chart
+            if (data.metrics.visibility && platformChart) {
+                updatePlatformChart(data.metrics.visibility.platformBreakdown);
+            }
+        }
+        
+        function showAlerts(alerts) {
+            const alertBanner = document.getElementById('alert-banner');
+            const alertMessage = document.getElementById('alert-message');
+            
+            if (alerts.length > 0) {
+                alertBanner.classList.add('active');
+                alertMessage.textContent = alerts[0].message;
+            } else {
+                alertBanner.classList.remove('active');
+            }
+        }
+        
+        function initPlatformChart() {
+            const chartDom = document.getElementById('platform-chart');
+            if (!chartDom || currentPage !== 'welcome') return;
+            
+            platformChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['AVI Score', 'Coverage Rate', 'Avg Position'],
+                    bottom: 0
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    top: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['ChatGPT', 'Perplexity', 'Claude', 'Gemini', 'You.com', 'Bing Chat']
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Score / Coverage %',
+                        min: 0,
+                        max: 100,
+                        position: 'left'
+                    },
+                    {
+                        type: 'value',
+                        name: 'Avg Position',
+                        min: 1,
+                        max: 10,
+                        inverse: true,
+                        position: 'right'
+                    }
+                ],
+                series: [
+                    {
+                        name: 'AVI Score',
+                        type: 'bar',
+                        data: [78.3, 71.2, 74.6, 69.8, 68.4, 72.9],
+                        itemStyle: {
+                            color: '#667eea'
+                        }
+                    },
+                    {
+                        name: 'Coverage Rate',
+                        type: 'bar',
+                        data: [72.1, 69.5, 71.3, 65.2, 63.7, 68.9],
+                        itemStyle: {
+                            color: '#48bb78'
+                        }
+                    },
+                    {
+                        name: 'Avg Position',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: [2.8, 3.1, 2.9, 3.5, 3.7, 3.2],
+                        itemStyle: {
+                            color: '#ed8936'
+                        }
+                    }
+                ]
+            };
+            
+            platformChart.setOption(option);
+            
+            // Make chart responsive
+            window.addEventListener('resize', () => {
+                if (platformChart) {
+                    platformChart.resize();
+                }
+            });
+        }
+        
+        function updatePlatformChart(platformData) {
+            if (!platformChart || !platformData) return;
+            
+            const platforms = Object.keys(platformData);
+            const aviData = platforms.map(p => platformData[p].avi);
+            const coverageData = platforms.map(p => platformData[p].coverage);
+            const positionData = platforms.map(p => platformData[p].avgPos);
+            
+            platformChart.setOption({
+                xAxis: {
+                    data: platforms
+                },
+                series: [
+                    { data: aviData },
+                    { data: coverageData },
+                    { data: positionData }
+                ]
+            });
+        }
+        
+        function loadPage(page) {
+            const container = document.getElementById('content-container');
+            const navLinks = document.querySelectorAll('.nav-submenu .nav-link');
+            
+            // Update active navigation
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                // Find the link that matches the page
+                if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(page)) {
+                    link.classList.add('active');
+                    // Ensure parent menu is expanded
+                    const parentMenu = link.closest('.nav-item-parent');
+                    if (parentMenu && !parentMenu.classList.contains('expanded')) {
+                        // Close other menus first
+                        document.querySelectorAll('.nav-item-parent').forEach(item => {
+                            item.classList.remove('expanded');
+                        });
+                        parentMenu.classList.add('expanded');
+                    }
+                }
+            });
+            
+            // If event exists, also handle the clicked element
+            if (event && event.target) {
+                const clickedLink = event.target.closest('.nav-link');
+                if (clickedLink && clickedLink.parentElement.parentElement.classList.contains('nav-submenu')) {
+                    clickedLink.classList.add('active');
+                }
+            }
+            
+            // Load content
+            if (page === 'welcome') {
+                // Show welcome screen (dashboard)
+                const welcomeContent = document.getElementById('welcome-content');
+                if (welcomeContent) {
+                    container.innerHTML = '';
+                    container.appendChild(welcomeContent);
+                    welcomeContent.style.display = 'flex';
+                    initPlatformChart();
+                }
+            } else {
+                // Hide welcome content if it exists
+                const welcomeContent = document.getElementById('welcome-content');
+                if (welcomeContent && welcomeContent.parentNode === container) {
+                    welcomeContent.style.display = 'none';
+                }
+                // Load page in iframe
+                container.innerHTML = `<iframe class="content-frame" src="${page}"></iframe>`;
+            }
+            
+            currentPage = page;
+            
+            // Close mobile menu if open
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+        
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target) &&
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+        
+        // Prevent default link behavior
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+            });
+        });
+    </script>
+</body>
+</html>

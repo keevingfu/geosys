@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Library Management Center - Asset Library Management</title>
+    <!-- Include ECharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        /* Global Design System - Professional Enterprise Content Management Interface */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Professional Content Management Color Scheme */
+            --primary: #5B21B6;        /* Deep Purple - Creative & Professional */
+            --primary-light: #7C3AED;  /* Light Purple */
+            --primary-dark: #4C1D95;   /* Dark Purple */
+            --secondary: #0891B2;       /* Cyan - Fresh */
+            --success: #059669;         /* Green - Success */
+            --warning: #D97706;         /* Orange - Warning */
+            --danger: #DC2626;          /* Red - Danger */
+            --info: #0284C7;            /* Blue - Info */
+            
+            /* Neutral Color Scale */
+            --gray-900: #111827;
+            --gray-800: #1F2937;
+            --gray-700: #374151;
+            --gray-600: #4B5563;
+            --gray-500: #6B7280;
+            --gray-400: #9CA3AF;
+            --gray-300: #D1D5DB;
+            --gray-200: #E5E7EB;
+            --gray-100: #F3F4F6;
+            --gray-50: #F9FAFB;
+            --white: #FFFFFF;
+            
+            /* Asset Type Colors */
+            --asset-faq: #8B5CF6;
+            --asset-howto: #3B82F6;
+            --asset-compare: #10B981;
+            --asset-tldr: #F59E0B;
+            --asset-data: #06B6D4;
+            --asset-review: #EC4899;
+            --asset-discussion: #6366F1;
+            --asset-ama: #84CC16;
+            --asset-video: #EF4444;
+            --asset-task: #14B8A6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        /* Main Container Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Left Sidebar - Navigation and Filter */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        /* Quick Create Button */
+        .create-btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .create-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(91, 33, 182, 0.3);
+        }
+
+        /* Filter Area */
+        .filter-section {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .filter-group {
+            margin-bottom: 24px;
+        }
+
+        .filter-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .filter-item:hover {
+            background: var(--gray-50);
+        }
+
+        .filter-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .filter-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .filter-count {
+            padding: 2px 8px;
+            background: var(--gray-100);
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+
+        .filter-item.active .filter-count {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* Tag Cloud */
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag-chip {
+            padding: 4px 10px;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag-chip:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .tag-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Toolbar */
+        .toolbar {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-bar {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 33, 182, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+
+        .view-toggles {
+            display: flex;
+            background: var(--gray-100);
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .view-btn {
+            padding: 6px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: white;
+            color: var(--gray-900);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .toolbar-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--gray-700);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-300);
+        }
+
+        /* Statistics Bar */
+        .stats-bar {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            gap: 32px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        /* Content Grid View */
+        .content-area {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: var(--gray-50);
+        }
+
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        /* Asset Card */
+        .asset-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .asset-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .asset-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .asset-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .badge-faq {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--asset-faq);
+        }
+
+        .badge-howto {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--asset-howto);
+        }
+
+        .badge-compare {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--asset-compare);
+        }
+
+        .badge-tldr {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--asset-tldr);
+        }
+
+        .asset-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .asset-meta {
+            font-size: 12px;
+            color: var(--gray-500);
+            display: flex;
+            gap: 12px;
+        }
+
+        .asset-content {
+            padding: 16px;
+        }
+
+        .asset-preview {
+            font-size: 14px;
+            color: var(--gray-600);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .asset-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .asset-tag {
+            padding: 2px 8px;
+            background: var(--gray-100);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--gray-600);
+        }
+
+        /* QualityScore */
+        .quality-score {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+
+        .score-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .score-high {
+            background: linear-gradient(135deg, var(--success) 0%, #10B981 100%);
+        }
+
+        .score-medium {
+            background: linear-gradient(135deg, var(--warning) 0%, #F59E0B 100%);
+        }
+
+        .score-low {
+            background: linear-gradient(135deg, var(--danger) 0%, #EF4444 100%);
+        }
+
+        .score-info {
+            flex: 1;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-bottom: 2px;
+        }
+
+        .score-desc {
+            font-size: 13px;
+            color: var(--gray-700);
+        }
+
+        /* Asset Action Bar */
+        .asset-actions {
+            padding: 12px 16px;
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 10px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .version-info {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        /* Create/Edit Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: 8px;
+            color: var(--gray-500);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* Asset Type Selector */
+        .asset-type-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .type-option {
+            padding: 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .type-option:hover {
+            border-color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .type-option.selected {
+            border-color: var(--primary);
+            background: rgba(91, 33, 182, 0.05);
+        }
+
+        .type-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .type-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .type-desc {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 33, 182, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Rich Text Editor Simulation */
+        .editor-toolbar {
+            display: flex;
+            gap: 4px;
+            padding: 8px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-300);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .editor-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            color: var(--gray-600);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .editor-btn:hover {
+            background: white;
+            color: var(--gray-900);
+        }
+
+        .editor-content {
+            min-height: 200px;
+            padding: 12px;
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 0 0 8px 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            outline: none;
+        }
+
+        /* Tag Input */
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            min-height: 44px;
+            align-items: center;
+        }
+
+        .tag-input-chip {
+            padding: 4px 8px 4px 10px;
+            background: var(--primary);
+            color: white;
+            border-radius: 6px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .tag-remove:hover {
+            opacity: 1;
+        }
+
+        .tag-input-field {
+            flex: 1;
+            min-width: 100px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-info {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(91, 33, 182, 0.3);
+        }
+
+        /* Right Panel - Asset Details */
+        .detail-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            bottom: 0;
+            width: 400px;
+            background: white;
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-panel.show {
+            right: 0;
+        }
+
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* Relationship Graph */
+        .relationship-chart {
+            height: 300px;
+            margin-bottom: 24px;
+        }
+
+        /* Version History */
+        .version-timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .version-timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gray-200);
+        }
+
+        .version-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .version-marker {
+            position: absolute;
+            left: -16px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--primary);
+        }
+
+        .version-content {
+            background: var(--gray-50);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .version-date {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-bottom: 4px;
+        }
+
+        .version-desc {
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        /* Bulk Actions Bar */
+        .bulk-actions {
+            position: fixed;
+            bottom: -80px;
+            left: 280px;
+            right: 0;
+            background: white;
+            border-top: 2px solid var(--primary);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: bottom 0.3s;
+            z-index: 998;
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .bulk-actions.show {
+            bottom: 0;
+        }
+
+        .bulk-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bulk-count {
+            padding: 4px 12px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .bulk-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Import/Export Popup */
+        .import-zone {
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: var(--gray-50);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .import-zone:hover {
+            border-color: var(--primary);
+            background: rgba(91, 33, 182, 0.02);
+        }
+
+        .import-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(91, 33, 182, 0.05);
+        }
+
+        .import-icon {
+            font-size: 48px;
+            color: var(--gray-400);
+            margin-bottom: 16px;
+        }
+
+        .import-text {
+            font-size: 16px;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .import-hint {
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+
+        /* Loading State */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                z-index: 1001;
+                height: 100vh;
+                transition: left 0.3s;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .assets-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .bulk-actions {
+                left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .assets-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 20px;
+            }
+            
+            .asset-type-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <div class="logo-icon">📚</div>
+                    <div class="logo-text">Asset Library Management Center</div>
+                </div>
+                <button class="create-btn-primary" onclick="openCreateModal()">
+                    <span>✨</span>
+                    <span>Create New Asset</span>
+                </button>
+            </div>
+
+            <div class="filter-section">
+                <!-- Asset Type Filter -->
+                <div class="filter-group">
+                    <div class="filter-title">Asset Type</div>
+                    <div class="filter-item active" onclick="filterByType('all')">
+                        <span class="filter-label">
+                            <span>📋</span>
+                            <span>All Assets</span>
+                        </span>
+                        <span class="filter-count">1,234</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByType('faq')">
+                        <span class="filter-label">
+                            <span>❓</span>
+                            <span>FAQ Card</span>
+                        </span>
+                        <span class="filter-count">256</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByType('howto')">
+                        <span class="filter-label">
+                            <span>📖</span>
+                            <span>How-to Card</span>
+                        </span>
+                        <span class="filter-count">189</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByType('compare')">
+                        <span class="filter-label">
+                            <span>⚖️</span>
+                            <span>Compare Card</span>
+                        </span>
+                        <span class="filter-count">145</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByType('tldr')">
+                        <span class="filter-label">
+                            <span>📝</span>
+                            <span>TL;DR Card</span>
+                        </span>
+                        <span class="filter-count">178</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByType('data')">
+                        <span class="filter-label">
+                            <span>📊</span>
+                            <span>Data Card</span>
+                        </span>
+                        <span class="filter-count">134</span>
+                    </div>
+                </div>
+
+                <!-- QualityScoreFilter -->
+                <div class="filter-group">
+                    <div class="filter-title">Quality Score</div>
+                    <div class="filter-item" onclick="filterByQuality('high')">
+                        <span class="filter-label">
+                            <span>⭐</span>
+                            <span>Excellent (85-100)</span>
+                        </span>
+                        <span class="filter-count">423</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByQuality('medium')">
+                        <span class="filter-label">
+                            <span>⭐</span>
+                            <span>Good (60-84)</span>
+                        </span>
+                        <span class="filter-count">567</span>
+                    </div>
+                    <div class="filter-item" onclick="filterByQuality('low')">
+                        <span class="filter-label">
+                            <span>⭐</span>
+                            <span>Needs Optimization (<60)</span>
+                        </span>
+                        <span class="filter-count">244</span>
+                    </div>
+                </div>
+
+                <!-- Popular Tags -->
+                <div class="filter-group">
+                    <div class="filter-title">Popular Tags</div>
+                    <div class="tag-cloud">
+                        <span class="tag-chip" onclick="toggleTag(this)">Product Features</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Pricing Plans</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Usage Tutorials</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Integration Guide</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Best Practices</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Common Questions</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">Security Compliance</span>
+                        <span class="tag-chip" onclick="toggleTag(this)">API Documentation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Top Toolbar -->
+            <div class="toolbar">
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" placeholder="Search asset titles, content or tags..." oninput="searchAssets(this.value)">
+                </div>
+
+                <div class="view-toggles">
+                    <button class="view-btn active" onclick="switchView('grid')">
+                        <span>⊞</span>
+                    </button>
+                    <button class="view-btn" onclick="switchView('list')">
+                        <span>☰</span>
+                    </button>
+                </div>
+
+                <div class="toolbar-actions">
+                    <button class="toolbar-btn" onclick="openImportModal()">
+                        <span>📥</span>
+                        <span>Bulk Import</span>
+                    </button>
+                    <button class="toolbar-btn" onclick="exportAssets()">
+                        <span>📤</span>
+                        <span>Export</span>
+                    </button>
+                    <button class="toolbar-btn" onclick="refreshAssets()">
+                        <span>🔄</span>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-icon" style="background: rgba(91, 33, 182, 0.1); color: var(--primary);">
+                        📚
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">1,234</div>
+                        <div class="stat-label">Total Assets</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                        ✅
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">89.2%</div>
+                        <div class="stat-label">Average Quality Score</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                        🔄
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">45</div>
+                        <div class="stat-label">Updated Today</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                        ⚠️
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Pending Review</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="assets-grid" id="assetsGrid">
+                    <!-- FAQ Card Example -->
+                    <div class="asset-card" onclick="showAssetDetail(this)">
+                        <div class="asset-header">
+                            <span class="asset-type-badge badge-faq">
+                                <span>❓</span>
+                                <span>FAQ Card</span>
+                            </span>
+                            <div class="asset-title">How does the product handle data privacy?</div>
+                            <div class="asset-meta">
+                                <span>Updated 2 hours ago</span>
+                                <span>•</span>
+                                <span>v2.3</span>
+                            </div>
+                        </div>
+                        <div class="asset-content">
+                            <div class="asset-preview">
+                                Our product implements end-to-end encryption for all user data. We follow GDPR compliance standards and undergo regular security audits. User data is never shared with third parties without explicit consent...
+                            </div>
+                            <div class="asset-tags">
+                                <span class="asset-tag">Privacy Protection</span>
+                                <span class="asset-tag">GDPR</span>
+                                <span class="asset-tag">Encryption Technology</span>
+                                <span class="asset-tag">Compliance</span>
+                            </div>
+                            <div class="quality-score">
+                                <div class="score-circle score-high">92</div>
+                                <div class="score-info">
+                                    <div class="score-label">Content Quality Score</div>
+                                    <div class="score-desc">Clear structure, complete information</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="asset-actions">
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="editAsset(event, 1)">Edit</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 1)">Duplicate</button>
+                                <button class="action-btn" onclick="viewHistory(event, 1)">History</button>
+                            </div>
+                            <div class="version-info">
+                                <span>5 Related Assets</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- How-to Card Example -->
+                    <div class="asset-card" onclick="showAssetDetail(this)">
+                        <div class="asset-header">
+                            <span class="asset-type-badge badge-howto">
+                                <span>📖</span>
+                                <span>How-to Card</span>
+                            </span>
+                            <div class="asset-title">How to Set Up Two-Factor Authentication</div>
+                            <div class="asset-meta">
+                                <span>Updated 5 hours ago</span>
+                                <span>•</span>
+                                <span>v1.2</span>
+                            </div>
+                        </div>
+                        <div class="asset-content">
+                            <div class="asset-preview">
+                                1. Go to Settings page → Security options
+                                2. Click "Enable Two-Factor Authentication"
+                                3. Choose verification method (SMS or authenticator app)
+                                4. Follow instructions to complete verification process...
+                            </div>
+                            <div class="asset-tags">
+                                <span class="asset-tag">Security Settings</span>
+                                <span class="asset-tag">User Guide</span>
+                                <span class="asset-tag">2FA</span>
+                            </div>
+                            <div class="quality-score">
+                                <div class="score-circle score-high">88</div>
+                                <div class="score-info">
+                                    <div class="score-label">Content Quality Score</div>
+                                    <div class="score-desc">Detailed steps, easy to understand</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="asset-actions">
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="editAsset(event, 2)">Edit</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 2)">Duplicate</button>
+                                <button class="action-btn" onclick="viewHistory(event, 2)">History</button>
+                            </div>
+                            <div class="version-info">
+                                <span>3 Related Assets</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compare Card Example -->
+                    <div class="asset-card" onclick="showAssetDetail(this)">
+                        <div class="asset-header">
+                            <span class="asset-type-badge badge-compare">
+                                <span>⚖️</span>
+                                <span>Compare Card</span>
+                            </span>
+                            <div class="asset-title">Product Version Feature Comparison</div>
+                            <div class="asset-meta">
+                                <span>Updated 1 day ago</span>
+                                <span>•</span>
+                                <span>v3.0</span>
+                            </div>
+                        </div>
+                        <div class="asset-content">
+                            <div class="asset-preview">
+                                Basic vs Professional vs Enterprise
+                                • User Limit: 10 vs 100 vs Unlimited
+                                • API Calls: 1000/Month vs 10000/Month vs Unlimited
+                                • Support: Email vs 24/7 Online vs Dedicated Account Manager...
+                            </div>
+                            <div class="asset-tags">
+                                <span class="asset-tag">Pricing Plans</span>
+                                <span class="asset-tag">Feature Comparison</span>
+                                <span class="asset-tag">Product Versions</span>
+                            </div>
+                            <div class="quality-score">
+                                <div class="score-circle score-medium">75</div>
+                                <div class="score-info">
+                                    <div class="score-label">Content Quality Score</div>
+                                    <div class="score-desc">Suggest adding more details</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="asset-actions">
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="editAsset(event, 3)">Edit</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 3)">Duplicate</button>
+                                <button class="action-btn" onclick="viewHistory(event, 3)">History</button>
+                            </div>
+                            <div class="version-info">
+                                <span>8 Related Assets</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TL;DR Card Example -->
+                    <div class="asset-card" onclick="showAssetDetail(this)">
+                        <div class="asset-header">
+                            <span class="asset-type-badge badge-tldr">
+                                <span>📝</span>
+                                <span>TL;DR Card</span>
+                            </span>
+                            <div class="asset-title">Q4 Product Update Highlights</div>
+                            <div class="asset-meta">
+                                <span>Updated 3 days ago</span>
+                                <span>•</span>
+                                <span>v1.0</span>
+                            </div>
+                        </div>
+                        <div class="asset-content">
+                            <div class="asset-preview">
+                                🚀 New feature: AI assistant launched
+                                ⚡ Performance boost: Response speed increased by 40%
+                                🔧 Fixes: Resolved 15 known issues
+                                📊 Data: User growth rate reached 25%
+                            </div>
+                            <div class="asset-tags">
+                                <span class="asset-tag">Product Updates</span>
+                                <span class="asset-tag">Quarterly Summary</span>
+                                <span class="asset-tag">New Features</span>
+                            </div>
+                            <div class="quality-score">
+                                <div class="score-circle score-high">85</div>
+                                <div class="score-info">
+                                    <div class="score-label">Content Quality Score</div>
+                                    <div class="score-desc">Concise and clear, key points highlighted</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="asset-actions">
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="editAsset(event, 4)">Edit</button>
+                                <button class="action-btn" onclick="duplicateAsset(event, 4)">Duplicate</button>
+                                <button class="action-btn" onclick="viewHistory(event, 4)">History</button>
+                            </div>
+                            <div class="version-info">
+                                <span>2 Related Assets</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Asset</h2>
+                <button class="modal-close" onclick="closeModal('createModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Asset Type Selection -->
+                <div class="form-group">
+                    <label class="form-label">Select Asset Type</label>
+                    <div class="asset-type-selector">
+                        <div class="type-option selected" onclick="selectAssetType(this, 'faq')">
+                            <div class="type-icon">❓</div>
+                            <div class="type-name">FAQ Card</div>
+                            <div class="type-desc">Q&A Format</div>
+                        </div>
+                        <div class="type-option" onclick="selectAssetType(this, 'howto')">
+                            <div class="type-icon">📖</div>
+                            <div class="type-name">How-to Card</div>
+                            <div class="type-desc">Operation Guide</div>
+                        </div>
+                        <div class="type-option" onclick="selectAssetType(this, 'compare')">
+                            <div class="type-icon">⚖️</div>
+                            <div class="type-name">Compare Card</div>
+                            <div class="type-desc">Feature Comparison</div>
+                        </div>
+                        <div class="type-option" onclick="selectAssetType(this, 'tldr')">
+                            <div class="type-icon">📝</div>
+                            <div class="type-name">TL;DR Card</div>
+                            <div class="type-desc">Quick Overview</div>
+                        </div>
+                        <div class="type-option" onclick="selectAssetType(this, 'data')">
+                            <div class="type-icon">📊</div>
+                            <div class="type-name">Data Card</div>
+                            <div class="type-desc">Data Insights</div>
+                        </div>
+                        <div class="type-option" onclick="selectAssetType(this, 'review')">
+                            <div class="type-icon">⭐</div>
+                            <div class="type-name">Review Card</div>
+                            <div class="type-desc">User Reviews</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="form-group">
+                    <label class="form-label">Title <span style="color: var(--danger);">*</span></label>
+                    <input type="text" class="form-input" placeholder="Enter asset title..." id="assetTitle">
+                </div>
+
+                <!-- Content Editor -->
+                <div class="form-group">
+                    <label class="form-label">Content <span style="color: var(--danger);">*</span></label>
+                    <div class="editor-toolbar">
+                        <button class="editor-btn" title="Bold">B</button>
+                        <button class="editor-btn" title="Italic">I</button>
+                        <button class="editor-btn" title="Underline">U</button>
+                        <button class="editor-btn" title="Link">🔗</button>
+                        <button class="editor-btn" title="List">•</button>
+                        <button class="editor-btn" title="Numbered List">1.</button>
+                        <button class="editor-btn" title="Citations">❝</button>
+                        <button class="editor-btn" title="Code">{ }</button>
+                    </div>
+                    <div class="editor-content" contenteditable="true" id="assetContent">
+                        Start typing content...
+                    </div>
+                </div>
+
+                <!-- Tag Management -->
+                <div class="form-group">
+                    <label class="form-label">Tags</label>
+                    <div class="tag-input-container" id="tagContainer">
+                        <div class="tag-input-chip">
+                            Product Features
+                            <span class="tag-remove" onclick="removeTag(this)">×</span>
+                        </div>
+                        <input type="text" class="tag-input-field" placeholder="Enter tag and press Enter..." onkeydown="handleTagInput(event)">
+                    </div>
+                </div>
+
+                <!-- Related Assets -->
+                <div class="form-group">
+                    <label class="form-label">Related Assets</label>
+                    <input type="text" class="form-input" placeholder="Search and select related assets...">
+                </div>
+
+                <!-- Advanced Settings -->
+                <div class="form-group">
+                    <label class="form-label">Applicable Channels</label>
+                    <div class="tag-cloud">
+                        <span class="tag-chip active">Reddit</span>
+                        <span class="tag-chip active">LinkedIn</span>
+                        <span class="tag-chip">Twitter</span>
+                        <span class="tag-chip">YouTube</span>
+                        <span class="tag-chip">Website FAQ</span>
+                        <span class="tag-chip">Email Marketing</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-info">
+                    <span>Quality score will be automatically calculated after creation</span>
+                </div>
+                <div class="footer-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('createModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveAsset()">Create Asset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Import Modal -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Bulk Import Assets</h2>
+                <button class="modal-close" onclick="closeModal('importModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-zone" id="importZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <div class="import-icon">📁</div>
+                    <div class="import-text">Drag files here or click to select</div>
+                    <div class="import-hint">Supports CSV, Excel, JSON formats, max 10MB</div>
+                    <input type="file" id="fileInput" style="display: none;" accept=".csv,.xlsx,.json" onchange="handleFileSelect(event)">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-info">
+                    <a href="#" style="color: var(--primary);">Download Import Template</a>
+                </div>
+                <div class="footer-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('importModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="startImport()">StartImport</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Details Panel -->
+    <div class="detail-panel" id="detailPanel">
+        <div class="panel-header">
+            <h3 class="panel-title">Asset Details</h3>
+            <button class="modal-close" onclick="closeDetailPanel()">×</button>
+        </div>
+        <div class="panel-body">
+            <!-- Relationship Graph -->
+            <div class="form-group">
+                <label class="form-label">Asset Relationship Graph</label>
+                <div class="relationship-chart" id="relationshipChart"></div>
+            </div>
+
+            <!-- Version History -->
+            <div class="form-group">
+                <label class="form-label">Version History</label>
+                <div class="version-timeline">
+                    <div class="version-item">
+                        <div class="version-marker"></div>
+                        <div class="version-content">
+                            <div class="version-date">2025-01-10 15:30</div>
+                            <div class="version-desc">Updated privacy policy related content</div>
+                        </div>
+                    </div>
+                    <div class="version-item">
+                        <div class="version-marker"></div>
+                        <div class="version-content">
+                            <div class="version-date">2025-01-08 10:15</div>
+                            <div class="version-desc">Added GDPR compliance description</div>
+                        </div>
+                    </div>
+                    <div class="version-item">
+                        <div class="version-marker"></div>
+                        <div class="version-content">
+                            <div class="version-date">2025-01-05 14:20</div>
+                            <div class="version-desc">Initial version created</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quality Optimization Suggestions -->
+            <div class="form-group">
+                <label class="form-label">Optimization Suggestions</label>
+                <div style="padding: 12px; background: var(--gray-50); border-radius: 8px; font-size: 14px; line-height: 1.6;">
+                    <div style="margin-bottom: 8px;">
+                        <strong>📝 Content Optimization:</strong><br>
+                        Suggest adding more specific data support to improve credibility
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong>🏷️ Tag Optimization:</strong><br>
+                        Recommend adding "Enterprise Edition", "Security Authentication" and other related tags
+                    </div>
+                    <div>
+                        <strong>🔗 Relationship Suggestions:</strong><br>
+                        Can link to "Security Whitepaper" and "Compliance Certification" assets
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Actions Bar -->
+    <div class="bulk-actions" id="bulkActions">
+        <div class="bulk-info">
+            <span class="bulk-count">3 assets selected</span>
+            <button class="action-btn" onclick="clearSelection()">Clear Selection</button>
+        </div>
+        <div class="bulk-buttons">
+            <button class="toolbar-btn" onclick="bulkEdit()">
+                <span>✏️</span>
+                <span>Bulk Edit</span>
+            </button>
+            <button class="toolbar-btn" onclick="bulkTag()">
+                <span>🏷️</span>
+                <span>Bulk Tag</span>
+            </button>
+            <button class="toolbar-btn" onclick="bulkExport()">
+                <span>📤</span>
+                <span>Export Selected</span>
+            </button>
+            <button class="toolbar-btn" onclick="bulkDelete()">
+                <span>🗑️</span>
+                <span>Delete</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize page
+        let selectedAssets = new Set();
+        let currentFilter = 'all';
+        let relationshipChart;
+
+        // Initialize after page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadAssets();
+        });
+
+        // Initialize charts
+        function initializeCharts() {
+            // Initialize relationship graph
+            const chartDom = document.getElementById('relationshipChart');
+            relationshipChart = echarts.init(chartDom);
+
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}'
+                },
+                series: [{
+                    type: 'graph',
+                    layout: 'force',
+                    data: [
+                        {name: 'Current Asset', symbolSize: 50, itemStyle: {color: '#5B21B6'}},
+                        {name: 'FAQ-001', symbolSize: 30, itemStyle: {color: '#8B5CF6'}},
+                        {name: 'HowTo-023', symbolSize: 30, itemStyle: {color: '#3B82F6'}},
+                        {name: 'Data-045', symbolSize: 30, itemStyle: {color: '#06B6D4'}},
+                        {name: 'Compare-012', symbolSize: 30, itemStyle: {color: '#10B981'}},
+                        {name: 'Video-089', symbolSize: 30, itemStyle: {color: '#EF4444'}}
+                    ],
+                    links: [
+                        {source: 'Current Asset', target: 'FAQ-001'},
+                        {source: 'Current Asset', target: 'HowTo-023'},
+                        {source: 'Current Asset', target: 'Data-045'},
+                        {source: 'FAQ-001', target: 'Compare-012'},
+                        {source: 'HowTo-023', target: 'Video-089'}
+                    ],
+                    roam: true,
+                    label: {
+                        show: true,
+                        position: 'bottom'
+                    },
+                    force: {
+                        repulsion: 100,
+                        edgeLength: 50
+                    }
+                }]
+            };
+
+            relationshipChart.setOption(option);
+
+            // Responsive adjustment
+            window.addEventListener('resize', function() {
+                relationshipChart.resize();
+            });
+        }
+
+        // Load asset data
+        function loadAssets() {
+            // Simulate loading asset data
+            console.log('Loading assets...');
+        }
+
+        // Open create modal
+        function openCreateModal() {
+            document.getElementById('createModal').classList.add('show');
+        }
+
+        // Open import modal
+        function openImportModal() {
+            document.getElementById('importModal').classList.add('show');
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Select asset type
+        function selectAssetType(element, type) {
+            // Remove other selected states
+            document.querySelectorAll('.type-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            // Add current selected state
+            element.classList.add('selected');
+            console.log('Selected asset type:', type);
+        }
+
+        // Save asset
+        function saveAsset() {
+            const title = document.getElementById('assetTitle').value;
+            const content = document.getElementById('assetContent').innerText;
+            
+            if (!title || !content) {
+                alert('Please fill in required fields');
+                return;
+            }
+
+            // Simulate save operation
+            console.log('Saving asset:', {title, content});
+            
+            // Show success message
+            closeModal('createModal');
+            showNotification('Asset created successfully', 'success');
+        }
+
+        // Filter asset type
+        function filterByType(type) {
+            currentFilter = type;
+            // Update filter state
+            document.querySelectorAll('.filter-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Reload assets
+            loadAssets();
+        }
+
+        // Quality filter
+        function filterByQuality(quality) {
+            console.log('Filtering by quality:', quality);
+            loadAssets();
+        }
+
+        // Tag toggle
+        function toggleTag(element) {
+            element.classList.toggle('active');
+            loadAssets();
+        }
+
+        // Search assets
+        function searchAssets(query) {
+            console.log('Searching:', query);
+            // Implement search logic
+        }
+
+        // Switch view
+        function switchView(view) {
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            const grid = document.getElementById('assetsGrid');
+            if (view === 'list') {
+                grid.style.gridTemplateColumns = '1fr';
+            } else {
+                grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(320px, 1fr))';
+            }
+        }
+
+        // Export assets
+        function exportAssets() {
+            console.log('Exporting assets...');
+            showNotification('Preparing export file...', 'info');
+        }
+
+        // Refresh asset list
+        function refreshAssets() {
+            loadAssets();
+            showNotification('Asset list refreshed', 'success');
+        }
+
+        // Edit asset
+        function editAsset(event, id) {
+            event.stopPropagation();
+            console.log('Editing asset:', id);
+            openCreateModal();
+        }
+
+        // Duplicate asset
+        function duplicateAsset(event, id) {
+            event.stopPropagation();
+            console.log('Duplicating asset:', id);
+            showNotification('Asset duplicated', 'success');
+        }
+
+        // View history
+        function viewHistory(event, id) {
+            event.stopPropagation();
+            console.log('Viewing history:', id);
+            showAssetDetail();
+        }
+
+        // Show asset details
+        function showAssetDetail(element) {
+            document.getElementById('detailPanel').classList.add('show');
+            if (relationshipChart) {
+                setTimeout(() => {
+                    relationshipChart.resize();
+                }, 300);
+            }
+        }
+
+        // Close details panel
+        function closeDetailPanel() {
+            document.getElementById('detailPanel').classList.remove('show');
+        }
+
+        // Tag input handling
+        function handleTagInput(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const input = event.target;
+                const value = input.value.trim();
+                
+                if (value) {
+                    const container = document.getElementById('tagContainer');
+                    const chip = document.createElement('div');
+                    chip.className = 'tag-input-chip';
+                    chip.innerHTML = `${value} <span class="tag-remove" onclick="removeTag(this)">×</span>`;
+                    container.insertBefore(chip, input);
+                    input.value = '';
+                }
+            }
+        }
+
+        // Remove tag
+        function removeTag(element) {
+            element.parentElement.remove();
+        }
+
+        // File drag and drop handling
+        function handleDragOver(event) {
+            event.preventDefault();
+            document.getElementById('importZone').classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            document.getElementById('importZone').classList.remove('dragover');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            document.getElementById('importZone').classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                handleFiles(files);
+            }
+        }
+
+        // File selection handling
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                handleFiles(files);
+            }
+        }
+
+        // Handle files
+        function handleFiles(files) {
+            const file = files[0];
+            console.log('Selected file:', file.name);
+            
+            // Update import zone display
+            const importZone = document.getElementById('importZone');
+            importZone.innerHTML = `
+                <div class="import-icon">✅</div>
+                <div class="import-text">${file.name}</div>
+                <div class="import-hint">File size: ${(file.size / 1024).toFixed(2)} KB</div>
+            `;
+        }
+
+        // Start import
+        function startImport() {
+            console.log('Starting import...');
+            closeModal('importModal');
+            showNotification('Importing assets...', 'info');
+            
+            // Simulate import progress
+            setTimeout(() => {
+                showNotification('Successfully imported 25 assets', 'success');
+                loadAssets();
+            }, 2000);
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 10000;
+                animation: slideIn 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            `;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            notification.innerHTML = `
+                <span style="font-size: 20px;">${icons[type]}</span>
+                <span style="font-size: 14px; color: #374151;">${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Click import zone to trigger file selection
+        document.getElementById('importZone').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEO Reddit+YouTube Closed-Loop Monitoring System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #FF4500;
+            --youtube: #FF0000;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1F2937;
+            --light: #F9FAFB;
+            --border: #E5E7EB;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            color: var(--dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header .subtitle {
+            color: #6B7280;
+            font-size: 16px;
+        }
+        
+        .status-badges {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .badge.active {
+            background: #DCFCE7;
+            color: var(--success);
+        }
+        
+        .badge.pending {
+            background: #FEF3C7;
+            color: var(--warning);
+        }
+        
+        /* Execution phase timeline */
+        .timeline {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .timeline h2 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            color: var(--dark);
+        }
+        
+        .timeline-track {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline-track::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--border);
+            z-index: 0;
+        }
+        
+        .phase {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .phase-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid var(--border);
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .phase.active .phase-dot {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+            transform: scale(1.2);
+        }
+        
+        .phase.current .phase-dot {
+            border-color: var(--warning);
+            background: var(--warning);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .phase-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .phase-date {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+        
+        /* Dual platform monitoring dashboard */
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .platform-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .platform-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .platform-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .reddit-icon {
+            background: #FF45001A;
+            color: var(--primary);
+        }
+        
+        .youtube-icon {
+            background: #FF00001A;
+            color: var(--youtube);
+        }
+        
+        .platform-title h3 {
+            font-size: 20px;
+            color: var(--dark);
+        }
+        
+        .platform-title p {
+            font-size: 14px;
+            color: #9CA3AF;
+        }
+        
+        /* Metrics cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .metric-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 8px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark);
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        
+        .metric-change {
+            font-size: 14px;
+            font-weight: normal;
+        }
+        
+        .metric-change.up {
+            color: var(--success);
+        }
+        
+        .metric-change.down {
+            color: var(--danger);
+        }
+        
+        /* Content monitoring table */
+        .content-monitor {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .monitor-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #9CA3AF;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--dark);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+        
+        .content-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .content-table th {
+            text-align: left;
+            padding: 12px;
+            font-size: 14px;
+            color: #6B7280;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .content-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .content-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .content-meta {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+        
+        .engagement-stats {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .stat {
+            font-size: 14px;
+            color: #6B7280;
+        }
+        
+        .stat strong {
+            color: var(--dark);
+        }
+        
+        .ai-citation {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .citation-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .citation-badge.high {
+            background: #DCFCE7;
+            color: var(--success);
+        }
+        
+        .citation-badge.medium {
+            background: #FEF3C7;
+            color: var(--warning);
+        }
+        
+        .citation-badge.low {
+            background: #FEE2E2;
+            color: var(--danger);
+        }
+        
+        /* Closed-loop flow diagram */
+        .loop-diagram {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .loop-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 30px 0;
+        }
+        
+        .loop-node {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        
+        .loop-node::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--primary);
+        }
+        
+        .loop-node:last-child::after {
+            content: none;
+        }
+        
+        .node-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .node-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .node-desc {
+            font-size: 14px;
+            color: #6B7280;
+        }
+        
+        /* Conversion funnel */
+        .funnel-chart {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .funnel-stage {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .funnel-bar {
+            height: 50px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .funnel-bar:hover {
+            transform: translateX(10px);
+        }
+        
+        .funnel-label {
+            position: absolute;
+            left: 0;
+            top: -20px;
+            font-size: 12px;
+            color: #6B7280;
+        }
+        
+        .funnel-value {
+            margin-left: auto;
+            font-size: 20px;
+        }
+        
+        /* Real-time alerts */
+        .alerts-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-item.success {
+            background: #DCFCE7;
+        }
+        
+        .alert-item.warning {
+            background: #FEF3C7;
+        }
+        
+        .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .alert-desc {
+            font-size: 14px;
+            color: #6B7280;
+        }
+        
+        .alert-time {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部信息 -->
+        <div class="header">
+            <h1>
+                🚀 GEO Reddit+YouTube Closed-Loop Monitoring System
+            </h1>
+            <p class="subtitle">90-Day Execution Blueprint · Dual Platform Strategy · AI Citations Optimization</p>
+            
+            <div class="status-badges">
+                <span class="badge active">
+                    <span>●</span> System Running
+                </span>
+                <span class="badge active">
+                    <span>●</span> Reddit Monitoring: Active
+                </span>
+                <span class="badge active">
+                    <span>●</span> YouTube Monitoring: Active
+                </span>
+                <span class="badge pending">
+                    <span>●</span> AI Citations Tracking: 12 times/today
+                </span>
+            </div>
+        </div>
+        
+        <!-- 执行阶段时间轴 -->
+        <div class="timeline">
+            <h2>📅 90-Day Execution Progress</h2>
+            <div class="timeline-track">
+                <div class="phase active">
+                    <div class="phase-dot">✓</div>
+                    <div class="phase-title">Diagnostics & Topic Selection</div>
+                    <div class="phase-date">Week 1-2</div>
+                </div>
+                <div class="phase current">
+                    <div class="phase-dot">2</div>
+                    <div class="phase-title">Reddit Implementation</div>
+                    <div class="phase-date">Week 2-6</div>
+                </div>
+                <div class="phase">
+                    <div class="phase-dot">3</div>
+                    <div class="phase-title">YouTube Implementation</div>
+                    <div class="phase-date">Week 2-8</div>
+                </div>
+                <div class="phase">
+                    <div class="phase-dot">4</div>
+                    <div class="phase-title">Monitoring & Amplification</div>
+                    <div class="phase-date">Week 6-12</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 双阵地监测看板 -->
+        <div class="platforms-grid">
+            <!-- Reddit监测 -->
+            <div class="platform-card">
+                <div class="platform-header">
+                    <div class="platform-icon reddit-icon">📱</div>
+                    <div class="platform-title">
+                        <h3>Reddit Discussion Platform</h3>
+                        <p>UGC Evidence Pool · High Intent Capture</p>
+                    </div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Internal Search Ranking</div>
+                        <div class="metric-value">
+                            #3
+                            <span class="metric-change up">↑2</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Save/Long Comment Ratio</div>
+                        <div class="metric-value">
+                            68%
+                            <span class="metric-change up">+12%</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">AMA Participation</div>
+                        <div class="metric-value">
+                            342
+                            <span class="metric-change up">+45</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">FAQ Cross-link Rate</div>
+                        <div class="metric-value">
+                            85%
+                            <span class="metric-change up">+8%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="font-size: 16px; margin-bottom: 15px;">Hot Post Performance</h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">[AMA] Our Team's 10 AI Tool Selection Pitfall Avoidance Guidelines</div>
+                            <div style="font-size: 12px; color: #6B7280;">r/artificialintelligence · 892 upvotes · 156 comments</div>
+                        </div>
+                        <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">Comparative Review: Mainstream AI Tools Practical Comparison Chart</div>
+                            <div style="font-size: 12px; color: #6B7280;">r/ChatGPT · 567 upvotes · 89 comments</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- YouTube监测 -->
+            <div class="platform-card">
+                <div class="platform-header">
+                    <div class="platform-icon youtube-icon">📺</div>
+                    <div class="platform-title">
+                        <h3>YouTube Evidence Hub</h3>
+                        <p>Video Evidence · Chapter Citations</p>
+                    </div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Chapter Citation Rate</div>
+                        <div class="metric-value">
+                            42%
+                            <span class="metric-change up">+15%</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Completion Rate</div>
+                        <div class="metric-value">
+                            58%
+                            <span class="metric-change up">+6%</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Description CTR</div>
+                        <div class="metric-value">
+                            12.3%
+                            <span class="metric-change up">+2.1%</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Shorts Traffic</div>
+                        <div class="metric-value">
+                            2.8K
+                            <span class="metric-change up">+450</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="font-size: 16px; margin-bottom: 15px;">High Citations Videos</h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">Complete Comparative Review: 2025 Latest AI Tools In-depth Evaluation</div>
+                            <div style="font-size: 12px; color: #6B7280;">15K views · 89% chapter completion rate · 23 AI Citations</div>
+                        </div>
+                        <div style="padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">10-Minute Quick Start Guide (Multi-language Subtitles)</div>
+                            <div style="font-size: 12px; color: #6B7280;">8.2K views · 12 language versions · 18 AI Citations</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 闭环流程监测 -->
+        <div class="loop-diagram">
+            <h2>🔄 Discussion-Evidence-FAQ Closed-Loop Monitoring</h2>
+            <div class="loop-flow">
+                <div class="loop-node">
+                    <div class="node-icon">💬</div>
+                    <div class="node-title">Reddit Discussion</div>
+                    <div class="node-desc">High Intent Question Capture</div>
+                </div>
+                <div class="loop-node">
+                    <div class="node-icon">🎥</div>
+                    <div class="node-title">YouTube Evidence</div>
+                    <div class="node-desc">Video Verification & Impressions</div>
+                </div>
+                <div class="loop-node">
+                    <div class="node-icon">📚</div>
+                    <div class="node-title">FAQ Consolidation</div>
+                    <div class="node-desc">Structured Knowledge Base</div>
+                </div>
+                <div class="loop-node">
+                    <div class="node-icon">🤖</div>
+                    <div class="node-title">AI Citations</div>
+                    <div class="node-desc">Search Result Optimization</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 内容监测表格 -->
+        <div class="content-monitor">
+            <h2>📊 Content Performance Monitoring</h2>
+            <div class="monitor-tabs">
+                <button class="tab active">High Citations Content</button>
+                <button class="tab">Content Pending Optimization</button>
+                <button class="tab">Competitor Monitoring</button>
+            </div>
+            
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Content Topic</th>
+                        <th>Platform Distribution</th>
+                        <th>Engagement Metrics</th>
+                        <th>AI Citations</th>
+                        <th>Conversion Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="content-title">AI Tool Comparison & Selection Guide</div>
+                            <div class="content-meta">Task-oriented · High Intent</div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Reddit: <strong>3 posts</strong></span>
+                                <span class="stat">YouTube: <strong>2 videos</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Save Rate: <strong>72%</strong></span>
+                                <span class="stat">Completion: <strong>61%</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ai-citation">
+                                <span class="citation-badge high">High Frequency Citations</span>
+                                <span style="font-size: 14px;">34 times/week</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">CTR: <strong>15.2%</strong></span>
+                                <span class="stat">Trial: <strong>89</strong></span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="content-title">Pitfall Avoidance Guide: Common Misconception Analysis</div>
+                            <div class="content-meta">Pitfall Avoidance · Trust Building</div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Reddit: <strong>5 posts</strong></span>
+                                <span class="stat">YouTube: <strong>1 video</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Save率: <strong>85%</strong></span>
+                                <span class="stat">完播: <strong>73%</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ai-citation">
+                                <span class="citation-badge high">High Frequency Citations</span>
+                                <span style="font-size: 14px;">28 times/week</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">CTR: <strong>18.7%</strong></span>
+                                <span class="stat">Trial: <strong>126</strong></span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="content-title">10-Minute Quick Start Tutorial</div>
+                            <div class="content-meta">Step-by-step · Practical Guidance</div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Reddit: <strong>2 posts</strong></span>
+                                <span class="stat">YouTube: <strong>4 videos</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">Save率: <strong>45%</strong></span>
+                                <span class="stat">完播: <strong>52%</strong></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ai-citation">
+                                <span class="citation-badge medium">Medium Frequency Citations</span>
+                                <span style="font-size: 14px;">15 times/week</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="engagement-stats">
+                                <span class="stat">CTR: <strong>9.3%</strong></span>
+                                <span class="stat">Trial: <strong>67</strong></span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Conversion漏斗 -->
+        <div class="funnel-chart">
+            <h2>🎯 Reddit+YouTube Conversion Funnel</h2>
+            
+            <div class="funnel-stage">
+                <div class="funnel-label">Exposure Volume (AI Search + Platform Internal Search)</div>
+                <div class="funnel-bar" style="width: 100%;">
+                    <span>Reddit+YouTube Exposure</span>
+                    <span class="funnel-value">45.2K</span>
+                </div>
+            </div>
+            
+            <div class="funnel-stage">
+                <div class="funnel-label">Deep Engagement (Save/Long Comments/Completion)</div>
+                <div class="funnel-bar" style="width: 75%;">
+                    <span>Effective Engagement</span>
+                    <span class="funnel-value">33.9K</span>
+                </div>
+            </div>
+            
+            <div class="funnel-stage">
+                <div class="funnel-label">FAQ/Official Website Clicks</div>
+                <div class="funnel-bar" style="width: 45%;">
+                    <span>Traffic Success</span>
+                    <span class="funnel-value">20.3K</span>
+                </div>
+            </div>
+            
+            <div class="funnel-stage">
+                <div class="funnel-label">Action Trigger (Trial/Consultation)</div>
+                <div class="funnel-bar" style="width: 25%;">
+                    <span>Conversion Action</span>
+                    <span class="funnel-value">11.3K</span>
+                </div>
+            </div>
+            
+            <div class="funnel-stage">
+                <div class="funnel-label">Private Domain Conversion</div>
+                <div class="funnel-bar" style="width: 15%;">
+                    <span>Long-term Value</span>
+                    <span class="funnel-value">6.8K</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Real-time警报 -->
+        <div class="alerts-panel">
+            <h2>🔔 Real-time Monitoring Alerts</h2>
+            
+            <div class="alert-item success">
+                <div class="alert-icon" style="background: #DCFCE7; color: var(--success);">✓</div>
+                <div class="alert-content">
+                    <div class="alert-title">Reddit AMA Receives High Attention</div>
+                    <div class="alert-desc">AMA post in r/artificialintelligence received 892 upvotes, generated 23 high-quality FAQs</div>
+                </div>
+                <div class="alert-time">10 minutes ago</div>
+            </div>
+            
+            <div class="alert-item success">
+                <div class="alert-icon" style="background: #DCFCE7; color: var(--success);">📈</div>
+                <div class="alert-content">
+                    <div class="alert-title">YouTube Chapter Citation Rate Exceeds 40%</div>
+                    <div class="alert-desc">Comparative review video chapter markers cited 34 times by AI Search, recommend creating more chaptered content</div>
+                </div>
+                <div class="alert-time">1 hour ago</div>
+            </div>
+            
+            <div class="alert-item warning">
+                <div class="alert-icon" style="background: #FEF3C7; color: var(--warning);">⚠️</div>
+                <div class="alert-content">
+                    <div class="alert-title">Cross-Platform Consistency Needs Optimization</div>
+                    <div class="alert-desc">Detected 3 data inconsistencies between Reddit FAQ and YouTube description sections, recommend synchronization update</div>
+                </div>
+                <div class="alert-time">2 hours ago</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simulate real-time data updates
+        function updateMetrics() {
+            // Update Reddit metrics
+            const redditMetrics = document.querySelectorAll('.reddit-icon').closest('.platform-card').querySelectorAll('.metric-value');
+            
+            // Randomly update some values to simulate real-time changes
+            if (Math.random() > 0.7) {
+                const saveRate = Math.floor(Math.random() * 5 + 65);
+                redditMetrics[1].innerHTML = `${saveRate}%<span class="metric-change up">+${Math.floor(Math.random() * 5 + 10)}%</span>`;
+            }
+            
+            // Update YouTube metrics
+            const youtubeMetrics = document.querySelectorAll('.youtube-icon').closest('.platform-card').querySelectorAll('.metric-value');
+            
+            if (Math.random() > 0.7) {
+                const citationRate = Math.floor(Math.random() * 10 + 38);
+                youtubeMetrics[0].innerHTML = `${citationRate}%<span class="metric-change up">+${Math.floor(Math.random() * 5 + 10)}%</span>`;
+            }
+        }
+        
+        // Update data every 5 seconds
+        setInterval(updateMetrics, 5000);
+        
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Logic for switching content can be added here
+                console.log('Switch to:', this.textContent);
+            });
+        });
+        
+        // Animation effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animation
+            const elements = document.querySelectorAll('.platform-card, .content-monitor, .loop-diagram, .funnel-chart, .alerts-panel');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'all 0.5s ease';
+                
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+        
+        // Simulate new alerts
+        function addNewAlert() {
+            const alertsContainer = document.querySelector('.alerts-panel');
+            const alerts = [
+                {
+                    type: 'success',
+                    icon: '🎯',
+                    title: 'Shorts Traffic Effect Significant',
+                    desc: 'YouTube Shorts brought 2.8K new user visits to main video, conversion rate reached 18%'
+                },
+                {
+                    type: 'success',
+                    icon: '📊',
+                    title: 'AI Citations Rate Continues to Rise',
+                    desc: 'Appearance frequency in Perplexity and ChatGPT Search increased by 23%'
+                },
+                {
+                    type: 'warning',
+                    icon: '🔄',
+                    title: 'FAQ Content Needs Update',
+                    desc: 'Detected new user question trends, recommend adding 3 new FAQ entries'
+                }
+            ];
+            
+            // Randomly add new alerts (in actual application should be based on real events)
+            if (Math.random() > 0.95) {
+                const randomAlert = alerts[Math.floor(Math.random() * alerts.length)];
+                console.log('New alert:', randomAlert.title);
+            }
+        }
+        
+        // Check for new alerts every 10 seconds
+        setInterval(addNewAlert, 10000);
+    </script>
+</body>
+</html>
