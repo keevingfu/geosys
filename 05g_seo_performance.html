@@ -256,24 +256,31 @@
             <h2 style="margin-bottom: 20px;">⚠️ Issues Requiring Attention</h2>
             <div id="alertsList">
                 <div class="alert-item">
-                    <span class="alert-icon">📉</span>
+                    <span class="alert-icon">🚨</span>
                     <div>
-                        <strong>Ranking Decline Warning</strong>
-                        <p>Keywords "titanium smart glasses" and "AI assistant glasses" dropped 5+ positions</p>
+                        <strong>Massive Traffic Gap</strong>
+                        <p>Ray-Ban Meta has 13.6M monthly visits vs our 12.5K - need aggressive growth strategy</p>
                     </div>
                 </div>
                 <div class="alert-item">
-                    <span class="alert-icon">⚡</span>
+                    <span class="alert-icon">📊</span>
                     <div>
-                        <strong>Competitor Activity Alert</strong>
-                        <p>Ray-Ban Meta increased content by 45% on "smart glasses with AI" topics</p>
+                        <strong>Keyword Coverage Alert</strong>
+                        <p>Only 342 keywords ranking vs Ray-Ban's 39,500 - focus on long-tail keywords</p>
                     </div>
                 </div>
                 <div class="alert-item">
                     <span class="alert-icon">🎯</span>
                     <div>
-                        <strong>Opportunity Detected</strong>
-                        <p>High search volume for "lightweight AI glasses" with low competition</p>
+                        <strong>Growth Opportunity</strong>
+                        <p>156.7% traffic growth from crowdfunding and review sites - maintain momentum</p>
+                    </div>
+                </div>
+                <div class="alert-item">
+                    <span class="alert-icon">💡</span>
+                    <div>
+                        <strong>Strategy Recommendation</strong>
+                        <p>Focus on "Titanium AI Glasses" niche keywords and KOL reviews for quick wins</p>
                     </div>
                 </div>
             </div>
@@ -288,45 +295,49 @@
         // Mock Data (should be fetched from API in production)
         const mockData = {
             metrics: {
-                totalTraffic: 85400,
-                trafficChange: 28.5,
-                totalKeywords: 2856,
-                keywordsChange: 156,
-                avgPosition: 12.8,
-                positionChange: -2.3,
-                totalBacklinks: 8420,
-                backlinksChange: 412,
-                domainScore: 62,
-                aiVisibility: 72
+                totalTraffic: 12500,
+                trafficChange: 156.7,
+                totalKeywords: 342,
+                keywordsChange: 87,
+                avgPosition: 28.5,
+                positionChange: -5.2,
+                totalBacklinks: 856,
+                backlinksChange: 234,
+                domainScore: 35,
+                aiVisibility: 15
             },
             trafficTrend: {
                 dates: Array.from({length: 30}, (_, i) => {
                     const d = new Date();
                     d.setDate(d.getDate() - (29 - i));
-                    return d.toLocaleDateString('zh-CN', {month: 'short', day: 'numeric'});
+                    return d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
                 }),
-                values: Array.from({length: 30}, () => Math.floor(Math.random() * 2000) + 3000)
+                values: Array.from({length: 30}, (_, i) => {
+                    // Simulate growth trend for startup
+                    const base = 8000 + i * 150;
+                    return Math.floor(base + Math.random() * 1000);
+                })
             },
             keywordDistribution: [
-                {name: 'Top 3', value: 124},
-                {name: 'Top 10', value: 456},
-                {name: 'Top 20', value: 892},
-                {name: 'Top 50', value: 1340},
-                {name: '50+', value: 609}
+                {name: 'Top 3', value: 5},
+                {name: 'Top 10', value: 28},
+                {name: 'Top 20', value: 67},
+                {name: 'Top 50', value: 145},
+                {name: '50+', value: 97}
             ],
             aiPlatforms: [
-                {name: 'ChatGPT', value: 72},
-                {name: 'Google AI', value: 68},
-                {name: 'Perplexity', value: 58},
-                {name: 'Claude', value: 75},
-                {name: 'Gemini', value: 62}
+                {name: 'ChatGPT', value: 12},
+                {name: 'Google AI', value: 8},
+                {name: 'Perplexity', value: 15},
+                {name: 'Claude', value: 10},
+                {name: 'Gemini', value: 5}
             ],
             competitors: [
-                {name: 'Dymesty AI Glasses', traffic: 85400, keywords: 2856},
-                {name: 'Ray-Ban Meta', traffic: 256000, keywords: 5420},
-                {name: 'Huawei Smart Glasses', traffic: 142000, keywords: 3680},
-                {name: 'Xiaomi MIJIA Glasses', traffic: 98500, keywords: 2890},
-                {name: 'XREAL AR Glasses', traffic: 112000, keywords: 3150}
+                {name: 'Dymesty AI Glasses', traffic: 12500, keywords: 342},
+                {name: 'Ray-Ban Meta', traffic: 13600000, keywords: 39500},
+                {name: 'Huawei Smart Glasses', traffic: 2850000, keywords: 18200},
+                {name: 'Xiaomi Smart Glasses', traffic: 1920000, keywords: 12800},
+                {name: 'XREAL AR Glasses', traffic: 485000, keywords: 5620}
             ]
         };
         
