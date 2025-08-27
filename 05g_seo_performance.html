@@ -174,6 +174,41 @@
             font-size: 0.85em;
             margin-top: 20px;
         }
+        
+        .keyword-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .keyword-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 4px;
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+        
+        .keyword-volume {
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        .keyword-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .tag-brand { background: #7c3aed; }
+        .tag-product { background: #2563eb; }
+        .tag-feature { background: #10b981; }
+        .tag-scenario { background: #f59e0b; }
     </style>
 </head>
 <body>
@@ -249,6 +284,37 @@
             <div class="chart-container">
                 <div class="chart-title">🏆 Competitor Comparison</div>
                 <div id="competitorChart" class="chart"></div>
+            </div>
+        </div>
+        
+        <!-- Keyword Strategy Section -->
+        <div class="keyword-section" style="margin-bottom: 30px;">
+            <h2 style="margin-bottom: 20px; color: #e2e8f0;">🎯 Keyword Strategy & Performance</h2>
+            
+            <div class="keyword-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                <!-- Google Keywords -->
+                <div class="keyword-box" style="background: #1e293b; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #818cf8; margin-bottom: 15px;">📱 Google Top Keywords</h3>
+                    <div class="keyword-list" id="googleKeywords"></div>
+                </div>
+                
+                <!-- Amazon Keywords -->
+                <div class="keyword-box" style="background: #1e293b; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #f59e0b; margin-bottom: 15px;">🛒 Amazon Top Keywords</h3>
+                    <div class="keyword-list" id="amazonKeywords"></div>
+                </div>
+                
+                <!-- Long-tail Keywords -->
+                <div class="keyword-box" style="background: #1e293b; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #10b981; margin-bottom: 15px;">🔍 High-Value Long-tail</h3>
+                    <div class="keyword-list" id="longtailKeywords"></div>
+                </div>
+            </div>
+            
+            <!-- Keyword Categories Chart -->
+            <div class="chart-container">
+                <div class="chart-title">📊 Keyword Categories Distribution</div>
+                <div id="keywordCategoryChart" class="chart" style="height: 300px;"></div>
             </div>
         </div>
         
@@ -338,6 +404,47 @@
                 {name: 'Huawei Smart Glasses', traffic: 2850000, keywords: 18200},
                 {name: 'Xiaomi Smart Glasses', traffic: 1920000, keywords: 12800},
                 {name: 'XREAL AR Glasses', traffic: 485000, keywords: 5620}
+            ]
+        };
+        
+        // Keyword Data
+        const keywordData = {
+            google: [
+                {keyword: 'dymesty ai glasses', volume: 3600, position: 4},
+                {keyword: 'titanium smart glasses', volume: 2400, position: 8},
+                {keyword: 'ai glasses translation', volume: 1800, position: 12},
+                {keyword: 'smart glasses', volume: 74000, position: 45},
+                {keyword: 'ai meeting assistant glasses', volume: 890, position: 3},
+                {keyword: 'real-time translation glasses', volume: 1200, position: 7},
+                {keyword: 'lightweight ai glasses', volume: 680, position: 5},
+                {keyword: 'privacy smart glasses', volume: 450, position: 9}
+            ],
+            amazon: [
+                {keyword: 'dymesty', volume: 2800, position: 1},
+                {keyword: 'titanium glasses', volume: 5200, position: 15},
+                {keyword: 'smart glasses for work', volume: 3400, position: 22},
+                {keyword: 'translation smart glasses', volume: 1600, position: 11},
+                {keyword: 'bluetooth smart glasses', volume: 8900, position: 38},
+                {keyword: 'meeting summary glasses', volume: 420, position: 6},
+                {keyword: 'ai wearable device', volume: 2100, position: 28},
+                {keyword: 'professional ai glasses', volume: 780, position: 14}
+            ],
+            longtail: [
+                {keyword: 'dymesty ai glasses for meetings', volume: 280, position: 2},
+                {keyword: 'titanium ai glasses for professionals', volume: 340, position: 3},
+                {keyword: 'smart translation glasses for travel', volume: 180, position: 5},
+                {keyword: 'no-camera privacy smart glasses for daily life', volume: 120, position: 4},
+                {keyword: 'real-time translation smart glasses for business trips', volume: 95, position: 6},
+                {keyword: 'lightweight ai glasses for all-day wear', volume: 160, position: 7},
+                {keyword: 'smart glasses for remote conferencing', volume: 220, position: 8},
+                {keyword: 'meeting summary smart glasses for executives', volume: 85, position: 9}
+            ],
+            categories: [
+                {name: 'Brand Keywords', value: 45, color: '#7c3aed'},
+                {name: 'Product Features', value: 68, color: '#10b981'},
+                {name: 'Use Scenarios', value: 52, color: '#f59e0b'},
+                {name: 'Target Audience', value: 38, color: '#2563eb'},
+                {name: 'Generic Terms', value: 139, color: '#64748b'}
             ]
         };
         
@@ -469,12 +576,47 @@
                 ]
             });
             
+            // Keyword Category Distribution Chart
+            const keywordCategoryChart = echarts.init(document.getElementById('keywordCategoryChart'));
+            keywordCategoryChart.setOption({
+                tooltip: { trigger: 'item' },
+                legend: {
+                    orient: 'horizontal',
+                    bottom: 0,
+                    textStyle: { color: '#94a3b8' }
+                },
+                series: [{
+                    type: 'pie',
+                    radius: ['30%', '60%'],
+                    center: ['50%', '45%'],
+                    avoidLabelOverlap: false,
+                    label: {
+                        show: true,
+                        formatter: '{b}\n{c} keywords',
+                        textStyle: { color: '#e2e8f0' }
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '16',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    data: keywordData.categories.map(cat => ({
+                        name: cat.name,
+                        value: cat.value,
+                        itemStyle: { color: cat.color }
+                    }))
+                }]
+            });
+            
             // Responsive
             window.addEventListener('resize', () => {
                 trafficChart.resize();
                 keywordChart.resize();
                 aiChart.resize();
                 competitorChart.resize();
+                keywordCategoryChart.resize();
             });
         }
         
@@ -497,6 +639,36 @@
             
             // Update time
             document.getElementById('lastUpdate').textContent = new Date().toLocaleString('en-US');
+        }
+        
+        // Display Keywords
+        function displayKeywords() {
+            // Display Google Keywords
+            const googleList = document.getElementById('googleKeywords');
+            googleList.innerHTML = keywordData.google.map(kw => `
+                <div class="keyword-item">
+                    <span>${kw.keyword}</span>
+                    <span class="keyword-volume">Vol: ${kw.volume.toLocaleString()} | Pos: ${kw.position}</span>
+                </div>
+            `).join('');
+            
+            // Display Amazon Keywords
+            const amazonList = document.getElementById('amazonKeywords');
+            amazonList.innerHTML = keywordData.amazon.map(kw => `
+                <div class="keyword-item">
+                    <span>${kw.keyword}</span>
+                    <span class="keyword-volume">Vol: ${kw.volume.toLocaleString()} | Pos: ${kw.position}</span>
+                </div>
+            `).join('');
+            
+            // Display Long-tail Keywords
+            const longtailList = document.getElementById('longtailKeywords');
+            longtailList.innerHTML = keywordData.longtail.map(kw => `
+                <div class="keyword-item">
+                    <span>${kw.keyword}</span>
+                    <span class="keyword-volume">Vol: ${kw.volume} | Pos: ${kw.position}</span>
+                </div>
+            `).join('');
         }
         
         // RefreshData
@@ -524,6 +696,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateMetrics();
             initCharts();
+            displayKeywords();
             
             // Auto refresh (every 5 minutes)
             setInterval(refreshData, 5 * 60 * 1000);
