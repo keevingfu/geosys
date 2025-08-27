@@ -124,3 +124,66 @@ The entire platform has been transformed to focus on the Dymesty AI Glasses prod
 - User testimonials and case studies
 
 All mock data and examples throughout the platform reflect AI glasses use cases and metrics relevant to the AR/VR industry.
+
+## CI/CD and Security Setup
+
+### Automated Deployment
+The project now includes a comprehensive CI/CD system for automatic GitHub synchronization:
+
+1. **Secure Token Management**
+   - GitHub tokens stored in `.env` file (git-ignored)
+   - Never hardcode credentials in code
+   - Tokens only used locally for authentication
+
+2. **Auto-Sync Features**
+   - **Manual sync**: Run `./auto-sync.sh` for immediate push
+   - **Automatic sync**: Git post-commit hook pushes changes automatically
+   - No manual push required after commits
+
+3. **Security Files**
+   - `.env` - Secure credential storage (never uploaded to GitHub)
+   - `.gitignore` - Comprehensive exclusion rules for sensitive files
+   - `auto-sync.sh` - One-command synchronization script
+   - `.git/hooks/post-commit` - Automatic push after every commit
+
+### Version Control
+- **Repository**: https://github.com/keevingfu/geosys
+- **Branch**: main
+- **Auto-push**: Enabled via git hooks
+
+## Current Project Status
+
+### Completed Features
+- ✅ Full platform transformation to Dymesty AI Glasses branding
+- ✅ Complete English localization (no Chinese characters)
+- ✅ All 20+ modules updated with AI glasses context
+- ✅ Secure CI/CD pipeline implemented
+- ✅ Automatic GitHub synchronization
+- ✅ Comprehensive documentation
+
+### File Structure
+```
+leapgeo-sys/
+├── index.html                    # Main dashboard
+├── login.html                    # Authentication page
+├── 00x-*.html                   # Diagnostic & strategy modules
+├── 01x-*.html                   # Content creation modules
+├── 02x-*.html                   # Content orchestration
+├── 03x-*.html                   # Channel configuration
+├── 04x-*.html                   # User journey tracking
+├── 05x-*.html                   # Analytics dashboards
+├── geo-platform-Intr.html       # Platform introduction
+├── CLAUDE.md                    # This documentation
+├── CI-CD-SETUP.md              # CI/CD documentation
+├── auto-sync.sh                # Auto-sync script
+├── .env                        # Secure tokens (git-ignored)
+├── .gitignore                  # Git exclusion rules
+└── transform_to_dymesty.py     # Transformation script
+```
+
+### Recent Updates
+- Changed platform title to "Dymesty AI Glasses Content Intelligence Center"
+- Updated domain references from leapunion.com to dymesty.com
+- Fixed AI Platform Performance chart with proper English labels
+- Implemented secure token management system
+- Added automated GitHub synchronization
