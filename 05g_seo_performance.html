@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semrush SEOMonitoring仪表板</title>
+    <title>SEO Performance Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
@@ -179,52 +179,52 @@
 <body>
     <div class="dashboard">
         <div class="header">
-            <h1>🚀 SEOReal-timeMonitoring仪表板</h1>
+            <h1>🚀 SEO Real-time Monitoring Dashboard</h1>
             <div class="status-indicator">
                 <span class="status-dot"></span>
-                <span>系统运行中</span>
+                <span>System Running</span>
             </div>
         </div>
         
         <div class="controls">
             <button class="btn" onclick="refreshData()">🔄 RefreshData</button>
-            <button class="btn" onclick="runAnalysis()">📊 运行Analytics</button>
-            <button class="btn" onclick="generateReport()">📄 生成Report</button>
+            <button class="btn" onclick="runAnalysis()">📊 Run Analytics</button>
+            <button class="btn" onclick="generateReport()">📄 Generate Report</button>
         </div>
         
         <div class="metrics-grid">
             <div class="metric-card">
-                <div class="metric-label">总有机Traffic</div>
+                <div class="metric-label">Total Organic Traffic</div>
                 <div class="metric-value" id="totalTraffic">0</div>
                 <div class="metric-change positive">+0%</div>
             </div>
             
             <div class="metric-card">
-                <div class="metric-label">Keywords数量</div>
+                <div class="metric-label">Total Keywords</div>
                 <div class="metric-value" id="totalKeywords">0</div>
                 <div class="metric-change positive">+0</div>
             </div>
             
             <div class="metric-card">
-                <div class="metric-label">平均Ranking</div>
+                <div class="metric-label">Average Ranking</div>
                 <div class="metric-value" id="avgPosition">0</div>
                 <div class="metric-change negative">-0</div>
             </div>
             
             <div class="metric-card">
-                <div class="metric-label">反向链接</div>
+                <div class="metric-label">Backlinks</div>
                 <div class="metric-value" id="totalBacklinks">0</div>
                 <div class="metric-change positive">+0</div>
             </div>
             
             <div class="metric-card">
-                <div class="metric-label">域名权重</div>
+                <div class="metric-label">Domain Authority</div>
                 <div class="metric-value" id="domainScore">0</div>
                 <div class="metric-change">-</div>
             </div>
             
             <div class="metric-card">
-                <div class="metric-label">AI可见性</div>
+                <div class="metric-label">AI Visibility</div>
                 <div class="metric-value" id="aiVisibility">0%</div>
                 <div class="metric-change positive">+0%</div>
             </div>
@@ -232,46 +232,46 @@
         
         <div class="charts-grid">
             <div class="chart-container">
-                <div class="chart-title">📈 TrafficTrend（最近30Days）</div>
+                <div class="chart-title">📈 Traffic Trend (Last 30 Days)</div>
                 <div id="trafficChart" class="chart"></div>
             </div>
             
             <div class="chart-container">
-                <div class="chart-title">🎯 KeywordsRanking分布</div>
+                <div class="chart-title">🎯 Keywords Ranking Distribution</div>
                 <div id="keywordChart" class="chart"></div>
             </div>
             
             <div class="chart-container">
-                <div class="chart-title">🤖 AIPlatform可见性</div>
+                <div class="chart-title">🤖 AI Platform Visibility</div>
                 <div id="aiChart" class="chart"></div>
             </div>
             
             <div class="chart-container">
-                <div class="chart-title">🏆 竞争对手对比</div>
+                <div class="chart-title">🏆 Competitor Comparison</div>
                 <div id="competitorChart" class="chart"></div>
             </div>
         </div>
         
         <div class="alerts-section">
-            <h2 style="margin-bottom: 20px;">⚠️ 需要关注的问题</h2>
+            <h2 style="margin-bottom: 20px;">⚠️ Issues Requiring Attention</h2>
             <div id="alertsList">
                 <div class="alert-item">
                     <span class="alert-icon">📉</span>
                     <div>
                         <strong>RankingDeclineWarning</strong>
-                        <p>15个Keywords在过去7Days内RankingDecline超过5位</p>
+                        <p>15 keywords have dropped more than 5 positions in the past 7 days</p>
                     </div>
                 </div>
             </div>
         </div>
         
         <div class="last-update">
-            最后更新时间：<span id="lastUpdate">-</span>
+            Last Update: <span id="lastUpdate">-</span>
         </div>
     </div>
     
     <script>
-        // 模拟Data（实际应该从API获取）
+        // Mock Data (should be fetched from API in production)
         const mockData = {
             metrics: {
                 totalTraffic: 125340,
@@ -307,16 +307,16 @@
                 {name: 'Claude', value: 82}
             ],
             competitors: [
-                {name: '我们', traffic: 125340, keywords: 3421},
-                {name: '竞争对手A', traffic: 98500, keywords: 2890},
-                {name: '竞争对手B', traffic: 156000, keywords: 4120},
-                {name: '竞争对手C', traffic: 87200, keywords: 2100}
+                {name: 'Dymesty AI Glasses', traffic: 125340, keywords: 3421},
+                {name: 'Meta Ray-Ban', traffic: 156000, keywords: 4120},
+                {name: 'Google Glass Enterprise', traffic: 98500, keywords: 2890},
+                {name: 'Vuzix Blade', traffic: 87200, keywords: 2100}
             ]
         };
         
-        // 初始化图表
+        // Initialize charts
         function initCharts() {
-            // TrafficTrend图
+            // Traffic Trend Chart
             const trafficChart = echarts.init(document.getElementById('trafficChart'));
             trafficChart.setOption({
                 color: ['#4f46e5'],
@@ -347,7 +347,7 @@
                 }]
             });
             
-            // Keywords分布图
+            // Keywords Distribution Chart
             const keywordChart = echarts.init(document.getElementById('keywordChart'));
             keywordChart.setOption({
                 color: ['#4f46e5', '#7c3aed', '#2563eb', '#0891b2', '#059669'],
@@ -365,7 +365,7 @@
                 }]
             });
             
-            // AIPlatform可见性
+            // AI Platform Visibility
             const aiChart = echarts.init(document.getElementById('aiChart'));
             aiChart.setOption({
                 color: ['#10b981'],
@@ -396,7 +396,7 @@
                 }]
             });
             
-            // 竞争对手对比
+            // Competitor Comparison
             const competitorChart = echarts.init(document.getElementById('competitorChart'));
             competitorChart.setOption({
                 color: ['#4f46e5', '#ef4444'],
@@ -442,7 +442,7 @@
                 ]
             });
             
-            // 响应式
+            // Responsive
             window.addEventListener('resize', () => {
                 trafficChart.resize();
                 keywordChart.resize();
@@ -451,7 +451,7 @@
             });
         }
         
-        // 更新Metrics
+        // Update Metrics
         function updateMetrics() {
             document.getElementById('totalTraffic').textContent = mockData.metrics.totalTraffic.toLocaleString();
             document.getElementById('totalKeywords').textContent = mockData.metrics.totalKeywords.toLocaleString();
@@ -460,7 +460,7 @@
             document.getElementById('domainScore').textContent = mockData.metrics.domainScore;
             document.getElementById('aiVisibility').textContent = mockData.metrics.aiVisibility + '%';
             
-            // 更新变化值
+            // Update change values
             const changes = document.querySelectorAll('.metric-change');
             changes[0].textContent = `+${mockData.metrics.trafficChange}%`;
             changes[1].textContent = `+${mockData.metrics.keywordsChange}`;
@@ -468,15 +468,15 @@
             changes[3].textContent = `+${mockData.metrics.backlinksChange}`;
             changes[5].textContent = `+${mockData.metrics.aiVisibility - 60}%`;
             
-            // 更新时间
-            document.getElementById('lastUpdate').textContent = new Date().toLocaleString('zh-CN');
+            // Update time
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString('en-US');
         }
         
         // RefreshData
         function refreshData() {
             console.log('Refreshing data...');
             updateMetrics();
-            // 实际应该调用API获取新Data
+            // Should call API to fetch new data
         }
         
         // Run analytics
@@ -493,12 +493,12 @@
             // Should call backend API in production
         }
         
-        // 初始化
+        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             updateMetrics();
             initCharts();
             
-            // 自动Refresh（每5Minutes）
+            // Auto refresh (every 5 minutes)
             setInterval(refreshData, 5 * 60 * 1000);
         });
     </script>
