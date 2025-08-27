@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEO Performance Dashboard</title>
+    <title>Dymesty AI Glasses - SEO Performance Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
@@ -179,7 +179,7 @@
 <body>
     <div class="dashboard">
         <div class="header">
-            <h1>🚀 SEO Real-time Monitoring Dashboard</h1>
+            <h1>👓 Dymesty AI Glasses - SEO Performance Monitor</h1>
             <div class="status-indicator">
                 <span class="status-dot"></span>
                 <span>System Running</span>
@@ -258,8 +258,22 @@
                 <div class="alert-item">
                     <span class="alert-icon">📉</span>
                     <div>
-                        <strong>RankingDeclineWarning</strong>
-                        <p>15 keywords have dropped more than 5 positions in the past 7 days</p>
+                        <strong>Ranking Decline Warning</strong>
+                        <p>Keywords "titanium smart glasses" and "AI assistant glasses" dropped 5+ positions</p>
+                    </div>
+                </div>
+                <div class="alert-item">
+                    <span class="alert-icon">⚡</span>
+                    <div>
+                        <strong>Competitor Activity Alert</strong>
+                        <p>Ray-Ban Meta increased content by 45% on "smart glasses with AI" topics</p>
+                    </div>
+                </div>
+                <div class="alert-item">
+                    <span class="alert-icon">🎯</span>
+                    <div>
+                        <strong>Opportunity Detected</strong>
+                        <p>High search volume for "lightweight AI glasses" with low competition</p>
                     </div>
                 </div>
             </div>
@@ -274,16 +288,16 @@
         // Mock Data (should be fetched from API in production)
         const mockData = {
             metrics: {
-                totalTraffic: 125340,
-                trafficChange: 12.5,
-                totalKeywords: 3421,
-                keywordsChange: 89,
-                avgPosition: 8.3,
-                positionChange: -0.5,
-                totalBacklinks: 15670,
-                backlinksChange: 234,
-                domainScore: 78,
-                aiVisibility: 65
+                totalTraffic: 85400,
+                trafficChange: 28.5,
+                totalKeywords: 2856,
+                keywordsChange: 156,
+                avgPosition: 12.8,
+                positionChange: -2.3,
+                totalBacklinks: 8420,
+                backlinksChange: 412,
+                domainScore: 62,
+                aiVisibility: 72
             },
             trafficTrend: {
                 dates: Array.from({length: 30}, (_, i) => {
@@ -301,16 +315,18 @@
                 {name: '50+', value: 609}
             ],
             aiPlatforms: [
-                {name: 'ChatGPT', value: 78},
-                {name: 'Google AI', value: 65},
-                {name: 'Perplexity', value: 45},
-                {name: 'Claude', value: 82}
+                {name: 'ChatGPT', value: 72},
+                {name: 'Google AI', value: 68},
+                {name: 'Perplexity', value: 58},
+                {name: 'Claude', value: 75},
+                {name: 'Gemini', value: 62}
             ],
             competitors: [
-                {name: 'Dymesty AI Glasses', traffic: 125340, keywords: 3421},
-                {name: 'Meta Ray-Ban', traffic: 156000, keywords: 4120},
-                {name: 'Google Glass Enterprise', traffic: 98500, keywords: 2890},
-                {name: 'Vuzix Blade', traffic: 87200, keywords: 2100}
+                {name: 'Dymesty AI Glasses', traffic: 85400, keywords: 2856},
+                {name: 'Ray-Ban Meta', traffic: 256000, keywords: 5420},
+                {name: 'Huawei Smart Glasses', traffic: 142000, keywords: 3680},
+                {name: 'Xiaomi MIJIA Glasses', traffic: 98500, keywords: 2890},
+                {name: 'XREAL AR Glasses', traffic: 112000, keywords: 3150}
             ]
         };
         
