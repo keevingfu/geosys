@@ -905,9 +905,9 @@
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Business Value Analysis</h2>
             
-            <!-- Performance Chart -->
+            <!-- AI Platform Performance Chart -->
             <div class="chart-container" data-aos="fade-up" data-aos-delay="100">
-                <h3 style="text-align: center; margin-bottom: 2rem;">Optimization Results Comparison</h3>
+                <h3 style="text-align: center; margin-bottom: 2rem;">AI Platform Performance</h3>
                 <div id="performanceChart" class="chart"></div>
             </div>
 
@@ -1018,12 +1018,12 @@
                     <div class="contact-item">
                         <div class="contact-icon">🌐</div>
                         <div class="contact-label">Website</div>
-                        <div class="contact-value">www.leapunion.com</div>
+                        <div class="contact-value">www.dymesty.com</div>
                     </div>
                     <div class="contact-item">
                         <div class="contact-icon">📧</div>
                         <div class="contact-label">Email</div>
-                        <div class="contact-value">contact@leapunion.com</div>
+                        <div class="contact-value">contact@dymesty.com</div>
                     </div>
                     <div class="contact-item">
                         <div class="contact-icon">📱</div>
@@ -1163,13 +1163,13 @@
                 },
                 formatter: function(params) {
                     return params[0].name + '<br/>' +
-                           params[0].marker + ' Before Optimization: ' + params[0].value + '%<br/>' +
-                           params[1].marker + ' After Optimization: ' + params[1].value + '%<br/>' +
-                           'Increase: +' + (params[1].value - params[0].value) + '%';
+                           params[0].marker + ' Before: ' + params[0].value + '%<br/>' +
+                           params[1].marker + ' After: ' + params[1].value + '%<br/>' +
+                           'Improvement: +' + (params[1].value - params[0].value) + '%';
                 }
             },
             legend: {
-                data: ['Before Optimization', 'After Optimization']
+                data: ['Before Content Intelligence', 'After Content Intelligence']
             },
             grid: {
                 left: '3%',
@@ -1179,7 +1179,7 @@
             },
             xAxis: {
                 type: 'category',
-                data: ['AI Search Visibility', 'Brand Mention Rate', 'Lead Inquiries', 'Content Conversion Rate']
+                data: ['ChatGPT Visibility', 'Perplexity Coverage', 'Claude Recognition', 'Overall AI Presence']
             },
             yAxis: {
                 type: 'value',
@@ -1189,17 +1189,17 @@
             },
             series: [
                 {
-                    name: 'Before Optimization',
+                    name: 'Before Content Intelligence',
                     type: 'bar',
-                    data: [15, 8, 100, 2.3],
+                    data: [12, 8, 15, 10],
                     itemStyle: {
                         color: '#cbd5e0'
                     }
                 },
                 {
-                    name: 'After Optimization',
+                    name: 'After Content Intelligence',
                     type: 'bar',
-                    data: [78, 45, 483, 8.7],
+                    data: [85, 78, 92, 88],
                     itemStyle: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                             {offset: 0, color: '#667eea'},

@@ -64,8 +64,11 @@ The platform uses CSS custom properties for theming:
 ```
 
 ### Language and Localization
-- Primary language: English
-- Key terminology: 
+- **Primary language**: English (MANDATORY)
+- **Language Policy**: NO Chinese characters or any non-English text allowed in any files
+- **UI Requirements**: All labels, buttons, messages, tooltips, and content must be in English
+- **Code Comments**: All code comments must be written in English
+- **Key terminology**: 
   - AI Platform Optimization (formerly GEO)
   - AVI (AI Visibility Index) 
   - Share of Voice
@@ -94,6 +97,7 @@ To add a module to the navigation:
 - **No Backend API**: All data is mock/demo data defined inline
 - **External Dependencies**: CDN-hosted libraries only (no npm/node_modules)
 - **Browser Support**: Modern browsers with ES6+ support required
+- **Language Requirements**: ALL CODE GENERATION MUST USE ENGLISH ONLY. No Chinese characters or text should appear in any page. All UI elements, labels, messages, comments, and content must be in English.
 
 ## Dymesty AI Glasses Focus
 
