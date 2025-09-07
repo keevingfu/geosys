@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON-LD Content Strategy - SweetNight GEO Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark-bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text-primary: #ffffff;
+            --text-secondary: #a8b2d1;
+            --border-color: #2a3f5f;
+            --success-color: #48bb78;
+            --warning-color: #fee140;
+            --danger-color: #f56565;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary-gradient);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            position: relative;
+            z-index: 1;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            position: relative;
+            z-index: 1;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-gradient);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .summary-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .summary-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .summary-card p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Priority Badge */
+        .priority-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .priority-p1 {
+            background: rgba(250, 112, 154, 0.2);
+            color: #fa709a;
+            border: 1px solid #fa709a;
+        }
+
+        .priority-p2 {
+            background: rgba(254, 225, 64, 0.2);
+            color: #fee140;
+            border: 1px solid #fee140;
+        }
+
+        .priority-p3 {
+            background: rgba(79, 172, 254, 0.2);
+            color: #4facfe;
+            border: 1px solid #4facfe;
+        }
+
+        /* Chart Section */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-header h2 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .chart-header .info-icon {
+            color: var(--text-secondary);
+            cursor: help;
+            transition: color 0.3s ease;
+        }
+
+        .chart-header .info-icon:hover {
+            color: var(--text-primary);
+        }
+
+        .chart-box {
+            width: 100%;
+            height: 400px;
+        }
+
+        /* Chart Insights */
+        .chart-insight {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 3px solid;
+            border-image: var(--primary-gradient) 1;
+        }
+
+        .chart-insight h4 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-insight h4 i {
+            font-size: 1rem;
+            color: #4facfe;
+        }
+
+        .insight-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .insight-recommendations {
+            list-style: none;
+            padding: 0;
+        }
+
+        .insight-recommendations li {
+            color: var(--text-secondary);
+            padding-left: 1.5rem;
+            position: relative;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .insight-recommendations li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #4facfe;
+            font-weight: bold;
+        }
+
+        /* Content Strategy Table */
+        .strategy-table-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 3rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(255,255,255,0.05);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-primary);
+            position: sticky;
+            top: 0;
+            background: var(--card-bg);
+            white-space: nowrap;
+        }
+
+        td {
+            color: var(--text-secondary);
+            vertical-align: top;
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .cta-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .cta-link {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: rgba(79, 172, 254, 0.2);
+            color: #4facfe;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .cta-link:hover {
+            background: rgba(79, 172, 254, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Performance Metrics */
+        .metric-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-box {
+                height: 300px;
+            }
+            
+            table {
+                font-size: 0.85rem;
+            }
+            
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-gradient);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>JSON-LD Content Strategy Dashboard</h1>
+        <p>Structured Data Optimization for Search Engine Visibility</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <i class="fas fa-code"></i>
+                <h3>20</h3>
+                <p>JSON-LD Schema Types</p>
+            </div>
+            <div class="summary-card">
+                <i class="fas fa-bullseye"></i>
+                <h3>12</h3>
+                <p>P1 Priority Items</p>
+            </div>
+            <div class="summary-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>45%+</h3>
+                <p>Target Completion Rate</p>
+            </div>
+            <div class="summary-card">
+                <i class="fas fa-rocket"></i>
+                <h3>8</h3>
+                <p>Distribution Channels</p>
+            </div>
+        </div>
+
+        <!-- Chart Grid -->
+        <div class="chart-grid">
+            <!-- Priority Distribution Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Content Priority Distribution</h2>
+                    <i class="fas fa-info-circle info-icon" title="Distribution of content by priority levels"></i>
+                </div>
+                <div id="priorityChart" class="chart-box"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
+                    <p class="insight-content">60% of content is P1 priority, focusing on core purchase decision factors like sleep position, firmness, and trial policies.</p>
+                    <ul class="insight-recommendations">
+                        <li>Prioritize P1 content implementation for maximum impact on conversion</li>
+                        <li>Ensure all P1 FAQ schemas are live within 30 days</li>
+                        <li>Create dedicated landing pages for each P1 topic cluster</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Schema Type Distribution -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Schema Type Distribution</h2>
+                    <i class="fas fa-info-circle info-icon" title="Types of structured data schemas used"></i>
+                </div>
+                <div id="schemaTypeChart" class="chart-box"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
+                    <p class="insight-content">FAQPage schema dominates at 70%, aligning with search engines' preference for Q&A format in featured snippets.</p>
+                    <ul class="insight-recommendations">
+                        <li>Expand FAQPage implementation across all product pages</li>
+                        <li>Add HowTo schemas for setup and maintenance guides</li>
+                        <li>Implement Product schema with aggregate ratings for social proof</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Performance Metrics Radar -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Performance Target Analysis</h2>
+                    <i class="fas fa-info-circle info-icon" title="Target performance metrics across content types"></i>
+                </div>
+                <div id="performanceRadarChart" class="chart-box"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
+                    <p class="insight-content">Collection rate targets (1.2%+) and completion rates (45%+) are ambitious, requiring engaging visual content.</p>
+                    <ul class="insight-recommendations">
+                        <li>Focus on video content for high completion rate targets</li>
+                        <li>Implement interactive elements for better collection rates</li>
+                        <li>A/B test different CTA placements to optimize click-through rates</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Distribution Channel Heatmap -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Channel Distribution Strategy</h2>
+                    <i class="fas fa-info-circle info-icon" title="Content distribution across different channels"></i>
+                </div>
+                <div id="channelHeatmapChart" class="chart-box"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
+                    <p class="insight-content">AI Max and Shorts are the most utilized channels, indicating a focus on visual and AI-optimized content.</p>
+                    <ul class="insight-recommendations">
+                        <li>Diversify Reddit presence with more community engagement</li>
+                        <li>Create channel-specific content variations for better performance</li>
+                        <li>Develop a content calendar balancing all distribution channels</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Keyword Focus Cloud -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Comment Keywords Monitor</h2>
+                    <i class="fas fa-info-circle info-icon" title="Keywords to monitor in user comments"></i>
+                </div>
+                <div id="keywordCloudChart" class="chart-box"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
+                    <p class="insight-content">Sleep position and comfort-related keywords dominate comment monitoring, reflecting primary customer concerns.</p>
+                    <ul class="insight-recommendations">
+                        <li>Set up automated alerts for high-frequency keywords</li>
+                        <li>Create response templates for common keyword themes</li>
+                        <li>Use keyword insights to guide future content creation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CTA Effectiveness -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>CTA Strategy Overview</h2>
+                    <i class="fas fa-info-circle info-icon" title="Call-to-action distribution and types"></i>
+                </div>
+                <div id="ctaChart" class="chart-box"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
+                    <p class="insight-content">Buy Links appear in 85% of content, but diverse CTAs like guides and comparisons show educational approach.</p>
+                    <ul class="insight-recommendations">
+                        <li>Balance commercial CTAs with educational resources</li>
+                        <li>Test multi-CTA strategies for higher engagement</li>
+                        <li>Create dynamic CTAs based on user journey stage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Strategy Table -->
+        <div class="strategy-table-section">
+            <div class="table-header">
+                <h2>Top Priority Content Items</h2>
+                <div style="display: flex; gap: 1rem;">
+                    <span class="priority-badge priority-p1">P1: Critical</span>
+                    <span class="priority-badge priority-p2">P2: Important</span>
+                    <span class="priority-badge priority-p3">P3: Nice to Have</span>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Schema ID</th>
+                            <th>Topic Focus</th>
+                            <th>Key Evidence</th>
+                            <th>Primary Channel</th>
+                            <th>Success Metrics</th>
+                            <th>Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody id="strategyTableBody">
+                        <!-- Table content will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Content Calendar Preview -->
+        <div class="chart-container" style="grid-column: 1 / -1;">
+            <div class="chart-header">
+                <h2>30-Day Implementation Timeline</h2>
+                <i class="fas fa-info-circle info-icon" title="Suggested rollout schedule for P1 content"></i>
+            </div>
+            <div id="timelineChart" class="chart-box" style="height: 300px;"></div>
+            <div class="chart-insight">
+                <h4><i class="fas fa-lightbulb"></i> Implementation Strategy</h4>
+                <p class="insight-content">Week 1-2 focus on high-conversion topics (sleep position, firmness), Week 3-4 on trust builders (trial, certification).</p>
+                <ul class="insight-recommendations">
+                    <li>Launch with sleep position content cluster for immediate impact</li>
+                    <li>Coordinate schema implementation with content publishing schedule</li>
+                    <li>Monitor early performance metrics to adjust rollout pace</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const authToken = localStorage.getItem('authToken');
+        const sessionExpiry = localStorage.getItem('sessionExpiry');
+        const currentTime = new Date().getTime();
+
+        if (!authToken || !sessionExpiry || currentTime > parseInt(sessionExpiry)) {
+            window.location.href = 'login.html';
+        }
+
+        // Content Strategy Data
+        const strategyData = [
+            { id: 'FAQPage#Q01', topic: 'Sleep Position Compatibility', priority: 'P1', channel: 'AI Max', metric: 'Collection ≥1.2%' },
+            { id: 'FAQPage#Q02', topic: 'Firmness Selection', priority: 'P1', channel: 'Shorts', metric: 'Completion ≥45%' },
+            { id: 'FAQPage#Q03', topic: 'Pressure Relief', priority: 'P1', channel: 'AI Max', metric: 'Collection ≥1.0%' },
+            { id: 'FAQPage#Q04', topic: 'Cooling Technology', priority: 'P1', channel: 'Blog', metric: 'Completion ≥45%' },
+            { id: 'FAQPage#Q16', topic: 'Trial & Warranty', priority: 'P1', channel: 'Shorts', metric: 'Collection ≥1.2%' },
+        ];
+
+        // Initialize all charts
+        function initCharts() {
+            // Priority Distribution Chart
+            const priorityChart = echarts.init(document.getElementById('priorityChart'));
+            const priorityData = [
+                { value: 12, name: 'P1 - Critical', itemStyle: { color: '#fa709a' } },
+                { value: 6, name: 'P2 - Important', itemStyle: { color: '#fee140' } },
+                { value: 2, name: 'P3 - Nice to Have', itemStyle: { color: '#4facfe' } }
+            ];
+
+            const priorityOption = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} items ({d}%)'
+                },
+                legend: {
+                    bottom: '5%',
+                    textStyle: { color: '#a8b2d1' }
+                },
+                series: [{
+                    type: 'pie',
+                    radius: ['45%', '75%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#1a1a2e',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: true,
+                        position: 'center',
+                        formatter: function(params) {
+                            return params.name.split(' - ')[0] + '\n' + params.percent + '%';
+                        },
+                        fontSize: 16,
+                        fontWeight: 'bold'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 20,
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: priorityData
+                }]
+            };
+
+            priorityChart.setOption(priorityOption);
+
+            // Schema Type Chart
+            const schemaChart = echarts.init(document.getElementById('schemaTypeChart'));
+            const schemaOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    axisLabel: { color: '#a8b2d1' },
+                    splitLine: { lineStyle: { color: '#2a3f5f' } }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ['FAQPage', 'HowTo', 'QAPage', 'Product'],
+                    axisLabel: { color: '#a8b2d1' }
+                },
+                series: [{
+                    type: 'bar',
+                    data: [
+                        { value: 14, itemStyle: { color: '#667eea' } },
+                        { value: 4, itemStyle: { color: '#764ba2' } },
+                        { value: 2, itemStyle: { color: '#f093fb' } },
+                        { value: 1, itemStyle: { color: '#f5576c' } }
+                    ],
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: '#a8b2d1'
+                    }
+                }]
+            };
+
+            schemaChart.setOption(schemaOption);
+
+            // Performance Radar Chart
+            const radarChart = echarts.init(document.getElementById('performanceRadarChart'));
+            const radarOption = {
+                tooltip: {},
+                radar: {
+                    indicator: [
+                        { name: 'Collection Rate', max: 2 },
+                        { name: 'Completion Rate', max: 60 },
+                        { name: 'CTA Click Rate', max: 5 },
+                        { name: 'Comment Engagement', max: 100 },
+                        { name: 'Share Rate', max: 3 }
+                    ],
+                    axisName: {
+                        color: '#a8b2d1'
+                    }
+                },
+                series: [{
+                    type: 'radar',
+                    data: [{
+                        value: [1.2, 45, 3.0, 85, 2.1],
+                        name: 'Target Metrics',
+                        areaStyle: {
+                            color: new echarts.graphic.RadialGradient(0.5, 0.5, 1, [
+                                { color: '#667eea', offset: 0 },
+                                { color: '#764ba2', offset: 1 }
+                            ])
+                        }
+                    }]
+                }]
+            };
+
+            radarChart.setOption(radarOption);
+
+            // Channel Heatmap
+            const heatmapChart = echarts.init(document.getElementById('channelHeatmapChart'));
+            const channels = ['AI Max', 'Shorts', 'Reddit', 'Blog', 'PR'];
+            const topics = ['Sleep Position', 'Firmness', 'Cooling', 'Motion', 'Trial'];
+            
+            const heatmapData = [];
+            const heatValues = [
+                [0, 0, 3], [0, 1, 2], [0, 2, 3], [0, 3, 1], [0, 4, 2],
+                [1, 0, 3], [1, 1, 3], [1, 2, 2], [1, 3, 3], [1, 4, 3],
+                [2, 0, 1], [2, 1, 1], [2, 2, 2], [2, 3, 1], [2, 4, 0],
+                [3, 0, 1], [3, 1, 2], [3, 2, 3], [3, 3, 1], [3, 4, 1],
+                [4, 0, 0], [4, 1, 1], [4, 2, 1], [4, 3, 0], [4, 4, 2]
+            ];
+
+            const heatmapOption = {
+                tooltip: {
+                    position: 'top'
+                },
+                grid: {
+                    height: '60%',
+                    top: '10%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: topics,
+                    splitArea: {
+                        show: true
+                    },
+                    axisLabel: { 
+                        color: '#a8b2d1',
+                        rotate: 45
+                    }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: channels,
+                    splitArea: {
+                        show: true
+                    },
+                    axisLabel: { color: '#a8b2d1' }
+                },
+                visualMap: {
+                    min: 0,
+                    max: 3,
+                    calculable: true,
+                    orient: 'horizontal',
+                    left: 'center',
+                    bottom: '0%',
+                    textStyle: { color: '#a8b2d1' },
+                    inRange: {
+                        color: ['#313695', '#4575b4', '#fee090', '#f46d43', '#d73027']
+                    }
+                },
+                series: [{
+                    name: 'Content Volume',
+                    type: 'heatmap',
+                    data: heatValues,
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }]
+            };
+
+            heatmapChart.setOption(heatmapOption);
+
+            // Keyword Cloud
+            const cloudChart = echarts.init(document.getElementById('keywordCloudChart'));
+            const keywords = [
+                { name: 'side sleep', value: 180 },
+                { name: 'back pain', value: 160 },
+                { name: 'pressure', value: 140 },
+                { name: 'cooling', value: 130 },
+                { name: 'motion', value: 120 },
+                { name: 'firmness', value: 150 },
+                { name: 'hot sleeper', value: 110 },
+                { name: 'edge support', value: 90 },
+                { name: 'trial', value: 100 },
+                { name: 'warranty', value: 85 },
+                { name: 'delivery', value: 75 },
+                { name: 'odor', value: 70 },
+                { name: 'height', value: 65 },
+                { name: 'rotate', value: 60 },
+                { name: 'clean', value: 55 }
+            ];
+
+            const cloudOption = {
+                tooltip: {},
+                series: [{
+                    type: 'wordCloud',
+                    shape: 'circle',
+                    keepAspect: false,
+                    left: 'center',
+                    top: 'center',
+                    width: '90%',
+                    height: '90%',
+                    right: null,
+                    bottom: null,
+                    sizeRange: [14, 70],
+                    rotationRange: [-45, 45],
+                    rotationStep: 30,
+                    gridSize: 10,
+                    drawOutOfBound: false,
+                    layoutAnimation: true,
+                    textStyle: {
+                        fontFamily: 'sans-serif',
+                        fontWeight: 'bold',
+                        color: function () {
+                            const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'];
+                            return colors[Math.floor(Math.random() * colors.length)];
+                        }
+                    },
+                    emphasis: {
+                        textStyle: {
+                            shadowBlur: 10,
+                            shadowColor: '#333'
+                        }
+                    },
+                    data: keywords
+                }]
+            };
+
+            cloudChart.setOption(cloudOption);
+
+            // CTA Distribution Chart
+            const ctaChart = echarts.init(document.getElementById('ctaChart'));
+            const ctaOption = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} occurrences'
+                },
+                series: [{
+                    type: 'funnel',
+                    left: '10%',
+                    top: 20,
+                    bottom: 20,
+                    width: '80%',
+                    min: 0,
+                    max: 100,
+                    minSize: '0%',
+                    maxSize: '100%',
+                    sort: 'descending',
+                    gap: 2,
+                    label: {
+                        show: true,
+                        position: 'inside',
+                        fontSize: 14
+                    },
+                    labelLine: {
+                        length: 10,
+                        lineStyle: {
+                            width: 1,
+                            type: 'solid'
+                        }
+                    },
+                    itemStyle: {
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    },
+                    emphasis: {
+                        label: {
+                            fontSize: 18
+                        }
+                    },
+                    data: [
+                        { value: 85, name: 'Buy Link', itemStyle: { color: '#667eea' } },
+                        { value: 70, name: 'Spec Link', itemStyle: { color: '#764ba2' } },
+                        { value: 50, name: 'Guide Link', itemStyle: { color: '#f093fb' } },
+                        { value: 40, name: 'Compare Link', itemStyle: { color: '#f5576c' } },
+                        { value: 30, name: 'Policy Link', itemStyle: { color: '#4facfe' } }
+                    ]
+                }]
+            };
+
+            ctaChart.setOption(ctaOption);
+
+            // Timeline Chart
+            const timelineChart = echarts.init(document.getElementById('timelineChart'));
+            const timelineOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        return params[0].name + '<br/>' + params[0].data + ' content items';
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    axisLabel: { color: '#a8b2d1' }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Content Items',
+                    nameTextStyle: { color: '#a8b2d1' },
+                    axisLabel: { color: '#a8b2d1' },
+                    splitLine: { lineStyle: { color: '#2a3f5f' } }
+                },
+                series: [{
+                    name: 'P1 Content',
+                    type: 'line',
+                    data: [5, 9, 11, 12],
+                    smooth: true,
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(102, 126, 234, 0.5)' },
+                            { offset: 1, color: 'rgba(102, 126, 234, 0.1)' }
+                        ])
+                    },
+                    itemStyle: {
+                        color: '#667eea'
+                    },
+                    markPoint: {
+                        data: [
+                            { type: 'max', name: 'Launch Complete' }
+                        ]
+                    }
+                }]
+            };
+
+            timelineChart.setOption(timelineOption);
+
+            // Populate strategy table
+            const tableBody = document.getElementById('strategyTableBody');
+            strategyData.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.topic}</td>
+                    <td>Official specs, test data</td>
+                    <td>${item.channel}</td>
+                    <td><span class="metric-value">${item.metric}</span></td>
+                    <td><span class="priority-badge priority-${item.priority.toLowerCase()}">${item.priority}</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                priorityChart.resize();
+                schemaChart.resize();
+                radarChart.resize();
+                heatmapChart.resize();
+                cloudChart.resize();
+                ctaChart.resize();
+                timelineChart.resize();
+            });
+        }
+
+        // Initialize when page loads
+        initCharts();
+    </script>
+</body>
+</html>

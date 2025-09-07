@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competitor Keyword Analysis - SweetNight GEO Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark-bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text-primary: #ffffff;
+            --text-secondary: #a8b2d1;
+            --border-color: #2a3f5f;
+            --success-color: #48bb78;
+            --warning-color: #fee140;
+            --danger-color: #f56565;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary-gradient);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            position: relative;
+            z-index: 1;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            position: relative;
+            z-index: 1;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-gradient);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .summary-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .summary-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .summary-card p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Chart Section */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .chart-container.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-header h2 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .chart-header .info-icon {
+            color: var(--text-secondary);
+            cursor: help;
+            transition: color 0.3s ease;
+        }
+
+        .chart-header .info-icon:hover {
+            color: var(--text-primary);
+        }
+
+        .chart-box {
+            width: 100%;
+            height: 400px;
+        }
+
+        .chart-box.tall {
+            height: 500px;
+        }
+
+        /* Chart Insights */
+        .chart-insight {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 3px solid;
+            border-image: var(--primary-gradient) 1;
+        }
+
+        .chart-insight h4 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-insight h4 i {
+            font-size: 1rem;
+            color: #4facfe;
+        }
+
+        .insight-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .insight-recommendations {
+            list-style: none;
+            padding: 0;
+        }
+
+        .insight-recommendations li {
+            color: var(--text-secondary);
+            padding-left: 1.5rem;
+            position: relative;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .insight-recommendations li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #4facfe;
+            font-weight: bold;
+        }
+
+        /* Competitor Badges */
+        .competitor-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .competitor-casper {
+            background: rgba(0, 114, 255, 0.2);
+            color: #0072ff;
+            border: 1px solid #0072ff;
+        }
+
+        .competitor-purple {
+            background: rgba(147, 51, 234, 0.2);
+            color: #9333ea;
+            border: 1px solid #9333ea;
+        }
+
+        .competitor-tempurpedic {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+            border: 1px solid #dc2626;
+        }
+
+        .competitor-saatva {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+        }
+
+        .competitor-sealy {
+            background: rgba(251, 146, 60, 0.2);
+            color: #fb923c;
+            border: 1px solid #fb923c;
+        }
+
+        .competitor-emma {
+            background: rgba(236, 72, 153, 0.2);
+            color: #ec4899;
+            border: 1px solid #ec4899;
+        }
+
+        /* Layer Tags */
+        .layer-tag {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .layer-big {
+            background: rgba(250, 112, 154, 0.2);
+            color: #fa709a;
+        }
+
+        .layer-medium {
+            background: rgba(254, 225, 64, 0.2);
+            color: #fee140;
+        }
+
+        .layer-longtail {
+            background: rgba(79, 172, 254, 0.2);
+            color: #4facfe;
+        }
+
+        /* Strategy Table */
+        .strategy-table-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 3rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(255,255,255,0.05);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-primary);
+            position: sticky;
+            top: 0;
+            background: var(--card-bg);
+            white-space: nowrap;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-box {
+                height: 300px;
+            }
+            
+            table {
+                font-size: 0.85rem;
+            }
+            
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-gradient);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Competitor Keyword Analysis Dashboard</h1>
+        <p>Strategic Keyword Intelligence for Mattress Industry Competition</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <i class="fas fa-key"></i>
+                <h3>65</h3>
+                <p>Total Keywords</p>
+            </div>
+            <div class="summary-card">
+                <i class="fas fa-users-cog"></i>
+                <h3>6</h3>
+                <p>Key Competitors</p>
+            </div>
+            <div class="summary-card">
+                <i class="fas fa-layer-group"></i>
+                <h3>3</h3>
+                <p>Keyword Layers</p>
+            </div>
+            <div class="summary-card">
+                <i class="fas fa-crosshairs"></i>
+                <h3>10</h3>
+                <p>Intent Types</p>
+            </div>
+        </div>
+
+        <!-- Chart Grid -->
+        <div class="chart-grid">
+            <!-- Keyword Layer Distribution -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Keyword Layer Distribution</h2>
+                    <i class="fas fa-info-circle info-icon" title="Distribution of keywords across search volume layers"></i>
+                </div>
+                <div id="layerDistributionChart" class="chart-box"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
+                    <p class="insight-content">Medium-tail keywords dominate at 71%, offering the best balance between search volume and competition.</p>
+                    <ul class="insight-recommendations">
+                        <li>Focus 60% of content efforts on medium-tail keywords for optimal ROI</li>
+                        <li>Use big-tail keywords for brand awareness and authority building</li>
+                        <li>Leverage long-tail keywords for high-intent, conversion-focused content</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Intent Type Analysis -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Search Intent Distribution</h2>
+                    <i class="fas fa-info-circle info-icon" title="Types of search intent across all keywords"></i>
+                </div>
+                <div id="intentChart" class="chart-box"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
+                    <p class="insight-content">"Compare" intent leads at 26%, showing users actively research before purchasing mattresses.</p>
+                    <ul class="insight-recommendations">
+                        <li>Create comprehensive comparison pages for each major competitor</li>
+                        <li>Develop "for_who" content targeting specific user segments</li>
+                        <li>Build educational content around "what" and "how" queries</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Competitor Analysis Radar -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Competitor Keyword Coverage</h2>
+                    <i class="fas fa-info-circle info-icon" title="Keyword coverage analysis for each competitor"></i>
+                </div>
+                <div id="competitorRadarChart" class="chart-box"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
+                    <p class="insight-content">All competitors have equal keyword coverage (7 each), indicating systematic competitive content strategy.</p>
+                    <ul class="insight-recommendations">
+                        <li>Prioritize Casper and Purple comparison content due to market position</li>
+                        <li>Create unique angles for Tempur-Pedic comparisons focusing on premium features</li>
+                        <li>Develop differentiation content highlighting SweetNight's unique value propositions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Keyword Intent Heatmap -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Competitor vs Intent Matrix</h2>
+                    <i class="fas fa-info-circle info-icon" title="Intent patterns across different competitors"></i>
+                </div>
+                <div id="intentHeatmapChart" class="chart-box"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
+                    <p class="insight-content">Comparison and price comparison intents dominate competitor-related searches, requiring dedicated content strategies.</p>
+                    <ul class="insight-recommendations">
+                        <li>Build interactive comparison tools for real-time feature comparisons</li>
+                        <li>Create transparent pricing pages with value justification</li>
+                        <li>Develop "alternatives" content positioning SweetNight favorably</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Keyword Opportunity Matrix -->
+            <div class="chart-container full-width">
+                <div class="chart-header">
+                    <h2>Keyword Opportunity Prioritization</h2>
+                    <i class="fas fa-info-circle info-icon" title="Keyword opportunities plotted by difficulty and search volume"></i>
+                </div>
+                <div id="opportunityScatterChart" class="chart-box tall"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Strategic Opportunities</h4>
+                    <p class="insight-content">Medium-tail "for_who" keywords offer the best opportunity with moderate competition and good search volume.</p>
+                    <ul class="insight-recommendations">
+                        <li>Target "hot sleepers" and "side sleepers" segments with dedicated landing pages</li>
+                        <li>Focus on motion isolation and edge support features for competitive advantage</li>
+                        <li>Create seasonal campaigns around cooling technology keywords</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Content Gap Analysis -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Content Type Requirements</h2>
+                    <i class="fas fa-info-circle info-icon" title="Required content types based on keyword analysis"></i>
+                </div>
+                <div id="contentTypeChart" class="chart-box"></div>
+                <div class="chart-insight">
+                    <h4><i class="fas fa-lightbulb"></i> Content Strategy</h4>
+                    <p class="insight-content">Comparison pages and buyer guides are most needed, aligning with dominant search intents.</p>
+                    <ul class="insight-recommendations">
+                        <li>Develop 6 comprehensive competitor comparison pages immediately</li>
+                        <li>Create targeted buyer guides for each "for_who" segment</li>
+                        <li>Build educational hub around "what" and "how" queries</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Keywords Strategy Table -->
+        <div class="strategy-table-section">
+            <div class="table-header">
+                <h2>Priority Keywords for Immediate Action</h2>
+                <div>
+                    <span class="layer-tag layer-big">Big Tail</span>
+                    <span class="layer-tag layer-medium">Medium Tail</span>
+                    <span class="layer-tag layer-longtail">Long Tail</span>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Keyword</th>
+                            <th>Competitor</th>
+                            <th>Intent</th>
+                            <th>Layer</th>
+                            <th>Content Strategy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="strategyTableBody">
+                        <!-- Table will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Competitive Battleground Map -->
+        <div class="chart-container full-width">
+            <div class="chart-header">
+                <h2>Competitive Battleground Map</h2>
+                <i class="fas fa-info-circle info-icon" title="Visual representation of competitive keyword landscape"></i>
+            </div>
+            <div id="battlegroundChart" class="chart-box tall"></div>
+            <div class="chart-insight">
+                <h4><i class="fas fa-lightbulb"></i> Competitive Strategy</h4>
+                <p class="insight-content">The battleground is most intense in comparison keywords, requiring superior content quality and user experience.</p>
+                <ul class="insight-recommendations">
+                    <li>Invest in interactive comparison tools to outperform static competitor pages</li>
+                    <li>Create video comparisons for high-engagement content</li>
+                    <li>Develop unique testing methodology to differentiate comparison content</li>
+                    <li>Focus on user-generated reviews and testimonials for authenticity</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const authToken = localStorage.getItem('authToken');
+        const sessionExpiry = localStorage.getItem('sessionExpiry');
+        const currentTime = new Date().getTime();
+
+        if (!authToken || !sessionExpiry || currentTime > parseInt(sessionExpiry)) {
+            window.location.href = 'login.html';
+        }
+
+        // Initialize Charts
+        function initCharts() {
+            // Layer Distribution Chart
+            const layerChart = echarts.init(document.getElementById('layerDistributionChart'));
+            const layerData = [
+                { value: 10, name: 'Big Tail (High Volume)', itemStyle: { color: '#fa709a' } },
+                { value: 46, name: 'Medium Tail (Balanced)', itemStyle: { color: '#fee140' } },
+                { value: 9, name: 'Long Tail (Specific)', itemStyle: { color: '#4facfe' } }
+            ];
+
+            const layerOption = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} keywords ({d}%)'
+                },
+                series: [{
+                    type: 'pie',
+                    radius: '70%',
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#1a1a2e',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{b}\n{d}%'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '16',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    data: layerData
+                }]
+            };
+
+            layerChart.setOption(layerOption);
+
+            // Intent Distribution Chart
+            const intentChart = echarts.init(document.getElementById('intentChart'));
+            const intentData = [
+                { value: 17, name: 'compare' },
+                { value: 12, name: 'for_who' },
+                { value: 7, name: 'what' },
+                { value: 7, name: 'how' },
+                { value: 6, name: 'price/compare' },
+                { value: 6, name: 'alternatives' },
+                { value: 3, name: 'safety' },
+                { value: 2, name: 'why' },
+                { value: 2, name: 'best' },
+                { value: 1, name: 'reviews' }
+            ];
+
+            const intentOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: intentData.map(item => item.name),
+                    axisLabel: { 
+                        color: '#a8b2d1',
+                        rotate: 45
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: { color: '#a8b2d1' },
+                    splitLine: { lineStyle: { color: '#2a3f5f' } }
+                },
+                series: [{
+                    type: 'bar',
+                    data: intentData.map(item => ({
+                        value: item.value,
+                        itemStyle: { 
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#667eea' },
+                                { offset: 1, color: '#764ba2' }
+                            ])
+                        }
+                    })),
+                    emphasis: {
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#764ba2' },
+                                { offset: 1, color: '#f093fb' }
+                            ])
+                        }
+                    }
+                }]
+            };
+
+            intentChart.setOption(intentOption);
+
+            // Competitor Radar Chart
+            const radarChart = echarts.init(document.getElementById('competitorRadarChart'));
+            const radarOption = {
+                tooltip: {},
+                radar: {
+                    indicator: [
+                        { name: 'Casper', max: 10 },
+                        { name: 'Purple', max: 10 },
+                        { name: 'Tempur-Pedic', max: 10 },
+                        { name: 'Saatva', max: 10 },
+                        { name: 'Sealy', max: 10 },
+                        { name: 'Emma', max: 10 }
+                    ],
+                    axisName: {
+                        color: '#a8b2d1'
+                    }
+                },
+                series: [{
+                    type: 'radar',
+                    data: [
+                        {
+                            value: [7, 7, 7, 7, 7, 7],
+                            name: 'Keyword Coverage',
+                            areaStyle: {
+                                color: new echarts.graphic.RadialGradient(0.5, 0.5, 1, [
+                                    { color: '#667eea', offset: 0 },
+                                    { color: '#764ba2', offset: 1 }
+                                ])
+                            }
+                        }
+                    ]
+                }]
+            };
+
+            radarChart.setOption(radarOption);
+
+            // Intent Heatmap
+            const heatmapChart = echarts.init(document.getElementById('intentHeatmapChart'));
+            const competitors = ['Casper', 'Purple', 'Tempur-Pedic', 'Saatva', 'Sealy', 'Emma'];
+            const intents = ['compare', 'alternatives', 'price/compare', 'motion isolation'];
+            
+            const heatmapData = [
+                [0, 0, 1], [0, 1, 1], [0, 2, 1], [0, 3, 1],
+                [1, 0, 1], [1, 1, 1], [1, 2, 1], [1, 3, 1],
+                [2, 0, 1], [2, 1, 1], [2, 2, 1], [2, 3, 1],
+                [3, 0, 1], [3, 1, 1], [3, 2, 1], [3, 3, 1],
+                [4, 0, 1], [4, 1, 1], [4, 2, 1], [4, 3, 1],
+                [5, 0, 1], [5, 1, 1], [5, 2, 1], [5, 3, 1]
+            ];
+
+            const heatmapOption = {
+                tooltip: {
+                    position: 'top'
+                },
+                grid: {
+                    height: '60%',
+                    top: '10%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: intents,
+                    splitArea: { show: true },
+                    axisLabel: { color: '#a8b2d1', rotate: 30 }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: competitors,
+                    splitArea: { show: true },
+                    axisLabel: { color: '#a8b2d1' }
+                },
+                visualMap: {
+                    min: 0,
+                    max: 2,
+                    calculable: true,
+                    orient: 'horizontal',
+                    left: 'center',
+                    bottom: '0%',
+                    textStyle: { color: '#a8b2d1' },
+                    inRange: {
+                        color: ['#313695', '#fee090', '#d73027']
+                    }
+                },
+                series: [{
+                    name: 'Keyword Focus',
+                    type: 'heatmap',
+                    data: heatmapData,
+                    label: { show: true },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }]
+            };
+
+            heatmapChart.setOption(heatmapOption);
+
+            // Opportunity Scatter Chart
+            const scatterChart = echarts.init(document.getElementById('opportunityScatterChart'));
+            
+            // Generate scatter data
+            const scatterData = {
+                'Big Tail': [],
+                'Medium Tail': [],
+                'Long Tail': []
+            };
+
+            // Sample data points
+            const opportunities = [
+                { keyword: 'best mattress choice', volume: 5000, difficulty: 85, layer: 'Big Tail' },
+                { keyword: 'mattress reviews 2025', volume: 4500, difficulty: 80, layer: 'Big Tail' },
+                { keyword: 'SweetNight for side sleepers', volume: 2000, difficulty: 45, layer: 'Medium Tail' },
+                { keyword: 'motion isolation test', volume: 1500, difficulty: 40, layer: 'Medium Tail' },
+                { keyword: 'Casper vs SweetNight', volume: 1800, difficulty: 55, layer: 'Medium Tail' },
+                { keyword: 'edge support for seniors', volume: 800, difficulty: 30, layer: 'Medium Tail' },
+                { keyword: 'rotate or flip schedule', volume: 300, difficulty: 20, layer: 'Long Tail' },
+                { keyword: 'RV bunk mattress', volume: 200, difficulty: 15, layer: 'Long Tail' }
+            ];
+
+            opportunities.forEach(item => {
+                scatterData[item.layer].push([item.difficulty, item.volume, item.keyword, item.layer]);
+            });
+
+            const scatterOption = {
+                tooltip: {
+                    formatter: function(params) {
+                        return params.data[2] + '<br/>' +
+                               'Search Volume: ' + params.data[1] + '<br/>' +
+                               'Difficulty: ' + params.data[0] + '%';
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '10%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    name: 'Keyword Difficulty',
+                    nameTextStyle: { color: '#a8b2d1' },
+                    type: 'value',
+                    min: 0,
+                    max: 100,
+                    axisLabel: { 
+                        color: '#a8b2d1',
+                        formatter: '{value}%'
+                    },
+                    splitLine: { lineStyle: { color: '#2a3f5f' } }
+                },
+                yAxis: {
+                    name: 'Search Volume',
+                    nameTextStyle: { color: '#a8b2d1' },
+                    type: 'value',
+                    axisLabel: { color: '#a8b2d1' },
+                    splitLine: { lineStyle: { color: '#2a3f5f' } }
+                },
+                legend: {
+                    data: ['Big Tail', 'Medium Tail', 'Long Tail'],
+                    textStyle: { color: '#a8b2d1' },
+                    top: 'top'
+                },
+                series: [
+                    {
+                        name: 'Big Tail',
+                        type: 'scatter',
+                        data: scatterData['Big Tail'],
+                        symbolSize: 20,
+                        itemStyle: { color: '#fa709a' }
+                    },
+                    {
+                        name: 'Medium Tail',
+                        type: 'scatter',
+                        data: scatterData['Medium Tail'],
+                        symbolSize: 20,
+                        itemStyle: { color: '#fee140' }
+                    },
+                    {
+                        name: 'Long Tail',
+                        type: 'scatter',
+                        data: scatterData['Long Tail'],
+                        symbolSize: 20,
+                        itemStyle: { color: '#4facfe' }
+                    }
+                ]
+            };
+
+            scatterChart.setOption(scatterOption);
+
+            // Content Type Requirements Chart
+            const contentChart = echarts.init(document.getElementById('contentTypeChart'));
+            const contentOption = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} pages needed'
+                },
+                series: [{
+                    type: 'treemap',
+                    data: [
+                        {
+                            name: 'Comparison Pages',
+                            value: 30,
+                            itemStyle: { color: '#667eea' },
+                            children: [
+                                { name: 'Competitor Comparisons', value: 18 },
+                                { name: 'Feature Comparisons', value: 12 }
+                            ]
+                        },
+                        {
+                            name: 'Buyer Guides',
+                            value: 20,
+                            itemStyle: { color: '#764ba2' },
+                            children: [
+                                { name: 'Sleep Position Guides', value: 8 },
+                                { name: 'Health Condition Guides', value: 7 },
+                                { name: 'Lifestyle Guides', value: 5 }
+                            ]
+                        },
+                        {
+                            name: 'Educational Content',
+                            value: 15,
+                            itemStyle: { color: '#f093fb' },
+                            children: [
+                                { name: 'How-To Guides', value: 7 },
+                                { name: 'What-Is Content', value: 5 },
+                                { name: 'Why Content', value: 3 }
+                            ]
+                        },
+                        {
+                            name: 'Product Pages',
+                            value: 10,
+                            itemStyle: { color: '#f5576c' }
+                        }
+                    ],
+                    levels: [
+                        {
+                            itemStyle: {
+                                borderWidth: 0,
+                                gapWidth: 5
+                            }
+                        },
+                        {
+                            itemStyle: {
+                                gapWidth: 1
+                            }
+                        }
+                    ]
+                }]
+            };
+
+            contentChart.setOption(contentOption);
+
+            // Battleground Chart
+            const battlegroundChart = echarts.init(document.getElementById('battlegroundChart'));
+            const battlegroundOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                legend: {
+                    data: ['Competition Intensity', 'Opportunity Score'],
+                    textStyle: { color: '#a8b2d1' },
+                    top: 'top'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Casper', 'Purple', 'Tempur-Pedic', 'Saatva', 'Sealy', 'Emma', 'Non-branded'],
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                    axisLabel: { color: '#a8b2d1' }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Competition Intensity',
+                        nameTextStyle: { color: '#a8b2d1' },
+                        min: 0,
+                        max: 100,
+                        axisLabel: {
+                            formatter: '{value}%',
+                            color: '#a8b2d1'
+                        },
+                        splitLine: { lineStyle: { color: '#2a3f5f' } }
+                    },
+                    {
+                        type: 'value',
+                        name: 'Opportunity Score',
+                        nameTextStyle: { color: '#a8b2d1' },
+                        min: 0,
+                        max: 100,
+                        axisLabel: {
+                            formatter: '{value}',
+                            color: '#a8b2d1'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: 'Competition Intensity',
+                        type: 'bar',
+                        data: [85, 80, 90, 75, 70, 65, 50],
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#f56565' },
+                                { offset: 1, color: '#dc2626' }
+                            ])
+                        }
+                    },
+                    {
+                        name: 'Opportunity Score',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: [70, 75, 60, 80, 85, 88, 95],
+                        smooth: true,
+                        itemStyle: { color: '#4facfe' },
+                        lineStyle: { width: 3 },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(79, 172, 254, 0.5)' },
+                                { offset: 1, color: 'rgba(79, 172, 254, 0.1)' }
+                            ])
+                        }
+                    }
+                ]
+            };
+
+            battlegroundChart.setOption(battlegroundOption);
+
+            // Populate Strategy Table
+            const strategyTableBody = document.getElementById('strategyTableBody');
+            const priorityKeywords = [
+                {
+                    keyword: 'SweetNight for side sleepers with shoulder pain',
+                    competitor: '-',
+                    intent: 'for_who',
+                    layer: 'Medium Tail',
+                    strategy: 'Create comprehensive guide with pressure mapping visuals'
+                },
+                {
+                    keyword: 'Casper vs SweetNight hybrid',
+                    competitor: 'Casper',
+                    intent: 'compare',
+                    layer: 'Medium Tail',
+                    strategy: 'Interactive comparison tool with side-by-side features'
+                },
+                {
+                    keyword: 'best mattress choice',
+                    competitor: '-',
+                    intent: 'best',
+                    layer: 'Big Tail',
+                    strategy: 'Ultimate buyer\'s guide with decision flowchart'
+                },
+                {
+                    keyword: 'mattress for hot sleepers',
+                    competitor: '-',
+                    intent: 'for_who',
+                    layer: 'Big Tail',
+                    strategy: 'Cooling technology showcase with thermal imaging'
+                },
+                {
+                    keyword: 'motion isolation meaning',
+                    competitor: '-',
+                    intent: 'what',
+                    layer: 'Big Tail',
+                    strategy: 'Educational hub with video demonstrations'
+                }
+            ];
+
+            priorityKeywords.forEach(item => {
+                const row = document.createElement('tr');
+                const competitorBadge = item.competitor !== '-' ? 
+                    `<span class="competitor-badge competitor-${item.competitor.toLowerCase()}">${item.competitor}</span>` :
+                    '-';
+                
+                row.innerHTML = `
+                    <td>${item.keyword}</td>
+                    <td>${competitorBadge}</td>
+                    <td>${item.intent}</td>
+                    <td><span class="layer-tag layer-${item.layer.toLowerCase().replace(' tail', '')}">${item.layer}</span></td>
+                    <td>${item.strategy}</td>
+                `;
+                strategyTableBody.appendChild(row);
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                layerChart.resize();
+                intentChart.resize();
+                radarChart.resize();
+                heatmapChart.resize();
+                scatterChart.resize();
+                contentChart.resize();
+                battlegroundChart.resize();
+            });
+        }
+
+        // Initialize charts when page loads
+        initCharts();
+    </script>
+</body>
+</html>

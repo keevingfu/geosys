@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON-LD & GEO Knowledge Graph Connection - SweetNight</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark-bg: #0f0f1e;
+            --card-bg: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a8b2d1;
+            --border-color: #2a3f5f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary-gradient);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            position: relative;
+            z-index: 1;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            position: relative;
+            z-index: 1;
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Overview Cards */
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .overview-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .overview-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .overview-card h2 i {
+            font-size: 2rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .overview-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .overview-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .overview-list li:last-child {
+            border-bottom: none;
+        }
+
+        .overview-list i {
+            color: #4facfe;
+            min-width: 20px;
+        }
+
+        /* Main Connection Diagram */
+        .diagram-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diagram-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .diagram-header h2 {
+            font-size: 2.2rem;
+            color: var(--text-primary);
+        }
+
+        #connectionDiagram {
+            width: 100%;
+            height: 900px;
+        }
+
+        /* Key Connections */
+        .connections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .connection-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .connection-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .connection-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .connection-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .connection-title h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .connection-title p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .connection-details {
+            padding-left: 1rem;
+            border-left: 3px solid rgba(255,255,255,0.1);
+        }
+
+        .connection-flow {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+        }
+
+        .flow-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .flow-arrow {
+            color: #4facfe;
+            font-size: 1.5rem;
+        }
+
+        /* Data Flow Visualization */
+        .data-flow-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 3rem;
+        }
+
+        #dataFlowChart {
+            width: 100%;
+            height: 600px;
+        }
+
+        /* Insights Section */
+        .insights-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .insight-box {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-left: 3px solid;
+            transition: all 0.3s ease;
+        }
+
+        .insight-box:nth-child(1) { border-left-color: #4facfe; }
+        .insight-box:nth-child(2) { border-left-color: #43e97b; }
+        .insight-box:nth-child(3) { border-left-color: #fa709a; }
+        .insight-box:nth-child(4) { border-left-color: #f093fb; }
+
+        .insight-box:hover {
+            transform: translateX(5px);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .insight-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .insight-box p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            #connectionDiagram {
+                height: 600px;
+            }
+            
+            .overview-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .connections-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>JSON-LD & GEO Knowledge Graph Connection</h1>
+        <p>Understanding the synergy between structured data implementation and knowledge graph architecture</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Overview Cards -->
+        <div class="overview-cards">
+            <div class="overview-card">
+                <h2><i class="fas fa-code"></i> JSON-LD Content Strategy</h2>
+                <ul class="overview-list">
+                    <li><i class="fas fa-check-circle"></i> 20 Schema Types Identified</li>
+                    <li><i class="fas fa-bullseye"></i> FAQPage Schema (70% Priority)</li>
+                    <li><i class="fas fa-chart-line"></i> 45%+ Target Completion Rate</li>
+                    <li><i class="fas fa-network-wired"></i> 8 Distribution Channels</li>
+                    <li><i class="fas fa-tags"></i> P1 Priority: Sleep, Firmness, Trial</li>
+                </ul>
+            </div>
+            <div class="overview-card">
+                <h2><i class="fas fa-project-diagram"></i> GEO Knowledge Graph</h2>
+                <ul class="overview-list">
+                    <li><i class="fas fa-circle-nodes"></i> 42 Strategic Nodes</li>
+                    <li><i class="fas fa-link"></i> 75+ Connections</li>
+                    <li><i class="fas fa-layer-group"></i> 9 Node Categories</li>
+                    <li><i class="fas fa-sitemap"></i> 3 Layout Modes</li>
+                    <li><i class="fas fa-brain"></i> AI-Driven Content Intelligence</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Connection Diagram -->
+        <div class="diagram-container">
+            <div class="diagram-header">
+                <h2>Interactive Connection Map</h2>
+            </div>
+            <div id="connectionDiagram"></div>
+        </div>
+
+        <!-- Key Connections Grid -->
+        <div class="connections-grid">
+            <div class="connection-card">
+                <div class="connection-header">
+                    <div class="connection-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <div class="connection-title">
+                        <h3>Schema to Knowledge Node Mapping</h3>
+                        <p>Direct correlation between JSON-LD schemas and graph nodes</p>
+                    </div>
+                </div>
+                <div class="connection-details">
+                    <div class="connection-flow">
+                        <div class="flow-item">FAQPage Schema</div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-item">FAQ Content Node</div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-item">Sleep Position Keywords</div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-top: 1rem;">
+                        Each JSON-LD schema type directly maps to content nodes in the knowledge graph, 
+                        creating a structured information architecture.
+                    </p>
+                </div>
+            </div>
+
+            <div class="connection-card">
+                <div class="connection-header">
+                    <div class="connection-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <div class="connection-title">
+                        <h3>User Intent Pathway</h3>
+                        <p>From structured data to user journey</p>
+                    </div>
+                </div>
+                <div class="connection-details">
+                    <div class="connection-flow">
+                        <div class="flow-item">QAPage Schema</div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-item">Informational Intent</div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-item">Side Sleeper Persona</div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-top: 1rem;">
+                        JSON-LD schemas enable search engines to understand content intent, 
+                        which maps directly to user personas in the knowledge graph.
+                    </p>
+                </div>
+            </div>
+
+            <div class="connection-card">
+                <div class="connection-header">
+                    <div class="connection-icon" style="background: linear-gradient(135deg, #fa709a, #fee140);">
+                        <i class="fas fa-broadcast-tower"></i>
+                    </div>
+                    <div class="connection-title">
+                        <h3>Channel Distribution Synergy</h3>
+                        <p>Content distribution across platforms</p>
+                    </div>
+                </div>
+                <div class="connection-details">
+                    <div class="connection-flow">
+                        <div class="flow-item">AI Max Channel</div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-item">Schema Markup</div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-item">Graph Visibility</div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-top: 1rem;">
+                        Distribution channels identified in JSON-LD strategy feed into the knowledge graph's 
+                        content distribution nodes.
+                    </p>
+                </div>
+            </div>
+
+            <div class="connection-card">
+                <div class="connection-header">
+                    <div class="connection-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="connection-title">
+                        <h3>Competitive Intelligence Layer</h3>
+                        <p>Schema advantages over competitors</p>
+                    </div>
+                </div>
+                <div class="connection-details">
+                    <div class="connection-flow">
+                        <div class="flow-item">Product Schema</div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-item">Competitor Nodes</div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-item">Differentiation</div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-top: 1rem;">
+                        Structured data implementation creates competitive advantages visible in the 
+                        knowledge graph's competitor analysis.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Flow Visualization -->
+        <div class="data-flow-section">
+            <h2 style="margin-bottom: 2rem;">Data Flow Architecture</h2>
+            <div id="dataFlowChart"></div>
+        </div>
+
+        <!-- Insights Section -->
+        <div class="insights-section">
+            <h2>Strategic Integration Insights</h2>
+            <div class="insight-grid">
+                <div class="insight-box">
+                    <h3>Schema-First Content Strategy</h3>
+                    <p>The JSON-LD implementation directly informs the knowledge graph structure, ensuring every piece of content has proper semantic markup for maximum search visibility.</p>
+                </div>
+                <div class="insight-box">
+                    <h3>Unified Information Architecture</h3>
+                    <p>Both systems work together to create a comprehensive information architecture where structured data enhances the knowledge graph's semantic relationships.</p>
+                </div>
+                <div class="insight-box">
+                    <h3>Performance Amplification</h3>
+                    <p>The 45%+ completion rate target from JSON-LD strategy feeds into the knowledge graph's performance metrics, creating measurable outcomes.</p>
+                </div>
+                <div class="insight-box">
+                    <h3>AI-Powered Optimization</h3>
+                    <p>The knowledge graph uses JSON-LD schema patterns to optimize content relationships, while structured data benefits from graph-based insights.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const authToken = localStorage.getItem('authToken');
+        const sessionExpiry = localStorage.getItem('sessionExpiry');
+        const currentTime = new Date().getTime();
+
+        if (!authToken || !sessionExpiry || currentTime > parseInt(sessionExpiry)) {
+            window.location.href = 'login.html';
+        }
+
+        // Initialize main connection diagram
+        function initConnectionDiagram() {
+            const chartDom = document.getElementById('connectionDiagram');
+            const myChart = echarts.init(chartDom);
+
+            // Define comprehensive nodes showing the connection
+            const nodes = [
+                // Central Connection Hub
+                { id: 'connection-hub', name: 'JSON-LD & GEO Integration', category: 0, symbolSize: 120, x: 400, y: 300, itemStyle: { color: '#667eea' } },
+                
+                // JSON-LD Strategy Layer
+                { id: 'jsonld-core', name: 'JSON-LD Content Strategy', category: 1, symbolSize: 100, x: 200, y: 200, itemStyle: { color: '#764ba2' } },
+                { id: 'faqpage-schema', name: 'FAQPage Schema (70%)', category: 2, symbolSize: 80, x: 100, y: 100, itemStyle: { color: '#fa709a' } },
+                { id: 'product-schema', name: 'Product Schema', category: 2, symbolSize: 60, x: 100, y: 200, itemStyle: { color: '#fa709a' } },
+                { id: 'howto-schema', name: 'HowTo Schema', category: 2, symbolSize: 60, x: 100, y: 300, itemStyle: { color: '#fa709a' } },
+                { id: 'qapage-schema', name: 'QAPage Schema', category: 2, symbolSize: 50, x: 100, y: 400, itemStyle: { color: '#fa709a' } },
+                
+                // GEO Knowledge Layer
+                { id: 'geo-core', name: 'GEO Knowledge Graph', category: 1, symbolSize: 100, x: 600, y: 200, itemStyle: { color: '#764ba2' } },
+                { id: 'content-db', name: 'Content Database', category: 3, symbolSize: 80, x: 700, y: 100, itemStyle: { color: '#4facfe' } },
+                { id: 'keyword-strategy', name: 'Keyword Strategy', category: 3, symbolSize: 80, x: 700, y: 200, itemStyle: { color: '#4facfe' } },
+                { id: 'schema-markup', name: 'Schema Markup Node', category: 3, symbolSize: 80, x: 700, y: 300, itemStyle: { color: '#4facfe' } },
+                { id: 'competitor-nodes', name: 'Competitor Analysis', category: 3, symbolSize: 70, x: 700, y: 400, itemStyle: { color: '#4facfe' } },
+                
+                // Content Types Bridge
+                { id: 'ct-faq', name: 'FAQ Content', category: 4, symbolSize: 60, x: 300, y: 100, itemStyle: { color: '#43e97b' } },
+                { id: 'ct-guides', name: 'Buyer Guides', category: 4, symbolSize: 60, x: 300, y: 200, itemStyle: { color: '#43e97b' } },
+                { id: 'ct-product', name: 'Product Pages', category: 4, symbolSize: 60, x: 300, y: 300, itemStyle: { color: '#43e97b' } },
+                { id: 'ct-comparison', name: 'Comparison Pages', category: 4, symbolSize: 60, x: 300, y: 400, itemStyle: { color: '#43e97b' } },
+                
+                // Keywords Bridge
+                { id: 'kw-sleep', name: 'Sleep Position Keywords', category: 5, symbolSize: 55, x: 500, y: 100, itemStyle: { color: '#fee140' } },
+                { id: 'kw-firmness', name: 'Firmness Keywords', category: 5, symbolSize: 55, x: 500, y: 200, itemStyle: { color: '#fee140' } },
+                { id: 'kw-cooling', name: 'Cooling Keywords', category: 5, symbolSize: 55, x: 500, y: 300, itemStyle: { color: '#fee140' } },
+                { id: 'kw-trial', name: 'Trial & Warranty', category: 5, symbolSize: 55, x: 500, y: 400, itemStyle: { color: '#fee140' } },
+                
+                // Distribution Channels
+                { id: 'ch-aimax', name: 'AI Max Channel', category: 6, symbolSize: 50, x: 200, y: 450, itemStyle: { color: '#f093fb' } },
+                { id: 'ch-shorts', name: 'Shorts Channel', category: 6, symbolSize: 50, x: 300, y: 500, itemStyle: { color: '#f093fb' } },
+                { id: 'ch-reddit', name: 'Reddit Channel', category: 6, symbolSize: 45, x: 400, y: 500, itemStyle: { color: '#f093fb' } },
+                { id: 'ch-blog', name: 'Blog Channel', category: 6, symbolSize: 45, x: 500, y: 500, itemStyle: { color: '#f093fb' } },
+                
+                // Performance Metrics
+                { id: 'metric-collection', name: 'Collection Rate ≥1.2%', category: 7, symbolSize: 45, x: 250, y: 50, itemStyle: { color: '#30cfd0' } },
+                { id: 'metric-completion', name: 'Completion ≥45%', category: 7, symbolSize: 45, x: 400, y: 50, itemStyle: { color: '#30cfd0' } },
+                { id: 'metric-cta', name: 'CTA Click Rate', category: 7, symbolSize: 45, x: 550, y: 50, itemStyle: { color: '#30cfd0' } }
+            ];
+
+            // Define comprehensive connections
+            const edges = [
+                // Central hub connections
+                { source: 'connection-hub', target: 'jsonld-core', value: 10, lineStyle: { width: 5 } },
+                { source: 'connection-hub', target: 'geo-core', value: 10, lineStyle: { width: 5 } },
+                
+                // JSON-LD to Schema connections
+                { source: 'jsonld-core', target: 'faqpage-schema', value: 8 },
+                { source: 'jsonld-core', target: 'product-schema', value: 6 },
+                { source: 'jsonld-core', target: 'howto-schema', value: 5 },
+                { source: 'jsonld-core', target: 'qapage-schema', value: 5 },
+                
+                // GEO to components connections
+                { source: 'geo-core', target: 'content-db', value: 8 },
+                { source: 'geo-core', target: 'keyword-strategy', value: 8 },
+                { source: 'geo-core', target: 'schema-markup', value: 8 },
+                { source: 'geo-core', target: 'competitor-nodes', value: 6 },
+                
+                // Schema to Content Type mappings
+                { source: 'faqpage-schema', target: 'ct-faq', value: 9 },
+                { source: 'product-schema', target: 'ct-product', value: 8 },
+                { source: 'howto-schema', target: 'ct-guides', value: 7 },
+                { source: 'qapage-schema', target: 'ct-comparison', value: 6 },
+                
+                // Content Types to Keywords
+                { source: 'ct-faq', target: 'kw-sleep', value: 7 },
+                { source: 'ct-guides', target: 'kw-firmness', value: 6 },
+                { source: 'ct-product', target: 'kw-cooling', value: 6 },
+                { source: 'ct-comparison', target: 'kw-trial', value: 5 },
+                
+                // Keywords to Knowledge Graph
+                { source: 'kw-sleep', target: 'content-db', value: 7 },
+                { source: 'kw-firmness', target: 'keyword-strategy', value: 7 },
+                { source: 'kw-cooling', target: 'keyword-strategy', value: 6 },
+                { source: 'kw-trial', target: 'content-db', value: 5 },
+                
+                // Channel connections
+                { source: 'jsonld-core', target: 'ch-aimax', value: 6 },
+                { source: 'jsonld-core', target: 'ch-shorts', value: 6 },
+                { source: 'ch-aimax', target: 'connection-hub', value: 5 },
+                { source: 'ch-shorts', target: 'connection-hub', value: 5 },
+                { source: 'ch-reddit', target: 'geo-core', value: 4 },
+                { source: 'ch-blog', target: 'geo-core', value: 4 },
+                
+                // Metrics connections
+                { source: 'metric-collection', target: 'jsonld-core', value: 5 },
+                { source: 'metric-completion', target: 'connection-hub', value: 5 },
+                { source: 'metric-cta', target: 'geo-core', value: 5 },
+                
+                // Cross-system bridges
+                { source: 'schema-markup', target: 'faqpage-schema', value: 7, lineStyle: { type: 'dashed', color: '#4facfe' } },
+                { source: 'content-db', target: 'ct-faq', value: 6, lineStyle: { type: 'dashed', color: '#4facfe' } },
+                { source: 'keyword-strategy', target: 'kw-sleep', value: 6, lineStyle: { type: 'dashed', color: '#4facfe' } }
+            ];
+
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function(params) {
+                        if (params.dataType === 'node') {
+                            return `<b>${params.name}</b><br/>Category: ${getCategoryName(params.data.category)}`;
+                        } else if (params.dataType === 'edge') {
+                            return `${params.data.source} → ${params.data.target}<br/>Connection Strength: ${params.data.value}`;
+                        }
+                    }
+                },
+                legend: {
+                    data: ['Hub', 'Core Systems', 'Schema Types', 'GEO Components', 'Content Types', 'Keywords', 'Channels', 'Metrics'],
+                    textStyle: { color: '#a8b2d1' },
+                    bottom: 10
+                },
+                animationThreshold: 100,
+                animationDuration: 1500,
+                animationEasingUpdate: 'cubicOut',
+                animationDelay: function (idx) {
+                    return idx * 20;
+                },
+                series: [{
+                    name: 'Connection Network',
+                    type: 'graph',
+                    layout: 'none',
+                    data: nodes,
+                    edges: edges,
+                    roam: true,
+                    focusNodeAdjacency: true,
+                    itemStyle: {
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0, 0, 0, 0.3)'
+                    },
+                    label: {
+                        show: true,
+                        position: 'bottom',
+                        color: '#a8b2d1',
+                        fontSize: 11,
+                        formatter: function(params) {
+                            return params.name.length > 15 ? params.name.substr(0, 15) + '...' : params.name;
+                        }
+                    },
+                    lineStyle: {
+                        color: 'source',
+                        curveness: 0.3,
+                        opacity: 0.7
+                    },
+                    emphasis: {
+                        focus: 'adjacency',
+                        label: {
+                            show: true,
+                            fontSize: 14,
+                            color: '#fff'
+                        },
+                        lineStyle: {
+                            width: 4,
+                            opacity: 1
+                        }
+                    }
+                }]
+            };
+
+            myChart.setOption(option);
+            
+            return myChart;
+        }
+
+        function getCategoryName(category) {
+            const categories = ['Hub', 'Core Systems', 'Schema Types', 'GEO Components', 'Content Types', 'Keywords', 'Channels', 'Metrics'];
+            return categories[category] || 'Unknown';
+        }
+
+        // Initialize data flow chart
+        function initDataFlowChart() {
+            const chartDom = document.getElementById('dataFlowChart');
+            const myChart = echarts.init(chartDom);
+
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    triggerOn: 'mousemove'
+                },
+                series: [{
+                    type: 'sankey',
+                    layout: 'none',
+                    emphasis: {
+                        focus: 'adjacency'
+                    },
+                    data: [
+                        { name: 'User Search Query' },
+                        { name: 'Search Engine Processing' },
+                        { name: 'JSON-LD Schema Recognition' },
+                        { name: 'Rich Snippet Generation' },
+                        { name: 'GEO Knowledge Graph' },
+                        { name: 'Content Mapping' },
+                        { name: 'Keyword Clustering' },
+                        { name: 'User Intent Analysis' },
+                        { name: 'Content Delivery' },
+                        { name: 'Performance Metrics' }
+                    ],
+                    links: [
+                        { source: 'User Search Query', target: 'Search Engine Processing', value: 100 },
+                        { source: 'Search Engine Processing', target: 'JSON-LD Schema Recognition', value: 90 },
+                        { source: 'JSON-LD Schema Recognition', target: 'Rich Snippet Generation', value: 80 },
+                        { source: 'Search Engine Processing', target: 'GEO Knowledge Graph', value: 85 },
+                        { source: 'GEO Knowledge Graph', target: 'Content Mapping', value: 75 },
+                        { source: 'GEO Knowledge Graph', target: 'Keyword Clustering', value: 70 },
+                        { source: 'GEO Knowledge Graph', target: 'User Intent Analysis', value: 65 },
+                        { source: 'Rich Snippet Generation', target: 'Content Delivery', value: 70 },
+                        { source: 'Content Mapping', target: 'Content Delivery', value: 60 },
+                        { source: 'Keyword Clustering', target: 'Content Delivery', value: 55 },
+                        { source: 'User Intent Analysis', target: 'Content Delivery', value: 50 },
+                        { source: 'Content Delivery', target: 'Performance Metrics', value: 90 }
+                    ],
+                    lineStyle: {
+                        color: 'gradient',
+                        curveness: 0.5
+                    },
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: '#667eea' },
+                            { offset: 1, color: '#764ba2' }
+                        ]),
+                        borderColor: '#1a1a2e',
+                        borderWidth: 1
+                    },
+                    label: {
+                        color: '#a8b2d1',
+                        fontSize: 12,
+                        formatter: '{b}'
+                    }
+                }]
+            };
+
+            myChart.setOption(option);
+            
+            return myChart;
+        }
+
+        // Initialize all charts
+        let connectionChart, dataFlowChart;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                connectionChart = initConnectionDiagram();
+                dataFlowChart = initDataFlowChart();
+            }, 500);
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            if (connectionChart) connectionChart.resize();
+            if (dataFlowChart) dataFlowChart.resize();
+        });
+    </script>
+</body>
+</html>

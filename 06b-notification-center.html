@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Center - SweetNightGEO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="shared-ui-components.css">
+    <script src="shared-components.js"></script>
+    <script>
+        // Authentication check
+        (function() {
+            const authToken = localStorage.getItem('authToken');
+            const sessionExpiry = localStorage.getItem('sessionExpiry');
+            
+            if (!authToken || !sessionExpiry || new Date().getTime() > parseInt(sessionExpiry)) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('sessionExpiry');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header header-fixed">
+        <div class="logo">
+            <i class="fas fa-bell"></i>
+            Notification Center
+        </div>
+        <div class="header-right">
+            <div class="notification-badge-container">
+                <button class="notification-icon" onclick="toggleNotificationPanel()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count">3</span>
+                </button>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="current-user">Admin User</span>
+            </div>
+            <button class="logout-btn" onclick="AuthManager.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Quick Notification Panel -->
+    <div class="notification-panel" id="notification-panel">
+        <div class="notification-panel-header">
+            <h3>Recent Notifications</h3>
+            <button class="btn-close" onclick="toggleNotificationPanel()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-panel-body">
+            <div class="quick-notification-item">
+                <div class="notification-icon-small bg-success">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="notification-content-small">
+                    <p>Report generated successfully</p>
+                    <span class="notification-time">5 min ago</span>
+                </div>
+            </div>
+            <div class="quick-notification-item">
+                <div class="notification-icon-small bg-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="notification-content-small">
+                    <p>High CPU usage detected</p>
+                    <span class="notification-time">12 min ago</span>
+                </div>
+            </div>
+            <div class="quick-notification-item">
+                <div class="notification-icon-small bg-info">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="notification-content-small">
+                    <p>New user registered</p>
+                    <span class="notification-time">1 hour ago</span>
+                </div>
+            </div>
+        </div>
+        <div class="notification-panel-footer">
+            <a href="#" class="view-all-link">View All Notifications</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-area">
+        <div class="container">
+            <!-- Breadcrumbs -->
+            <nav class="breadcrumb">
+                <a href="index.html" class="breadcrumb-item">Dashboard</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-item">Notification Center</span>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h1 class="page-title">Notification Center</h1>
+                    <p class="page-subtitle">Manage alerts, messages, and system notifications</p>
+                </div>
+                <div class="page-header-right">
+                    <button class="btn btn-primary" onclick="showNotificationSettings()">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notification Stats -->
+            <div class="grid grid-cols-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-info">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">127</div>
+                                <div class="stat-label">Total Messages</div>
+                                <div class="stat-change text-info">This month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">89</div>
+                                <div class="stat-label">Read Messages</div>
+                                <div class="stat-change text-success">70.1% read rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">23</div>
+                                <div class="stat-label">Urgent Alerts</div>
+                                <div class="stat-change text-warning">Needs attention</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-error">
+                                <i class="fas fa-ban"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">15</div>
+                                <div class="stat-label">Blocked</div>
+                                <div class="stat-change text-error">Spam filtered</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Filters -->
+            <div class="filters-bar">
+                <div class="filters-left">
+                    <div class="nav-tabs">
+                        <button class="nav-tab active" data-filter="all" onclick="filterNotifications('all')">
+                            All <span class="tab-count">127</span>
+                        </button>
+                        <button class="nav-tab" data-filter="unread" onclick="filterNotifications('unread')">
+                            Unread <span class="tab-count">38</span>
+                        </button>
+                        <button class="nav-tab" data-filter="urgent" onclick="filterNotifications('urgent')">
+                            Urgent <span class="tab-count">23</span>
+                        </button>
+                        <button class="nav-tab" data-filter="system" onclick="filterNotifications('system')">
+                            System <span class="tab-count">45</span>
+                        </button>
+                        <button class="nav-tab" data-filter="user" onclick="filterNotifications('user')">
+                            User <span class="tab-count">59</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="filters-right">
+                    <button class="btn btn-ghost" onclick="markAllAsRead()">
+                        <i class="fas fa-check-double"></i>
+                        Mark All Read
+                    </button>
+                    <button class="btn btn-ghost" onclick="clearAllNotifications()">
+                        <i class="fas fa-trash"></i>
+                        Clear All
+                    </button>
+                    <select id="time-filter" class="form-select">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Notifications List -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="notifications-list" id="notifications-list">
+                        <!-- Notifications will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Load More Button -->
+                    <div class="load-more-container">
+                        <button class="btn btn-secondary" onclick="loadMoreNotifications()">
+                            <i class="fas fa-plus"></i>
+                            Load More Notifications
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+        }
+        
+        .page-header-left h1.page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .page-header-left p.page-subtitle {
+            color: var(--gray-600);
+            font-size: 16px;
+        }
+
+        /* Quick Notification Panel */
+        .notification-badge-container {
+            position: relative;
+        }
+        
+        .notification-icon {
+            position: relative;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: var(--transition);
+        }
+        
+        .notification-icon:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--error);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+        
+        .notification-panel {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            z-index: 1001;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .notification-panel.show {
+            display: block;
+        }
+        
+        .notification-panel-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .notification-panel-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .btn-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray-500);
+            font-size: 16px;
+        }
+        
+        .notification-panel-body {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .quick-notification-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-100);
+            transition: var(--transition);
+        }
+        
+        .quick-notification-item:hover {
+            background: var(--gray-50);
+        }
+        
+        .notification-icon-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .notification-content-small {
+            flex: 1;
+        }
+        
+        .notification-content-small p {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            color: var(--dark);
+        }
+        
+        .notification-time {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        
+        .notification-panel-footer {
+            padding: 16px 20px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+        
+        .view-all-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Filters Bar */
+        .filters-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .filters-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 0;
+        }
+        
+        .nav-tab {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-tab:hover,
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .tab-count {
+            background: var(--gray-200);
+            color: var(--gray-600);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .nav-tab.active .tab-count {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Notifications List */
+        .notifications-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            display: flex;
+            gap: 16px;
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-100);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .notification-item:hover {
+            background: var(--gray-50);
+        }
+        
+        .notification-item.unread {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .notification-item.urgent {
+            border-left: 4px solid var(--error);
+        }
+        
+        .notification-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .notification-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .notification-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        
+        .notification-description {
+            color: var(--gray-700);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        
+        .notification-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .notification-action {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 16px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .notification-action-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .notification-action-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .notification-action-secondary {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+        
+        .notification-action-secondary:hover {
+            background: var(--gray-300);
+        }
+        
+        .notification-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        
+        .notification-time-full {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        
+        .notification-control-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray-400);
+            padding: 4px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+        
+        .notification-control-btn:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+        
+        .load-more-container {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            margin-top: 24px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .notification-panel {
+                width: calc(100vw - 40px);
+                right: 20px;
+            }
+            
+            .filters-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .nav-tabs {
+                overflow-x: auto;
+                width: 100%;
+            }
+            
+            .nav-tab {
+                white-space: nowrap;
+            }
+            
+            .filters-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .notification-item {
+                padding: 16px;
+            }
+            
+            .notification-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+        }
+    </style>
+
+    <script>
+        // Mock notifications data
+        const mockNotifications = [
+            {
+                id: 1,
+                type: 'system',
+                title: 'System Maintenance Scheduled',
+                description: 'Scheduled maintenance will occur on Sunday at 2 AM EST. Expected downtime: 2 hours.',
+                time: '2024-01-15T10:30:00Z',
+                read: false,
+                urgent: true,
+                avatar: 'fas fa-cog',
+                avatarColor: 'bg-warning',
+                actions: [
+                    { text: 'View Details', type: 'primary', action: 'viewMaintenance' },
+                    { text: 'Dismiss', type: 'secondary', action: 'dismiss' }
+                ]
+            },
+            {
+                id: 2,
+                type: 'user',
+                title: 'New User Registration',
+                description: 'John Smith has requested access to the analytics dashboard.',
+                time: '2024-01-15T09:15:00Z',
+                read: false,
+                urgent: false,
+                avatar: 'fas fa-user-plus',
+                avatarColor: 'bg-success',
+                actions: [
+                    { text: 'Approve', type: 'primary', action: 'approveUser' },
+                    { text: 'Reject', type: 'secondary', action: 'rejectUser' }
+                ]
+            },
+            {
+                id: 3,
+                type: 'system',
+                title: 'High CPU Usage Alert',
+                description: 'Server CPU usage has exceeded 85% for the past 10 minutes. Investigation recommended.',
+                time: '2024-01-15T08:45:00Z',
+                read: true,
+                urgent: true,
+                avatar: 'fas fa-exclamation-triangle',
+                avatarColor: 'bg-error',
+                actions: [
+                    { text: 'Investigate', type: 'primary', action: 'investigate' }
+                ]
+            },
+            {
+                id: 4,
+                type: 'user',
+                title: 'Report Generation Complete',
+                description: 'Monthly analytics report has been generated and is ready for download.',
+                time: '2024-01-15T08:00:00Z',
+                read: true,
+                urgent: false,
+                avatar: 'fas fa-file-alt',
+                avatarColor: 'bg-info',
+                actions: [
+                    { text: 'Download', type: 'primary', action: 'downloadReport' }
+                ]
+            },
+            {
+                id: 5,
+                type: 'system',
+                title: 'Database Backup Completed',
+                description: 'Daily database backup completed successfully at 3:00 AM.',
+                time: '2024-01-15T03:00:00Z',
+                read: true,
+                urgent: false,
+                avatar: 'fas fa-database',
+                avatarColor: 'bg-success',
+                actions: []
+            }
+        ];
+
+        let currentFilter = 'all';
+        let notifications = [...mockNotifications];
+
+        function initializeNotificationCenter() {
+            // Set current user info
+            const currentUser = AuthManager.getCurrentUser();
+            if (currentUser) {
+                document.getElementById('current-user').textContent = currentUser.name || 'Admin User';
+            }
+
+            // Render notifications
+            renderNotifications();
+            
+            // Setup event listeners
+            document.getElementById('time-filter').addEventListener('change', filterByTime);
+            
+            // Close notification panel when clicking outside
+            document.addEventListener('click', (e) => {
+                const panel = document.getElementById('notification-panel');
+                const trigger = document.querySelector('.notification-icon');
+                
+                if (panel.classList.contains('show') && 
+                    !panel.contains(e.target) && 
+                    !trigger.contains(e.target)) {
+                    toggleNotificationPanel();
+                }
+            });
+        }
+
+        function renderNotifications() {
+            const container = document.getElementById('notifications-list');
+            const filteredNotifications = getFilteredNotifications();
+
+            if (filteredNotifications.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray-500);">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 16px;"></i>
+                        <p>No notifications found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredNotifications.map(notification => `
+                <div class="notification-item ${notification.read ? '' : 'unread'} ${notification.urgent ? 'urgent' : ''}" 
+                     onclick="markAsRead(${notification.id})">
+                    <div class="notification-avatar ${notification.avatarColor}">
+                        <i class="${notification.avatar}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-header">
+                            <h4 class="notification-title">${notification.title}</h4>
+                            <div class="notification-meta">
+                                <span class="badge badge-${notification.type === 'system' ? 'info' : 'success'}">
+                                    ${notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}
+                                </span>
+                                ${notification.urgent ? '<span class="badge badge-error">Urgent</span>' : ''}
+                            </div>
+                        </div>
+                        <p class="notification-description">${notification.description}</p>
+                        ${notification.actions.length > 0 ? `
+                            <div class="notification-actions">
+                                ${notification.actions.map(action => `
+                                    <a href="#" class="notification-action notification-action-${action.type}" 
+                                       onclick="executeAction('${action.action}', ${notification.id}); event.stopPropagation();">
+                                        ${action.text}
+                                    </a>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="notification-controls">
+                        <span class="notification-time-full">${formatTimeAgo(notification.time)}</span>
+                        <button class="notification-control-btn" onclick="deleteNotification(${notification.id}); event.stopPropagation();" 
+                                title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getFilteredNotifications() {
+            let filtered = notifications;
+
+            // Filter by type
+            switch (currentFilter) {
+                case 'unread':
+                    filtered = filtered.filter(n => !n.read);
+                    break;
+                case 'urgent':
+                    filtered = filtered.filter(n => n.urgent);
+                    break;
+                case 'system':
+                    filtered = filtered.filter(n => n.type === 'system');
+                    break;
+                case 'user':
+                    filtered = filtered.filter(n => n.type === 'user');
+                    break;
+            }
+
+            // Sort by time (newest first)
+            return filtered.sort((a, b) => new Date(b.time) - new Date(a.time));
+        }
+
+        function filterNotifications(filter) {
+            currentFilter = filter;
+            
+            // Update active tab
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('data-filter') === filter);
+            });
+
+            renderNotifications();
+        }
+
+        function filterByTime() {
+            // Time filtering logic would go here
+            UIComponents.showNotification('Time filter applied', 'info');
+            renderNotifications();
+        }
+
+        function formatTimeAgo(timeString) {
+            const time = new Date(timeString);
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - time) / 1000);
+
+            if (diffInSeconds < 60) return 'Just now';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+            return `${Math.floor(diffInSeconds / 86400)}d ago`;
+        }
+
+        function toggleNotificationPanel() {
+            const panel = document.getElementById('notification-panel');
+            panel.classList.toggle('show');
+        }
+
+        function markAsRead(notificationId) {
+            const notification = notifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+                renderNotifications();
+                updateNotificationCounts();
+            }
+        }
+
+        function markAllAsRead() {
+            notifications.forEach(notification => {
+                notification.read = true;
+            });
+            renderNotifications();
+            updateNotificationCounts();
+            UIComponents.showNotification('All notifications marked as read', 'success');
+        }
+
+        function clearAllNotifications() {
+            UIComponents.showModal(
+                'Clear All Notifications',
+                '<p>Are you sure you want to clear all notifications? This action cannot be undone.</p>',
+                {
+                    confirmText: 'Clear All',
+                    onConfirm: () => {
+                        notifications = [];
+                        renderNotifications();
+                        updateNotificationCounts();
+                        UIComponents.showNotification('All notifications cleared', 'success');
+                    }
+                }
+            );
+        }
+
+        function deleteNotification(notificationId) {
+            const index = notifications.findIndex(n => n.id === notificationId);
+            if (index !== -1) {
+                notifications.splice(index, 1);
+                renderNotifications();
+                updateNotificationCounts();
+            }
+        }
+
+        function updateNotificationCounts() {
+            const total = notifications.length;
+            const unread = notifications.filter(n => !n.read).length;
+            const urgent = notifications.filter(n => n.urgent).length;
+            const system = notifications.filter(n => n.type === 'system').length;
+            const user = notifications.filter(n => n.type === 'user').length;
+
+            document.querySelector('[data-filter="all"] .tab-count').textContent = total;
+            document.querySelector('[data-filter="unread"] .tab-count').textContent = unread;
+            document.querySelector('[data-filter="urgent"] .tab-count').textContent = urgent;
+            document.querySelector('[data-filter="system"] .tab-count').textContent = system;
+            document.querySelector('[data-filter="user"] .tab-count').textContent = user;
+
+            // Update header badge
+            const badge = document.querySelector('.notification-count');
+            if (badge) {
+                badge.textContent = unread;
+                badge.style.display = unread > 0 ? 'block' : 'none';
+            }
+        }
+
+        function executeAction(action, notificationId) {
+            const notification = notifications.find(n => n.id === notificationId);
+            
+            switch (action) {
+                case 'viewMaintenance':
+                    UIComponents.showNotification('Viewing maintenance details...', 'info');
+                    break;
+                case 'approveUser':
+                    UIComponents.showNotification('User approved successfully', 'success');
+                    deleteNotification(notificationId);
+                    break;
+                case 'rejectUser':
+                    UIComponents.showNotification('User rejected', 'info');
+                    deleteNotification(notificationId);
+                    break;
+                case 'investigate':
+                    UIComponents.showNotification('Opening system monitoring...', 'info');
+                    break;
+                case 'downloadReport':
+                    UIComponents.showNotification('Downloading report...', 'info');
+                    markAsRead(notificationId);
+                    break;
+                case 'dismiss':
+                    deleteNotification(notificationId);
+                    break;
+                default:
+                    UIComponents.showNotification('Action executed', 'info');
+            }
+        }
+
+        function loadMoreNotifications() {
+            // Simulate loading more notifications
+            UIComponents.showNotification('Loading more notifications...', 'info');
+            
+            // In a real app, this would fetch more data from the server
+            setTimeout(() => {
+                UIComponents.showNotification('No more notifications to load', 'info');
+            }, 1000);
+        }
+
+        function showNotificationSettings() {
+            const settingsContent = `
+                <form id="notification-settings-form">
+                    <div class="form-group">
+                        <label class="form-label">Email Notifications</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked> System alerts
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked> User activities
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox"> Marketing updates
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Push Notifications</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked> Urgent alerts only
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox"> All notifications
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notification Sound</label>
+                        <select class="form-select">
+                            <option>Default</option>
+                            <option>Chime</option>
+                            <option>Ding</option>
+                            <option>Silent</option>
+                        </select>
+                    </div>
+                </form>
+                <style>
+                    .checkbox-group {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                        margin-top: 8px;
+                    }
+                    .checkbox-label {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        font-size: 14px;
+                        cursor: pointer;
+                    }
+                </style>
+            `;
+
+            UIComponents.showModal('Notification Settings', settingsContent, {
+                confirmText: 'Save Settings',
+                onConfirm: () => {
+                    UIComponents.showNotification('Notification settings updated', 'success');
+                }
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNotificationCenter();
+            updateNotificationCounts();
+        });
+    </script>
+</body>
+</html>

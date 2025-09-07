@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Import/Export Tools - SweetNightGEO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="shared-ui-components.css">
+    <script src="shared-components.js"></script>
+    <script>
+        // Authentication check
+        (function() {
+            const authToken = localStorage.getItem('authToken');
+            const sessionExpiry = localStorage.getItem('sessionExpiry');
+            
+            if (!authToken || !sessionExpiry || new Date().getTime() > parseInt(sessionExpiry)) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('sessionExpiry');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header header-fixed">
+        <div class="logo">
+            <i class="fas fa-exchange-alt"></i>
+            Data Import/Export Tools
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="current-user">Admin User</span>
+            </div>
+            <button class="logout-btn" onclick="AuthManager.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="content-area">
+        <div class="container">
+            <!-- Breadcrumbs -->
+            <nav class="breadcrumb">
+                <a href="index.html" class="breadcrumb-item">Dashboard</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-item">Data Tools</span>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h1 class="page-title">Data Import/Export Tools</h1>
+                    <p class="page-subtitle">Manage data transfers, backups, and synchronization</p>
+                </div>
+                <div class="page-header-right">
+                    <button class="btn btn-secondary" onclick="showDataHistory()">
+                        <i class="fas fa-history"></i>
+                        View History
+                    </button>
+                    <button class="btn btn-primary" onclick="showScheduleModal()">
+                        <i class="fas fa-calendar-plus"></i>
+                        Schedule Task
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-info">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">23</div>
+                                <div class="stat-label">Imports This Month</div>
+                                <div class="stat-change text-success">+15% vs last month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-success">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">47</div>
+                                <div class="stat-label">Exports This Month</div>
+                                <div class="stat-change text-success">2.3GB transferred</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-warning">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">5</div>
+                                <div class="stat-label">Running Tasks</div>
+                                <div class="stat-change text-warning">Monitor progress</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-error">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">2</div>
+                                <div class="stat-label">Failed Tasks</div>
+                                <div class="stat-change text-error">Need attention</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Tools Grid -->
+            <div class="grid grid-cols-2 mb-4">
+                <!-- Data Import Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-upload text-info"></i>
+                            Data Import
+                        </h3>
+                        <button class="btn btn-ghost" onclick="refreshImportOptions()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="import-options">
+                            <div class="import-option" onclick="showImportModal('file')">
+                                <div class="import-icon">
+                                    <i class="fas fa-file-csv"></i>
+                                </div>
+                                <div class="import-content">
+                                    <h4>File Upload</h4>
+                                    <p>Upload CSV, Excel, or JSON files</p>
+                                    <span class="import-formats">CSV, XLS, XLSX, JSON</span>
+                                </div>
+                                <div class="import-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="import-option" onclick="showImportModal('database')">
+                                <div class="import-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="import-content">
+                                    <h4>Database Connection</h4>
+                                    <p>Connect to external databases</p>
+                                    <span class="import-formats">MySQL, PostgreSQL, MongoDB</span>
+                                </div>
+                                <div class="import-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="import-option" onclick="showImportModal('api')">
+                                <div class="import-icon">
+                                    <i class="fas fa-cloud-download-alt"></i>
+                                </div>
+                                <div class="import-content">
+                                    <h4>API Integration</h4>
+                                    <p>Import from REST APIs or webhooks</p>
+                                    <span class="import-formats">REST, GraphQL, Webhook</span>
+                                </div>
+                                <div class="import-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="import-option" onclick="showImportModal('bulk')">
+                                <div class="import-icon">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <div class="import-content">
+                                    <h4>Bulk Import</h4>
+                                    <p>Process multiple files or sources</p>
+                                    <span class="import-formats">Batch Processing</span>
+                                </div>
+                                <div class="import-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Export Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-download text-success"></i>
+                            Data Export
+                        </h3>
+                        <button class="btn btn-ghost" onclick="refreshExportOptions()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="export-options">
+                            <div class="export-option" onclick="showExportModal('reports')">
+                                <div class="export-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="export-content">
+                                    <h4>Analytics Reports</h4>
+                                    <p>Export charts and analytics data</p>
+                                    <span class="export-formats">PDF, Excel, CSV</span>
+                                </div>
+                                <div class="export-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="export-option" onclick="showExportModal('database')">
+                                <div class="export-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="export-content">
+                                    <h4>Database Backup</h4>
+                                    <p>Export database or table data</p>
+                                    <span class="export-formats">SQL, JSON, CSV</span>
+                                </div>
+                                <div class="export-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="export-option" onclick="showExportModal('custom')">
+                                <div class="export-icon">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div class="export-content">
+                                    <h4>Custom Export</h4>
+                                    <p>Define custom data selection</p>
+                                    <span class="export-formats">Multiple Formats</span>
+                                </div>
+                                <div class="export-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="export-option" onclick="showExportModal('scheduled')">
+                                <div class="export-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="export-content">
+                                    <h4>Scheduled Exports</h4>
+                                    <p>Set up automated exports</p>
+                                    <span class="export-formats">Automated</span>
+                                </div>
+                                <div class="export-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Transformation Tools -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-magic text-warning"></i>
+                        Data Transformation Tools
+                    </h3>
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="showTransformationStudio()">
+                            <i class="fas fa-plus"></i>
+                            New Transformation
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="transformation-tools">
+                        <div class="tool-grid">
+                            <div class="tool-card" onclick="showTool('cleaner')">
+                                <i class="fas fa-broom"></i>
+                                <h4>Data Cleaner</h4>
+                                <p>Remove duplicates, fix formats</p>
+                            </div>
+                            <div class="tool-card" onclick="showTool('mapper')">
+                                <i class="fas fa-sitemap"></i>
+                                <h4>Field Mapper</h4>
+                                <p>Map fields between schemas</p>
+                            </div>
+                            <div class="tool-card" onclick="showTool('validator')">
+                                <i class="fas fa-check-circle"></i>
+                                <h4>Data Validator</h4>
+                                <p>Validate data integrity</p>
+                            </div>
+                            <div class="tool-card" onclick="showTool('converter')">
+                                <i class="fas fa-exchange-alt"></i>
+                                <h4>Format Converter</h4>
+                                <p>Convert between formats</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Tasks -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Data Tasks</h3>
+                    <div class="task-filters">
+                        <select id="task-filter" class="form-select">
+                            <option value="all">All Tasks</option>
+                            <option value="import">Import</option>
+                            <option value="export">Export</option>
+                            <option value="transformation">Transformation</option>
+                        </select>
+                        <select id="status-filter" class="form-select">
+                            <option value="all">All Status</option>
+                            <option value="running">Running</option>
+                            <option value="completed">Completed</option>
+                            <option value="failed">Failed</option>
+                            <option value="scheduled">Scheduled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="tasks-list" id="tasks-list">
+                        <!-- Tasks will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+        }
+        
+        .page-header-left h1.page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .page-header-left p.page-subtitle {
+            color: var(--gray-600);
+            font-size: 16px;
+        }
+        
+        .page-header-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Import/Export Options */
+        .import-options, .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .import-option, .export-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--border-radius-lg);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .import-option:hover, .export-option:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        
+        .import-icon, .export-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-light);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        
+        .import-content, .export-content {
+            flex: 1;
+        }
+        
+        .import-content h4, .export-content h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .import-content p, .export-content p {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+        
+        .import-formats, .export-formats {
+            font-size: 12px;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        
+        .import-arrow, .export-arrow {
+            color: var(--gray-400);
+            font-size: 16px;
+        }
+
+        /* Transformation Tools */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .tool-card {
+            text-align: center;
+            padding: 24px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--border-radius-lg);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .tool-card:hover {
+            border-color: var(--warning);
+            background: var(--warning-light);
+        }
+        
+        .tool-card i {
+            font-size: 32px;
+            color: var(--warning);
+            margin-bottom: 12px;
+        }
+        
+        .tool-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .tool-card p {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        /* Task Filters */
+        .task-filters {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .task-filters .form-select {
+            min-width: 120px;
+        }
+
+        /* Tasks List */
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        
+        .task-item:hover {
+            background: var(--gray-50);
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .task-content {
+            flex: 1;
+        }
+        
+        .task-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .task-description {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+        
+        .task-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        
+        .task-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+        }
+        
+        .progress-bar-small {
+            flex: 1;
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.3s ease;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .task-action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .task-action-view {
+            background: var(--info-light);
+            color: var(--info);
+        }
+        
+        .task-action-view:hover {
+            background: var(--info);
+            color: white;
+        }
+        
+        .task-action-download {
+            background: var(--success-light);
+            color: var(--success);
+        }
+        
+        .task-action-download:hover {
+            background: var(--success);
+            color: white;
+        }
+        
+        .task-action-delete {
+            background: var(--error-light);
+            color: var(--error);
+        }
+        
+        .task-action-delete:hover {
+            background: var(--error);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .page-header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .task-filters {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .task-filters .form-select {
+                min-width: auto;
+            }
+            
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .task-progress,
+            .task-actions {
+                width: 100%;
+            }
+            
+            .tool-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+
+    <script>
+        // Mock tasks data
+        const mockTasks = [
+            {
+                id: 1,
+                type: 'import',
+                title: 'Customer Data Import',
+                description: 'Importing customer records from CSV file',
+                status: 'running',
+                progress: 65,
+                startTime: '2024-01-15T09:30:00Z',
+                fileSize: '2.3 MB',
+                recordCount: 15420
+            },
+            {
+                id: 2,
+                type: 'export',
+                title: 'Analytics Report Export',
+                description: 'Exporting Q4 analytics data to Excel',
+                status: 'completed',
+                progress: 100,
+                startTime: '2024-01-15T08:15:00Z',
+                endTime: '2024-01-15T08:18:00Z',
+                fileSize: '4.7 MB'
+            },
+            {
+                id: 3,
+                type: 'transformation',
+                title: 'Data Cleaning Pipeline',
+                description: 'Removing duplicates and standardizing formats',
+                status: 'running',
+                progress: 30,
+                startTime: '2024-01-15T10:00:00Z',
+                recordCount: 8500
+            },
+            {
+                id: 4,
+                type: 'import',
+                title: 'Product Catalog Sync',
+                description: 'Syncing products from external API',
+                status: 'failed',
+                progress: 0,
+                startTime: '2024-01-15T07:45:00Z',
+                error: 'Connection timeout'
+            },
+            {
+                id: 5,
+                type: 'export',
+                title: 'User Backup',
+                description: 'Daily user data backup',
+                status: 'scheduled',
+                progress: 0,
+                scheduledTime: '2024-01-16T02:00:00Z'
+            }
+        ];
+
+        function initializeDataTools() {
+            // Set current user info
+            const currentUser = AuthManager.getCurrentUser();
+            if (currentUser) {
+                document.getElementById('current-user').textContent = currentUser.name || 'Admin User';
+            }
+
+            // Render tasks
+            renderTasks();
+            
+            // Setup event listeners
+            document.getElementById('task-filter').addEventListener('change', filterTasks);
+            document.getElementById('status-filter').addEventListener('change', filterTasks);
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasks-list');
+            const filteredTasks = getFilteredTasks();
+
+            if (filteredTasks.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray-500);">
+                        <i class="fas fa-tasks" style="font-size: 48px; margin-bottom: 16px;"></i>
+                        <p>No tasks found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredTasks.map(task => `
+                <div class="task-item">
+                    <div class="task-icon ${getTaskIconColor(task.type, task.status)}">
+                        <i class="${getTaskIcon(task.type)}"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-description">${task.description}</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-clock"></i> ${formatTaskTime(task)}</span>
+                            ${task.fileSize ? `<span><i class="fas fa-file"></i> ${task.fileSize}</span>` : ''}
+                            ${task.recordCount ? `<span><i class="fas fa-list"></i> ${task.recordCount.toLocaleString()} records</span>` : ''}
+                            ${task.error ? `<span class="text-error"><i class="fas fa-exclamation-circle"></i> ${task.error}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="task-progress">
+                        ${task.status === 'running' ? `
+                            <div class="progress-bar-small">
+                                <div class="progress-fill" style="width: ${task.progress}%"></div>
+                            </div>
+                            <span>${task.progress}%</span>
+                        ` : `
+                            <span class="badge badge-${getStatusBadgeType(task.status)}">
+                                ${task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                            </span>
+                        `}
+                    </div>
+                    <div class="task-actions">
+                        <button class="task-action-btn task-action-view" onclick="viewTaskDetails(${task.id})" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        ${task.status === 'completed' ? `
+                            <button class="task-action-btn task-action-download" onclick="downloadTaskResult(${task.id})" title="Download">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        ` : ''}
+                        <button class="task-action-btn task-action-delete" onclick="deleteTask(${task.id})" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getFilteredTasks() {
+            const typeFilter = document.getElementById('task-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            return mockTasks.filter(task => {
+                const matchesType = typeFilter === 'all' || task.type === typeFilter;
+                const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
+                return matchesType && matchesStatus;
+            }).sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+        }
+
+        function getTaskIcon(type) {
+            const icons = {
+                'import': 'fas fa-upload',
+                'export': 'fas fa-download',
+                'transformation': 'fas fa-magic'
+            };
+            return icons[type] || 'fas fa-task';
+        }
+
+        function getTaskIconColor(type, status) {
+            if (status === 'failed') return 'bg-error';
+            if (status === 'completed') return 'bg-success';
+            if (status === 'running') return 'bg-info';
+            if (status === 'scheduled') return 'bg-warning';
+            
+            const colors = {
+                'import': 'bg-info',
+                'export': 'bg-success',
+                'transformation': 'bg-warning'
+            };
+            return colors[type] || 'bg-primary';
+        }
+
+        function getStatusBadgeType(status) {
+            const types = {
+                'completed': 'success',
+                'failed': 'error',
+                'scheduled': 'warning',
+                'running': 'info'
+            };
+            return types[status] || 'info';
+        }
+
+        function formatTaskTime(task) {
+            if (task.status === 'scheduled') {
+                return `Scheduled for ${DataUtils.formatDate(task.scheduledTime, 'MM/DD HH:mm')}`;
+            }
+            
+            const startTime = DataUtils.formatDate(task.startTime, 'MM/DD HH:mm');
+            
+            if (task.endTime) {
+                const duration = Math.floor((new Date(task.endTime) - new Date(task.startTime)) / 1000 / 60);
+                return `${startTime} (${duration}m)`;
+            }
+            
+            return `Started ${startTime}`;
+        }
+
+        function filterTasks() {
+            renderTasks();
+        }
+
+        function showImportModal(type) {
+            let modalContent = '';
+            let modalTitle = '';
+
+            switch (type) {
+                case 'file':
+                    modalTitle = 'File Upload Import';
+                    modalContent = `
+                        <div class="form-group">
+                            <label class="form-label">Select File</label>
+                            <input type="file" class="form-input" accept=".csv,.xls,.xlsx,.json" multiple>
+                            <p class="form-help">Supported formats: CSV, Excel (.xls, .xlsx), JSON</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Target Table</label>
+                            <select class="form-select">
+                                <option>customers</option>
+                                <option>products</option>
+                                <option>orders</option>
+                                <option>analytics</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked> Skip duplicate records
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox"> Validate data before import
+                            </label>
+                        </div>
+                    `;
+                    break;
+                case 'database':
+                    modalTitle = 'Database Import';
+                    modalContent = `
+                        <div class="form-group">
+                            <label class="form-label">Database Type</label>
+                            <select class="form-select">
+                                <option>MySQL</option>
+                                <option>PostgreSQL</option>
+                                <option>MongoDB</option>
+                                <option>SQL Server</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2">
+                            <div class="form-group">
+                                <label class="form-label">Host</label>
+                                <input type="text" class="form-input" placeholder="localhost">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Port</label>
+                                <input type="number" class="form-input" placeholder="5432">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2">
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">SQL Query</label>
+                            <textarea class="form-textarea" placeholder="SELECT * FROM table_name WHERE..."></textarea>
+                        </div>
+                    `;
+                    break;
+                case 'api':
+                    modalTitle = 'API Import';
+                    modalContent = `
+                        <div class="form-group">
+                            <label class="form-label">API Endpoint</label>
+                            <input type="url" class="form-input" placeholder="https://api.example.com/data">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Method</label>
+                            <select class="form-select">
+                                <option>GET</option>
+                                <option>POST</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Headers</label>
+                            <textarea class="form-textarea" placeholder='{"Authorization": "Bearer token", "Content-Type": "application/json"}'></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Schedule</label>
+                            <select class="form-select">
+                                <option>One-time</option>
+                                <option>Hourly</option>
+                                <option>Daily</option>
+                                <option>Weekly</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                case 'bulk':
+                    modalTitle = 'Bulk Import';
+                    modalContent = `
+                        <div class="form-group">
+                            <label class="form-label">Import Type</label>
+                            <select class="form-select">
+                                <option>Multiple Files</option>
+                                <option>Directory Scan</option>
+                                <option>FTP/SFTP</option>
+                                <option>Cloud Storage</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Source Path</label>
+                            <input type="text" class="form-input" placeholder="/path/to/files">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">File Pattern</label>
+                            <input type="text" class="form-input" placeholder="*.csv" value="*.csv">
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox"> Process files in parallel
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked> Move processed files to archive
+                            </label>
+                        </div>
+                    `;
+                    break;
+            }
+
+            UIComponents.showModal(modalTitle, modalContent, {
+                confirmText: 'Start Import',
+                onConfirm: () => {
+                    startImportTask(type);
+                }
+            });
+        }
+
+        function showExportModal(type) {
+            let modalContent = '';
+            let modalTitle = '';
+
+            switch (type) {
+                case 'reports':
+                    modalTitle = 'Export Analytics Reports';
+                    modalContent = `
+                        <div class="form-group">
+                            <label class="form-label">Report Type</label>
+                            <select class="form-select">
+                                <option>Dashboard Overview</option>
+                                <option>User Analytics</option>
+                                <option>Performance Metrics</option>
+                                <option>Custom Report</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2">
+                            <div class="form-group">
+                                <label class="form-label">Date From</label>
+                                <input type="date" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Date To</label>
+                                <input type="date" class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Export Format</label>
+                            <select class="form-select">
+                                <option>PDF</option>
+                                <option>Excel (.xlsx)</option>
+                                <option>CSV</option>
+                                <option>JSON</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                case 'database':
+                    modalTitle = 'Database Export';
+                    modalContent = `
+                        <div class="form-group">
+                            <label class="form-label">Export Scope</label>
+                            <select class="form-select">
+                                <option>Full Database</option>
+                                <option>Specific Tables</option>
+                                <option>Custom Query</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tables to Export</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label"><input type="checkbox" checked> users</label>
+                                <label class="checkbox-label"><input type="checkbox" checked> products</label>
+                                <label class="checkbox-label"><input type="checkbox"> orders</label>
+                                <label class="checkbox-label"><input type="checkbox"> analytics</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Export Format</label>
+                            <select class="form-select">
+                                <option>SQL Dump</option>
+                                <option>JSON</option>
+                                <option>CSV (per table)</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                case 'custom':
+                    modalTitle = 'Custom Data Export';
+                    modalContent = `
+                        <div class="form-group">
+                            <label class="form-label">Data Query</label>
+                            <textarea class="form-textarea" placeholder="SELECT * FROM users WHERE created_at > '2024-01-01'"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Output Format</label>
+                            <select class="form-select">
+                                <option>CSV</option>
+                                <option>JSON</option>
+                                <option>Excel</option>
+                                <option>XML</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox"> Include column headers
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked> Compress output file
+                            </label>
+                        </div>
+                    `;
+                    break;
+                case 'scheduled':
+                    modalTitle = 'Scheduled Export';
+                    modalContent = `
+                        <div class="form-group">
+                            <label class="form-label">Export Name</label>
+                            <input type="text" class="form-input" placeholder="Weekly Sales Report">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Schedule</label>
+                            <select class="form-select">
+                                <option>Daily</option>
+                                <option>Weekly</option>
+                                <option>Monthly</option>
+                                <option>Custom Cron</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Time</label>
+                            <input type="time" class="form-input" value="02:00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Recipients</label>
+                            <input type="email" class="form-input" placeholder="admin@company.com" multiple>
+                        </div>
+                    `;
+                    break;
+            }
+
+            UIComponents.showModal(modalTitle, modalContent, {
+                confirmText: 'Start Export',
+                onConfirm: () => {
+                    startExportTask(type);
+                }
+            });
+        }
+
+        function startImportTask(type) {
+            UIComponents.showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} import started!`, 'success');
+            // In a real app, this would start the actual import process
+            setTimeout(() => {
+                renderTasks(); // Refresh tasks list
+            }, 1000);
+        }
+
+        function startExportTask(type) {
+            UIComponents.showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} export started!`, 'success');
+            // In a real app, this would start the actual export process
+            setTimeout(() => {
+                renderTasks(); // Refresh tasks list
+            }, 1000);
+        }
+
+        function showTool(toolType) {
+            const toolNames = {
+                'cleaner': 'Data Cleaner',
+                'mapper': 'Field Mapper',
+                'validator': 'Data Validator',
+                'converter': 'Format Converter'
+            };
+
+            UIComponents.showNotification(`Opening ${toolNames[toolType]}...`, 'info');
+            // In a real app, this would open the transformation tool interface
+        }
+
+        function showTransformationStudio() {
+            UIComponents.showNotification('Opening Transformation Studio...', 'info');
+            // In a real app, this would open a visual transformation builder
+        }
+
+        function viewTaskDetails(taskId) {
+            const task = mockTasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            const detailsContent = `
+                <div class="task-details">
+                    <div class="detail-row">
+                        <strong>Task ID:</strong> ${task.id}
+                    </div>
+                    <div class="detail-row">
+                        <strong>Type:</strong> ${task.type.charAt(0).toUpperCase() + task.type.slice(1)}
+                    </div>
+                    <div class="detail-row">
+                        <strong>Status:</strong> <span class="badge badge-${getStatusBadgeType(task.status)}">${task.status}</span>
+                    </div>
+                    <div class="detail-row">
+                        <strong>Progress:</strong> ${task.progress}%
+                    </div>
+                    <div class="detail-row">
+                        <strong>Started:</strong> ${DataUtils.formatDate(task.startTime, 'YYYY-MM-DD HH:mm')}
+                    </div>
+                    ${task.endTime ? `<div class="detail-row"><strong>Completed:</strong> ${DataUtils.formatDate(task.endTime, 'YYYY-MM-DD HH:mm')}</div>` : ''}
+                    ${task.fileSize ? `<div class="detail-row"><strong>File Size:</strong> ${task.fileSize}</div>` : ''}
+                    ${task.recordCount ? `<div class="detail-row"><strong>Records:</strong> ${task.recordCount.toLocaleString()}</div>` : ''}
+                    ${task.error ? `<div class="detail-row text-error"><strong>Error:</strong> ${task.error}</div>` : ''}
+                </div>
+                <style>
+                    .task-details {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 12px;
+                    }
+                    .detail-row {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 8px 0;
+                        border-bottom: 1px solid var(--border);
+                    }
+                </style>
+            `;
+
+            UIComponents.showModal('Task Details', detailsContent, {
+                showCancel: false,
+                confirmText: 'Close'
+            });
+        }
+
+        function downloadTaskResult(taskId) {
+            UIComponents.showNotification('Downloading task result...', 'success');
+            // In a real app, this would trigger a file download
+        }
+
+        function deleteTask(taskId) {
+            const task = mockTasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            UIComponents.showModal(
+                'Delete Task',
+                `<p>Are you sure you want to delete the task "<strong>${task.title}</strong>"?</p>`,
+                {
+                    confirmText: 'Delete',
+                    onConfirm: () => {
+                        const index = mockTasks.findIndex(t => t.id === taskId);
+                        if (index !== -1) {
+                            mockTasks.splice(index, 1);
+                            renderTasks();
+                            UIComponents.showNotification('Task deleted successfully', 'success');
+                        }
+                    }
+                }
+            );
+        }
+
+        function refreshImportOptions() {
+            UIComponents.showNotification('Import options refreshed', 'success');
+        }
+
+        function refreshExportOptions() {
+            UIComponents.showNotification('Export options refreshed', 'success');
+        }
+
+        function showDataHistory() {
+            UIComponents.showNotification('Opening data history...', 'info');
+            // In a real app, this would show detailed task history
+        }
+
+        function showScheduleModal() {
+            const scheduleContent = `
+                <form id="schedule-form">
+                    <div class="form-group">
+                        <label class="form-label">Task Type</label>
+                        <select name="type" class="form-select">
+                            <option value="import">Data Import</option>
+                            <option value="export">Data Export</option>
+                            <option value="backup">Database Backup</option>
+                            <option value="cleanup">Data Cleanup</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Task Name</label>
+                        <input type="text" name="name" class="form-input" placeholder="Daily user backup">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Schedule</label>
+                        <select name="schedule" class="form-select">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="custom">Custom Cron</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Time</label>
+                        <input type="time" name="time" class="form-input" value="02:00">
+                    </div>
+                </form>
+            `;
+
+            UIComponents.showModal('Schedule New Task', scheduleContent, {
+                confirmText: 'Schedule Task',
+                onConfirm: () => {
+                    const formData = FormUtils.serializeForm('schedule-form');
+                    UIComponents.showNotification(`Task "${formData.name}" scheduled successfully!`, 'success');
+                }
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeDataTools);
+    </script>
+</body>
+</html>

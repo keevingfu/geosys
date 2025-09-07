@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dymesty AI Glasses - Keyword Strategy Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text-primary: #ffffff;
+            --text-secondary: #a8b2d1;
+            --border-color: #2a3f5f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary-gradient);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            position: relative;
+            z-index: 1;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            position: relative;
+            z-index: 1;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--primary-gradient);
+            border-radius: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .summary-card:hover::before {
+            opacity: 1;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            background: var(--card-bg);
+            border-color: transparent;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-label {
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .card-change {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .positive {
+            color: #4ade80;
+        }
+
+        .negative {
+            color: #f87171;
+        }
+
+        /* Section */
+        .section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title i {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Keyword Cloud */
+        .keyword-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .keyword-tag {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid #667eea;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .keyword-tag:hover {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            transform: scale(1.05);
+        }
+
+        .keyword-tag span {
+            font-weight: bold;
+            margin-left: 0.5rem;
+            color: #667eea;
+        }
+
+        .keyword-tag:hover span {
+            color: var(--text-primary);
+        }
+
+        /* Charts */
+        .chart-container {
+            background: rgba(26, 26, 46, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+
+        /* Table */
+        .keyword-table {
+            width: 100%;
+            margin-top: 1.5rem;
+            border-collapse: collapse;
+        }
+
+        .keyword-table th {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .keyword-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .keyword-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .difficulty-low {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+
+        .difficulty-medium {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .difficulty-high {
+            background: rgba(248, 113, 113, 0.2);
+            color: #f87171;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .chart {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1><i class="fas fa-key"></i> Dymesty AI Glasses - Keyword Strategy Analysis</h1>
+        <p>Strategic keyword optimization for smart glasses market dominance</p>
+    </header>
+
+    <div class="container">
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <i class="fas fa-search card-icon"></i>
+                <div class="card-value">342</div>
+                <div class="card-label">Total Keywords</div>
+                <div class="card-change positive">
+                    <i class="fas fa-arrow-up"></i> +45 new this month
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <i class="fas fa-chart-line card-icon"></i>
+                <div class="card-value">28.5</div>
+                <div class="card-label">Average Position</div>
+                <div class="card-change positive">
+                    <i class="fas fa-arrow-up"></i> Improved by 6.2
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <i class="fas fa-trophy card-icon"></i>
+                <div class="card-value">87</div>
+                <div class="card-label">Top 10 Rankings</div>
+                <div class="card-change positive">
+                    <i class="fas fa-arrow-up"></i> +23 positions gained
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <i class="fas fa-percentage card-icon"></i>
+                <div class="card-value">68%</div>
+                <div class="card-label">Keyword Coverage</div>
+                <div class="card-change positive">
+                    <i class="fas fa-arrow-up"></i> +15% improvement
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyword Categories -->
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-tags"></i> Keyword Categories Performance
+            </h2>
+            <div class="chart-container">
+                <div id="categoryChart" class="chart"></div>
+            </div>
+        </section>
+
+        <!-- High-Value Keywords -->
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-star"></i> High-Value Smart Glasses Keywords
+            </h2>
+            <div class="keyword-cloud">
+                <div class="keyword-tag">titanium AI glasses <span>3,600</span></div>
+                <div class="keyword-tag">privacy smart glasses <span>2,900</span></div>
+                <div class="keyword-tag">no camera glasses <span>2,400</span></div>
+                <div class="keyword-tag">AI meeting assistant <span>1,900</span></div>
+                <div class="keyword-tag">real-time translation glasses <span>1,600</span></div>
+                <div class="keyword-tag">professional smart eyewear <span>1,300</span></div>
+                <div class="keyword-tag">48 hour battery glasses <span>1,100</span></div>
+                <div class="keyword-tag">lightweight AI glasses <span>980</span></div>
+                <div class="keyword-tag">business smart glasses <span>850</span></div>
+                <div class="keyword-tag">travel translation device <span>720</span></div>
+                <div class="keyword-tag">open-ear audio glasses <span>650</span></div>
+                <div class="keyword-tag">voice to text glasses <span>580</span></div>
+            </div>
+        </section>
+
+        <!-- Keyword Competition Analysis -->
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-chess"></i> Competition Analysis
+            </h2>
+            <div class="chart-container">
+                <div id="competitionChart" class="chart"></div>
+            </div>
+        </section>
+
+        <!-- Top Performing Keywords Table -->
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-medal"></i> Top Performing Keywords
+            </h2>
+            <table class="keyword-table">
+                <thead>
+                    <tr>
+                        <th>Keyword</th>
+                        <th>Search Volume</th>
+                        <th>Position</th>
+                        <th>Difficulty</th>
+                        <th>Trend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>dymesty ai glasses</td>
+                        <td>3,600</td>
+                        <td>#3</td>
+                        <td><span class="difficulty-badge difficulty-low">Low</span></td>
+                        <td class="positive">+156%</td>
+                    </tr>
+                    <tr>
+                        <td>titanium smart glasses</td>
+                        <td>2,900</td>
+                        <td>#5</td>
+                        <td><span class="difficulty-badge difficulty-medium">Medium</span></td>
+                        <td class="positive">+89%</td>
+                    </tr>
+                    <tr>
+                        <td>privacy focused smart glasses</td>
+                        <td>2,400</td>
+                        <td>#4</td>
+                        <td><span class="difficulty-badge difficulty-low">Low</span></td>
+                        <td class="positive">+124%</td>
+                    </tr>
+                    <tr>
+                        <td>no camera smart glasses</td>
+                        <td>1,900</td>
+                        <td>#2</td>
+                        <td><span class="difficulty-badge difficulty-low">Low</span></td>
+                        <td class="positive">+203%</td>
+                    </tr>
+                    <tr>
+                        <td>AI translation glasses</td>
+                        <td>1,600</td>
+                        <td>#6</td>
+                        <td><span class="difficulty-badge difficulty-medium">Medium</span></td>
+                        <td class="positive">+67%</td>
+                    </tr>
+                    <tr>
+                        <td>professional AI eyewear</td>
+                        <td>1,300</td>
+                        <td>#8</td>
+                        <td><span class="difficulty-badge difficulty-medium">Medium</span></td>
+                        <td class="positive">+45%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Opportunity Keywords -->
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-lightbulb"></i> Keyword Opportunities
+            </h2>
+            <div class="chart-container">
+                <div id="opportunityChart" class="chart"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Category Performance Chart
+        const categoryChart = echarts.init(document.getElementById('categoryChart'));
+        categoryChart.setOption({
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Brand', 'Product Features', 'Use Cases', 'Target Audience', 'Technology', 'Comparison'],
+                axisLabel: {
+                    color: '#a8b2d1',
+                    rotate: 30
+                },
+                axisLine: { lineStyle: { color: '#2a3f5f' } }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Keywords',
+                axisLabel: { color: '#a8b2d1' },
+                axisLine: { lineStyle: { color: '#2a3f5f' } },
+                splitLine: { lineStyle: { color: '#2a3f5f', opacity: 0.3 } }
+            },
+            series: [{
+                name: 'Keywords',
+                type: 'bar',
+                data: [45, 68, 52, 38, 78, 61],
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: '#667eea' },
+                        { offset: 1, color: '#764ba2' }
+                    ])
+                }
+            }]
+        });
+
+        // Competition Analysis
+        const competitionChart = echarts.init(document.getElementById('competitionChart'));
+        competitionChart.setOption({
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'cross' }
+            },
+            legend: {
+                data: ['Search Volume', 'Competition Score'],
+                textStyle: { color: '#a8b2d1' }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025', 'Q1 2026', 'Q2 2026'],
+                axisLabel: { color: '#a8b2d1' },
+                axisLine: { lineStyle: { color: '#2a3f5f' } }
+            },
+            yAxis: [
+                {
+                    type: 'value',
+                    name: 'Search Volume',
+                    position: 'left',
+                    axisLabel: { color: '#a8b2d1' },
+                    axisLine: { lineStyle: { color: '#2a3f5f' } },
+                    splitLine: { lineStyle: { color: '#2a3f5f', opacity: 0.3 } }
+                },
+                {
+                    type: 'value',
+                    name: 'Competition',
+                    position: 'right',
+                    min: 0,
+                    max: 100,
+                    axisLabel: { 
+                        color: '#a8b2d1',
+                        formatter: '{value}%'
+                    },
+                    axisLine: { lineStyle: { color: '#2a3f5f' } }
+                }
+            ],
+            series: [
+                {
+                    name: 'Search Volume',
+                    type: 'bar',
+                    data: [8500, 12300, 18900, 25600, 31200, 38500],
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: '#4facfe' },
+                            { offset: 1, color: '#00f2fe' }
+                        ])
+                    }
+                },
+                {
+                    name: 'Competition Score',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    data: [45, 48, 52, 58, 65, 72],
+                    smooth: true,
+                    itemStyle: { color: '#f5576c' }
+                }
+            ]
+        });
+
+        // Opportunity Chart
+        const opportunityChart = echarts.init(document.getElementById('opportunityChart'));
+        opportunityChart.setOption({
+            tooltip: {
+                trigger: 'item'
+            },
+            series: [{
+                type: 'treemap',
+                data: [
+                    {
+                        name: 'Long-tail Keywords',
+                        value: 156,
+                        itemStyle: { color: '#667eea' },
+                        children: [
+                            { name: 'titanium ai glasses for professionals', value: 28 },
+                            { name: 'no-camera privacy smart glasses', value: 24 },
+                            { name: 'AI glasses with real-time translation', value: 21 },
+                            { name: 'lightweight smart glasses for business', value: 18 },
+                            { name: 'smart glasses 48 hour battery life', value: 16 },
+                            { name: 'professional meeting assistant glasses', value: 14 },
+                            { name: 'travel translation smart eyewear', value: 12 },
+                            { name: 'voice to text AI glasses', value: 11 },
+                            { name: 'Others', value: 12 }
+                        ]
+                    },
+                    {
+                        name: 'Question Keywords',
+                        value: 98,
+                        itemStyle: { color: '#764ba2' },
+                        children: [
+                            { name: 'what are privacy smart glasses', value: 18 },
+                            { name: 'how do AI translation glasses work', value: 16 },
+                            { name: 'best smart glasses without camera', value: 14 },
+                            { name: 'which smart glasses for business', value: 13 },
+                            { name: 'why titanium frame glasses', value: 11 },
+                            { name: 'when to use AI meeting glasses', value: 10 },
+                            { name: 'where to buy Dymesty glasses', value: 9 },
+                            { name: 'Others', value: 7 }
+                        ]
+                    },
+                    {
+                        name: 'Comparison Keywords',
+                        value: 88,
+                        itemStyle: { color: '#f093fb' },
+                        children: [
+                            { name: 'Dymesty vs Ray-Ban Meta', value: 22 },
+                            { name: 'Dymesty vs XREAL', value: 18 },
+                            { name: 'titanium vs plastic frames', value: 15 },
+                            { name: 'camera vs no-camera glasses', value: 12 },
+                            { name: 'AI glasses comparison 2025', value: 11 },
+                            { name: 'Others', value: 10 }
+                        ]
+                    }
+                ]
+            }]
+        });
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            categoryChart.resize();
+            competitionChart.resize();
+            opportunityChart.resize();
+        });
+    </script>
+</body>
+</html>

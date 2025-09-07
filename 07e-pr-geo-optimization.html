@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dymesty AI Glasses - Advanced PR Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --dark: #1F2937;
+            --gray: #6B7280;
+            --light: #F9FAFB;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+            --ai-blue: #0EA5E9;
+            --ai-purple: #A855F7;
+            --geo-green: #22C55E;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        }
+
+        .kpi-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .kpi-icon.primary {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+        }
+
+        .kpi-icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .kpi-icon.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .kpi-icon.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
+        .kpi-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .kpi-label {
+            color: var(--gray);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .kpi-change {
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .positive { color: var(--success); }
+        .negative { color: var(--danger); }
+
+        /* Section */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .section-header {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Charts */
+        .chart {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+        }
+
+        /* PR Campaign Table */
+        .campaign-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .campaign-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .campaign-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .campaign-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-active { 
+            background: rgba(16, 185, 129, 0.1); 
+            color: var(--success); 
+        }
+
+        .status-pending { 
+            background: rgba(245, 158, 11, 0.1); 
+            color: var(--warning); 
+        }
+
+        .status-completed { 
+            background: rgba(59, 130, 246, 0.1); 
+            color: var(--info); 
+        }
+
+        /* AI Platform Pills */
+        .ai-platforms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .ai-platform {
+            background: var(--light);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .ai-platform:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .ai-platform i {
+            font-size: 1.1em;
+        }
+
+        /* Sentiment Analysis */
+        .sentiment-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .sentiment-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: var(--light);
+        }
+
+        .sentiment-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .sentiment-positive { color: var(--success); }
+        .sentiment-neutral { color: var(--warning); }
+        .sentiment-negative { color: var(--danger); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sentiment-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-chart-area"></i> Dymesty AI Glasses - Advanced PR Analytics</h1>
+        <p>Comprehensive PR campaign analysis and AI platform optimization for smart glasses technology</p>
+    </div>
+
+    <div class="container">
+        <!-- KPI Overview -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon primary">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <div class="kpi-value">892</div>
+                <div class="kpi-label">Total PR Mentions</div>
+                <div class="kpi-change positive">
+                    <i class="fas fa-arrow-up"></i> +124 (16.2%) this month
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon success">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="kpi-value">427</div>
+                <div class="kpi-label">AI Platform Citations</div>
+                <div class="kpi-change positive">
+                    <i class="fas fa-arrow-up"></i> +89 (26.3%) growth
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon warning">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div class="kpi-value">5.2M</div>
+                <div class="kpi-label">Global Reach</div>
+                <div class="kpi-change positive">
+                    <i class="fas fa-arrow-up"></i> +1.3M impressions
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon info">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="kpi-value">94%</div>
+                <div class="kpi-label">Sentiment Score</div>
+                <div class="kpi-change positive">
+                    <i class="fas fa-arrow-up"></i> +6% improvement
+                </div>
+            </div>
+        </div>
+
+        <!-- PR Campaign Performance -->
+        <div class="section">
+            <h2 class="section-header">
+                <i class="fas fa-bullhorn"></i> Active PR Campaigns
+            </h2>
+            
+            <table class="campaign-table">
+                <thead>
+                    <tr>
+                        <th>Campaign</th>
+                        <th>Status</th>
+                        <th>Reach</th>
+                        <th>AI Citations</th>
+                        <th>Sentiment</th>
+                        <th>ROI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Privacy-First Smart Glasses Launch</strong></td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>1.8M</td>
+                        <td>156</td>
+                        <td class="positive">96%</td>
+                        <td class="positive">342%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Titanium Innovation Story</strong></td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>1.2M</td>
+                        <td>98</td>
+                        <td class="positive">92%</td>
+                        <td class="positive">278%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Real-Time Translation Feature</strong></td>
+                        <td><span class="status-badge status-pending">Pending</span></td>
+                        <td>850K</td>
+                        <td>67</td>
+                        <td class="positive">89%</td>
+                        <td class="positive">215%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Professional User Testimonials</strong></td>
+                        <td><span class="status-badge status-completed">Completed</span></td>
+                        <td>980K</td>
+                        <td>106</td>
+                        <td class="positive">94%</td>
+                        <td class="positive">298%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- AI Platform Distribution -->
+        <div class="section">
+            <h2 class="section-header">
+                <i class="fas fa-share-alt"></i> AI Platform Distribution Analysis
+            </h2>
+            
+            <div class="chart-grid">
+                <div>
+                    <div id="platformDistributionChart" class="chart"></div>
+                </div>
+                <div>
+                    <div id="citationTrendChart" class="chart"></div>
+                </div>
+            </div>
+
+            <div class="ai-platforms">
+                <div class="ai-platform">
+                    <i class="fas fa-brain"></i> ChatGPT (34%)
+                </div>
+                <div class="ai-platform">
+                    <i class="fas fa-compass"></i> Perplexity (28%)
+                </div>
+                <div class="ai-platform">
+                    <i class="fas fa-gem"></i> Claude (22%)
+                </div>
+                <div class="ai-platform">
+                    <i class="fas fa-star"></i> Gemini (10%)
+                </div>
+                <div class="ai-platform">
+                    <i class="fas fa-search"></i> You.com (6%)
+                </div>
+            </div>
+        </div>
+
+        <!-- Sentiment Analysis -->
+        <div class="section">
+            <h2 class="section-header">
+                <i class="fas fa-smile"></i> PR Sentiment Analysis
+            </h2>
+
+            <div class="sentiment-grid">
+                <div class="sentiment-card">
+                    <div class="sentiment-icon sentiment-positive">😊</div>
+                    <h3>Positive</h3>
+                    <div class="kpi-value">94%</div>
+                    <p>Privacy-focused design, titanium quality, innovation</p>
+                </div>
+                <div class="sentiment-card">
+                    <div class="sentiment-icon sentiment-neutral">😐</div>
+                    <h3>Neutral</h3>
+                    <div class="kpi-value">4%</div>
+                    <p>Price comparisons, market analysis</p>
+                </div>
+                <div class="sentiment-card">
+                    <div class="sentiment-icon sentiment-negative">😞</div>
+                    <h3>Negative</h3>
+                    <div class="kpi-value">2%</div>
+                    <p>Limited availability concerns</p>
+                </div>
+            </div>
+
+            <div id="sentimentTrendChart" class="chart"></div>
+        </div>
+
+        <!-- Geographic Impact -->
+        <div class="section">
+            <h2 class="section-header">
+                <i class="fas fa-globe-americas"></i> Geographic PR Impact
+            </h2>
+            <div id="geographicChart" class="chart"></div>
+        </div>
+
+        <!-- Key Message Performance -->
+        <div class="section">
+            <h2 class="section-header">
+                <i class="fas fa-comment-dots"></i> Key Message Performance
+            </h2>
+            <div id="messagePerformanceChart" class="chart"></div>
+        </div>
+    </div>
+
+    <script>
+        // Platform Distribution Chart
+        const platformChart = echarts.init(document.getElementById('platformDistributionChart'));
+        platformChart.setOption({
+            title: {
+                text: 'AI Platform Citation Distribution',
+                textStyle: { fontSize: 16 }
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}: {c} ({d}%)'
+            },
+            series: [{
+                type: 'pie',
+                radius: ['40%', '70%'],
+                data: [
+                    { value: 145, name: 'ChatGPT', itemStyle: { color: '#667eea' } },
+                    { value: 120, name: 'Perplexity', itemStyle: { color: '#764ba2' } },
+                    { value: 94, name: 'Claude', itemStyle: { color: '#f093fb' } },
+                    { value: 43, name: 'Gemini', itemStyle: { color: '#4facfe' } },
+                    { value: 25, name: 'You.com', itemStyle: { color: '#00f2fe' } }
+                ],
+                label: {
+                    formatter: '{b}\n{c} citations'
+                }
+            }]
+        });
+
+        // Citation Trend Chart
+        const trendChart = echarts.init(document.getElementById('citationTrendChart'));
+        trendChart.setOption({
+            title: {
+                text: 'Monthly Citation Growth',
+                textStyle: { fontSize: 16 }
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug']
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Citations'
+            },
+            series: [{
+                name: 'AI Platform Citations',
+                type: 'line',
+                data: [45, 68, 92, 124, 178, 245, 332, 427],
+                smooth: true,
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
+                        { offset: 1, color: 'rgba(102, 126, 234, 0.05)' }
+                    ])
+                },
+                itemStyle: { color: '#667eea' }
+            }]
+        });
+
+        // Sentiment Trend Chart
+        const sentimentChart = echarts.init(document.getElementById('sentimentTrendChart'));
+        sentimentChart.setOption({
+            title: {
+                text: 'Sentiment Score Trend',
+                textStyle: { fontSize: 16 }
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['Positive', 'Neutral', 'Negative']
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8']
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Percentage',
+                max: 100
+            },
+            series: [
+                {
+                    name: 'Positive',
+                    type: 'line',
+                    data: [88, 89, 90, 91, 92, 93, 94, 94],
+                    itemStyle: { color: '#10B981' }
+                },
+                {
+                    name: 'Neutral',
+                    type: 'line',
+                    data: [10, 8, 7, 6, 5, 5, 4, 4],
+                    itemStyle: { color: '#F59E0B' }
+                },
+                {
+                    name: 'Negative',
+                    type: 'line',
+                    data: [2, 3, 3, 3, 3, 2, 2, 2],
+                    itemStyle: { color: '#EF4444' }
+                }
+            ]
+        });
+
+        // Geographic Impact Chart
+        const geoChart = echarts.init(document.getElementById('geographicChart'));
+        geoChart.setOption({
+            title: {
+                text: 'PR Impact by Region',
+                textStyle: { fontSize: 16 }
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' }
+            },
+            xAxis: {
+                type: 'value',
+                name: 'PR Mentions'
+            },
+            yAxis: {
+                type: 'category',
+                data: ['North America', 'Europe', 'Asia Pacific', 'Latin America', 'Middle East', 'Africa']
+            },
+            series: [{
+                name: 'PR Mentions',
+                type: 'bar',
+                data: [342, 278, 198, 76, 54, 44],
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                        { offset: 0, color: '#667eea' },
+                        { offset: 1, color: '#764ba2' }
+                    ])
+                },
+                label: {
+                    show: true,
+                    position: 'right'
+                }
+            }]
+        });
+
+        // Key Message Performance
+        const messageChart = echarts.init(document.getElementById('messagePerformanceChart'));
+        messageChart.setOption({
+            title: {
+                text: 'Key Message Effectiveness',
+                textStyle: { fontSize: 16 }
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' }
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Privacy-First Design', 'Titanium Quality', 'Real-Time Translation', 'Professional Focus', '48-Hour Battery', 'No Camera Feature'],
+                axisLabel: { rotate: 30 }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Effectiveness Score'
+            },
+            series: [{
+                name: 'Message Performance',
+                type: 'bar',
+                data: [96, 92, 88, 85, 82, 94],
+                itemStyle: {
+                    color: function(params) {
+                        const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#00f2fe', '#10B981'];
+                        return colors[params.dataIndex];
+                    }
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}%'
+                }
+            }]
+        });
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            platformChart.resize();
+            trendChart.resize();
+            sentimentChart.resize();
+            geoChart.resize();
+            messageChart.resize();
+        });
+    </script>
+</body>
+</html>

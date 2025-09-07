@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dymesty AI Glasses - PR & Media Scoring Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background-color: #f0f4f8;
+            color: #1a202c;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .dashboard-header h1 {
+            font-size: 2.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .dashboard-header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        }
+        
+        .metric-label {
+            color: #64748b;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+        
+        .metric-change {
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        .neutral { color: #6b7280; }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 350px;
+        }
+        
+        .media-table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+        
+        .media-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .media-table th {
+            background: #f8fafc;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .media-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .media-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .score-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .score-high { background: #d1fae5; color: #065f46; }
+        .score-medium { background: #fef3c7; color: #92400e; }
+        .score-low { background: #fee2e2; color: #991b1b; }
+        
+        .media-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .filter-btn:hover {
+            background: #f8fafc;
+            border-color: #667eea;
+        }
+        
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <h1>🎯 Dymesty AI Glasses - PR & Media Scoring Dashboard</h1>
+        <p>Real-time media coverage analysis and sentiment tracking across global platforms</p>
+    </div>
+    
+    <div class="container">
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">
+                    <i class="fas fa-newspaper"></i> Total Media Mentions
+                </div>
+                <div class="metric-value">342</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> +47 (15.9%) this week
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">
+                    <i class="fas fa-star"></i> Media Score
+                </div>
+                <div class="metric-value">78.5</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> +3.2 points
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">
+                    <i class="fas fa-smile"></i> Sentiment Score
+                </div>
+                <div class="metric-value">82%</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> +5% positive sentiment
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">
+                    <i class="fas fa-globe"></i> Media Reach
+                </div>
+                <div class="metric-value">2.4M</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> +380K impressions
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterMedia('all')">All Media</button>
+            <button class="filter-btn" onclick="filterMedia('tech')">Tech Press</button>
+            <button class="filter-btn" onclick="filterMedia('design')">Design Media</button>
+            <button class="filter-btn" onclick="filterMedia('youtube')">YouTube Reviews</button>
+            <button class="filter-btn" onclick="filterMedia('blogs')">Tech Blogs</button>
+        </div>
+        
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div class="chart-title">
+                    <i class="fas fa-chart-line"></i> Media Coverage Trend (30 Days)
+                </div>
+                <div id="coverageTrendChart" class="chart"></div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">
+                    <i class="fas fa-chart-pie"></i> Media Type Distribution
+                </div>
+                <div id="mediaTypeChart" class="chart"></div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">
+                    <i class="fas fa-globe-americas"></i> Geographic Coverage
+                </div>
+                <div id="geoChart" class="chart"></div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">
+                    <i class="fas fa-comments"></i> Sentiment Analysis
+                </div>
+                <div id="sentimentChart" class="chart"></div>
+            </div>
+        </div>
+        
+        <!-- Media Coverage Table -->
+        <div class="media-table-container">
+            <h2 style="font-size: 1.4em; margin-bottom: 20px; color: #1a202c;">
+                <i class="fas fa-list"></i> Recent Media Coverage
+            </h2>
+            <table class="media-table">
+                <thead>
+                    <tr>
+                        <th>Media Outlet</th>
+                        <th>Article Title</th>
+                        <th>Score</th>
+                        <th>Reach</th>
+                        <th>Sentiment</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="mediaTableBody">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        // Mock data for Dymesty AI Glasses
+        const mediaData = {
+            coverageTrend: {
+                dates: Array.from({length: 30}, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - (29 - i));
+                    return d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+                }),
+                values: [8, 12, 10, 15, 18, 14, 20, 22, 19, 24, 26, 23, 28, 30, 27, 32, 35, 31, 38, 40, 37, 42, 45, 41, 48, 52, 49, 55, 58, 62]
+            },
+            
+            mediaTypes: [
+                {name: 'Tech Reviews', value: 85, color: '#667eea'},
+                {name: 'Design Media', value: 62, color: '#764ba2'},
+                {name: 'YouTube', value: 78, color: '#f59e0b'},
+                {name: 'Tech Blogs', value: 56, color: '#10b981'},
+                {name: 'Mainstream', value: 41, color: '#ef4444'},
+                {name: 'Social Media', value: 20, color: '#6b7280'}
+            ],
+            
+            geographic: [
+                {name: 'North America', value: 42},
+                {name: 'Europe', value: 28},
+                {name: 'Asia Pacific', value: 20},
+                {name: 'Others', value: 10}
+            ],
+            
+            sentiment: {
+                positive: 82,
+                neutral: 15,
+                negative: 3
+            },
+            
+            recentCoverage: [
+                {
+                    outlet: 'TechCrunch',
+                    title: 'Dymesty AI Glasses: The Privacy-First Smart Glasses for Professionals',
+                    score: 92,
+                    reach: '450K',
+                    sentiment: 'positive',
+                    date: '2025-08-26'
+                },
+                {
+                    outlet: 'The Verge',
+                    title: 'Hands-on: Dymesty\'s Ultra-Light Titanium Smart Glasses',
+                    score: 88,
+                    reach: '380K',
+                    sentiment: 'positive',
+                    date: '2025-08-25'
+                },
+                {
+                    outlet: 'Yanko Design',
+                    title: 'Dymesty AI Glasses Bring Professional Features Without the Camera',
+                    score: 85,
+                    reach: '220K',
+                    sentiment: 'positive',
+                    date: '2025-08-24'
+                },
+                {
+                    outlet: 'Gadget Flow',
+                    title: 'Premium Titanium AI Glasses You\'ll Actually Want to Wear',
+                    score: 90,
+                    reach: '180K',
+                    sentiment: 'positive',
+                    date: '2025-08-23'
+                },
+                {
+                    outlet: 'YouTube - MKBHD',
+                    title: 'Smart Glasses Without a Camera? Dymesty AI Glasses Review',
+                    score: 87,
+                    reach: '650K',
+                    sentiment: 'positive',
+                    date: '2025-08-22'
+                },
+                {
+                    outlet: 'Wired',
+                    title: 'The Best Smart Glasses for Privacy-Conscious Professionals',
+                    score: 83,
+                    reach: '310K',
+                    sentiment: 'positive',
+                    date: '2025-08-21'
+                }
+            ]
+        };
+        
+        // Initialize Charts
+        function initCharts() {
+            // Coverage Trend Chart
+            const coverageTrendChart = echarts.init(document.getElementById('coverageTrendChart'));
+            coverageTrendChart.setOption({
+                color: ['#667eea'],
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#e5e7eb',
+                    borderWidth: 1,
+                    textStyle: { color: '#1a202c' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: mediaData.coverageTrend.dates,
+                    axisLine: { lineStyle: { color: '#e5e7eb' } },
+                    axisLabel: { color: '#64748b' }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: '#e5e7eb' } },
+                    axisLabel: { color: '#64748b' },
+                    splitLine: { lineStyle: { color: '#f1f5f9' } }
+                },
+                series: [{
+                    name: 'Media Mentions',
+                    type: 'line',
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 6,
+                    sampling: 'lttb',
+                    itemStyle: {
+                        color: '#667eea'
+                    },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
+                            { offset: 1, color: 'rgba(102, 126, 234, 0.05)' }
+                        ])
+                    },
+                    data: mediaData.coverageTrend.values
+                }]
+            });
+            
+            // Media Type Distribution
+            const mediaTypeChart = echarts.init(document.getElementById('mediaTypeChart'));
+            mediaTypeChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#e5e7eb',
+                    borderWidth: 1,
+                    textStyle: { color: '#1a202c' }
+                },
+                legend: {
+                    bottom: '5%',
+                    textStyle: { color: '#64748b' }
+                },
+                series: [{
+                    name: 'Media Type',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: true,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{b}\n{c} mentions'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 16,
+                            fontWeight: 'bold'
+                        }
+                    },
+                    data: mediaData.mediaTypes.map(item => ({
+                        name: item.name,
+                        value: item.value,
+                        itemStyle: { color: item.color }
+                    }))
+                }]
+            });
+            
+            // Geographic Distribution
+            const geoChart = echarts.init(document.getElementById('geoChart'));
+            geoChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#e5e7eb',
+                    borderWidth: 1,
+                    textStyle: { color: '#1a202c' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: '#e5e7eb' } },
+                    axisLabel: { color: '#64748b' },
+                    splitLine: { lineStyle: { color: '#f1f5f9' } }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: mediaData.geographic.map(item => item.name),
+                    axisLine: { lineStyle: { color: '#e5e7eb' } },
+                    axisLabel: { color: '#64748b' }
+                },
+                series: [{
+                    name: 'Coverage %',
+                    type: 'bar',
+                    data: mediaData.geographic.map(item => item.value),
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                            { offset: 0, color: '#667eea' },
+                            { offset: 1, color: '#764ba2' }
+                        ]),
+                        borderRadius: [0, 6, 6, 0]
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        formatter: '{c}%'
+                    }
+                }]
+            });
+            
+            // Sentiment Analysis
+            const sentimentChart = echarts.init(document.getElementById('sentimentChart'));
+            sentimentChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c}%',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#e5e7eb',
+                    borderWidth: 1,
+                    textStyle: { color: '#1a202c' }
+                },
+                series: [{
+                    name: 'Sentiment',
+                    type: 'gauge',
+                    startAngle: 180,
+                    endAngle: 0,
+                    min: 0,
+                    max: 100,
+                    splitNumber: 10,
+                    radius: '90%',
+                    axisLine: {
+                        lineStyle: {
+                            width: 25,
+                            color: [
+                                [0.3, '#ef4444'],
+                                [0.7, '#f59e0b'],
+                                [1, '#10b981']
+                            ]
+                        }
+                    },
+                    pointer: {
+                        icon: 'path://M12.8,0.7l4,4.2L12.8,9.1L12.8,0.7z',
+                        width: 12,
+                        length: '75%',
+                        offsetCenter: [0, '-60%'],
+                        itemStyle: {
+                            color: '#667eea'
+                        }
+                    },
+                    axisTick: {
+                        length: 12,
+                        lineStyle: {
+                            color: 'auto',
+                            width: 1
+                        }
+                    },
+                    splitLine: {
+                        length: 20,
+                        lineStyle: {
+                            color: 'auto',
+                            width: 3
+                        }
+                    },
+                    axisLabel: {
+                        color: '#64748b',
+                        fontSize: 12,
+                        distance: -50
+                    },
+                    title: {
+                        offsetCenter: [0, '-20%'],
+                        fontSize: 14,
+                        color: '#64748b'
+                    },
+                    detail: {
+                        fontSize: 30,
+                        offsetCenter: [0, '20%'],
+                        valueAnimation: true,
+                        formatter: function (value) {
+                            return value + '%';
+                        },
+                        color: '#1a202c'
+                    },
+                    data: [{
+                        value: mediaData.sentiment.positive,
+                        name: 'Positive Sentiment'
+                    }]
+                }]
+            });
+            
+            // Responsive
+            window.addEventListener('resize', () => {
+                coverageTrendChart.resize();
+                mediaTypeChart.resize();
+                geoChart.resize();
+                sentimentChart.resize();
+            });
+        }
+        
+        // Populate Media Table
+        function populateMediaTable() {
+            const tbody = document.getElementById('mediaTableBody');
+            tbody.innerHTML = mediaData.recentCoverage.map(item => {
+                const scoreClass = item.score >= 85 ? 'score-high' : item.score >= 70 ? 'score-medium' : 'score-low';
+                const sentimentIcon = item.sentiment === 'positive' ? '😊' : item.sentiment === 'neutral' ? '😐' : '😞';
+                
+                return `
+                    <tr>
+                        <td><strong>${item.outlet}</strong></td>
+                        <td>${item.title}</td>
+                        <td><span class="score-badge ${scoreClass}">${item.score}</span></td>
+                        <td>${item.reach}</td>
+                        <td>${sentimentIcon} ${item.sentiment}</td>
+                        <td>${item.date}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Filter Media
+        function filterMedia(type) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // In a real application, this would filter the data
+            console.log('Filtering by:', type);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            populateMediaTable();
+        });
+    </script>
+</body>
+</html>

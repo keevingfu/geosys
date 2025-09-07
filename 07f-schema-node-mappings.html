@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema-to-Node Mappings - SweetNight GEO</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark-bg: #0f0f1e;
+            --card-bg: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a8b2d1;
+            --border-color: #2a3f5f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary-gradient);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            position: relative;
+            z-index: 1;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            position: relative;
+            z-index: 1;
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .control-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.active {
+            background: var(--primary-gradient);
+            border-color: transparent;
+        }
+
+        /* Mapping Visualization */
+        .mapping-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .mapping-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .mapping-header h2 {
+            font-size: 2rem;
+            color: var(--text-primary);
+        }
+
+        #mappingDiagram {
+            width: 100%;
+            height: 700px;
+        }
+
+        /* Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .detail-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .detail-title h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-title p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .mapping-table th,
+        .mapping-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mapping-table th {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .mapping-table td {
+            color: var(--text-secondary);
+        }
+
+        .schema-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: rgba(79, 172, 254, 0.2);
+            color: #4facfe;
+            border: 1px solid #4facfe;
+        }
+
+        .node-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: rgba(67, 233, 123, 0.2);
+            color: #43e97b;
+            border: 1px solid #43e97b;
+        }
+
+        .strength-indicator {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .strength-fill {
+            height: 100%;
+            background: var(--success-gradient);
+            transition: width 0.3s ease;
+        }
+
+        /* Chart Containers */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-container h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .chart-box {
+            width: 100%;
+            height: 400px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            #mappingDiagram {
+                height: 500px;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Schema-to-Node Mappings</h1>
+        <p>Detailed visualization of how JSON-LD schemas map to knowledge graph nodes</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="control-group">
+                <span class="control-label">Schema Focus:</span>
+                <button class="control-btn active" onclick="showMapping('all')">All Schemas</button>
+                <button class="control-btn" onclick="showMapping('faqpage')">FAQPage</button>
+                <button class="control-btn" onclick="showMapping('product')">Product</button>
+                <button class="control-btn" onclick="showMapping('howto')">HowTo</button>
+            </div>
+            <div class="control-group">
+                <span class="control-label">View Mode:</span>
+                <button class="control-btn" onclick="changeView('detailed')">Detailed View</button>
+                <button class="control-btn" onclick="changeView('simplified')">Simplified View</button>
+            </div>
+        </div>
+
+        <!-- Main Mapping Diagram -->
+        <div class="mapping-container">
+            <div class="mapping-header">
+                <h2>Interactive Schema-Node Mapping</h2>
+            </div>
+            <div id="mappingDiagram"></div>
+        </div>
+
+        <!-- Detailed Mappings -->
+        <div class="details-grid">
+            <!-- FAQPage Mapping -->
+            <div class="detail-card">
+                <div class="detail-header">
+                    <div class="detail-icon" style="background: linear-gradient(135deg, #fa709a, #fee140);">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div class="detail-title">
+                        <h3>FAQPage Schema Mapping</h3>
+                        <p>70% of content priority - Primary knowledge graph driver</p>
+                    </div>
+                </div>
+                <table class="mapping-table">
+                    <thead>
+                        <tr>
+                            <th>Schema Element</th>
+                            <th>Knowledge Graph Node</th>
+                            <th>Connection Strength</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="schema-badge">FAQPage#Q01</span></td>
+                            <td><span class="node-badge">Sleep Position Node</span></td>
+                            <td>
+                                High (90%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 90%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="schema-badge">FAQPage#Q02</span></td>
+                            <td><span class="node-badge">Firmness Keywords</span></td>
+                            <td>
+                                High (85%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 85%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="schema-badge">FAQPage#Q03</span></td>
+                            <td><span class="node-badge">Pressure Relief Keywords</span></td>
+                            <td>
+                                High (80%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 80%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="schema-badge">FAQPage#Q04</span></td>
+                            <td><span class="node-badge">Cooling Technology</span></td>
+                            <td>
+                                Medium (75%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 75%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Product Schema Mapping -->
+            <div class="detail-card">
+                <div class="detail-header">
+                    <div class="detail-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="detail-title">
+                        <h3>Product Schema Mapping</h3>
+                        <p>Commercial intent and product specification nodes</p>
+                    </div>
+                </div>
+                <table class="mapping-table">
+                    <thead>
+                        <tr>
+                            <th>Schema Element</th>
+                            <th>Knowledge Graph Node</th>
+                            <th>Connection Strength</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="schema-badge">Product.name</span></td>
+                            <td><span class="node-badge">Product Pages Node</span></td>
+                            <td>
+                                Very High (95%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 95%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="schema-badge">Product.offers</span></td>
+                            <td><span class="node-badge">Commercial Intent</span></td>
+                            <td>
+                                High (88%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 88%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="schema-badge">Product.review</span></td>
+                            <td><span class="node-badge">Comparison Intent</span></td>
+                            <td>
+                                High (82%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 82%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- HowTo Schema Mapping -->
+            <div class="detail-card">
+                <div class="detail-header">
+                    <div class="detail-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                        <i class="fas fa-list-ol"></i>
+                    </div>
+                    <div class="detail-title">
+                        <h3>HowTo Schema Mapping</h3>
+                        <p>Educational content and guide nodes</p>
+                    </div>
+                </div>
+                <table class="mapping-table">
+                    <thead>
+                        <tr>
+                            <th>Schema Element</th>
+                            <th>Knowledge Graph Node</th>
+                            <th>Connection Strength</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="schema-badge">HowTo.step</span></td>
+                            <td><span class="node-badge">Buyer Guides Node</span></td>
+                            <td>
+                                High (85%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 85%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="schema-badge">HowTo.supply</span></td>
+                            <td><span class="node-badge">Certification Keywords</span></td>
+                            <td>
+                                Medium (70%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 70%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="schema-badge">HowTo.tool</span></td>
+                            <td><span class="node-badge">Video Content Node</span></td>
+                            <td>
+                                Medium (65%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 65%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- QAPage Schema Mapping -->
+            <div class="detail-card">
+                <div class="detail-header">
+                    <div class="detail-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="detail-title">
+                        <h3>QAPage Schema Mapping</h3>
+                        <p>Community-driven content and discussion nodes</p>
+                    </div>
+                </div>
+                <table class="mapping-table">
+                    <thead>
+                        <tr>
+                            <th>Schema Element</th>
+                            <th>Knowledge Graph Node</th>
+                            <th>Connection Strength</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="schema-badge">QAPage.mainEntity</span></td>
+                            <td><span class="node-badge">Informational Intent</span></td>
+                            <td>
+                                High (80%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 80%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="schema-badge">Question.acceptedAnswer</span></td>
+                            <td><span class="node-badge">FAQ Content Node</span></td>
+                            <td>
+                                High (85%)
+                                <div class="strength-indicator">
+                                    <div class="strength-fill" style="width: 85%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Detailed Analysis Charts -->
+        <div class="chart-grid">
+            <!-- Connection Strength Matrix -->
+            <div class="chart-container">
+                <h3>Schema-Node Connection Strength Matrix</h3>
+                <div id="connectionMatrixChart" class="chart-box"></div>
+            </div>
+
+            <!-- Impact Analysis -->
+            <div class="chart-container">
+                <h3>SEO Impact by Schema-Node Pair</h3>
+                <div id="impactAnalysisChart" class="chart-box"></div>
+            </div>
+
+            <!-- Performance Correlation -->
+            <div class="chart-container">
+                <h3>Performance Metrics Correlation</h3>
+                <div id="performanceCorrelationChart" class="chart-box"></div>
+            </div>
+
+            <!-- Priority Mapping -->
+            <div class="chart-container">
+                <h3>Priority-based Schema Distribution</h3>
+                <div id="priorityMappingChart" class="chart-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const authToken = localStorage.getItem('authToken');
+        const sessionExpiry = localStorage.getItem('sessionExpiry');
+        const currentTime = new Date().getTime();
+
+        if (!authToken || !sessionExpiry || currentTime > parseInt(sessionExpiry)) {
+            window.location.href = 'login.html';
+        }
+
+        let mappingChart, matrixChart, impactChart, correlationChart, priorityChart;
+
+        // Initialize main mapping diagram
+        function initMappingDiagram() {
+            const chartDom = document.getElementById('mappingDiagram');
+            mappingChart = echarts.init(chartDom);
+
+            const nodes = [
+                // JSON-LD Schema Layer (Left Side)
+                { id: 'faqpage', name: 'FAQPage Schema', category: 0, x: 100, y: 150, symbolSize: 80, itemStyle: { color: '#fa709a' } },
+                { id: 'product', name: 'Product Schema', category: 0, x: 100, y: 250, symbolSize: 70, itemStyle: { color: '#fa709a' } },
+                { id: 'howto', name: 'HowTo Schema', category: 0, x: 100, y: 350, symbolSize: 60, itemStyle: { color: '#fa709a' } },
+                { id: 'qapage', name: 'QAPage Schema', category: 0, x: 100, y: 450, symbolSize: 55, itemStyle: { color: '#fa709a' } },
+                
+                // Bridge Layer (Center)
+                { id: 'bridge-content', name: 'Content Bridge', category: 1, x: 350, y: 200, symbolSize: 40, itemStyle: { color: '#667eea' } },
+                { id: 'bridge-intent', name: 'Intent Bridge', category: 1, x: 350, y: 300, symbolSize: 40, itemStyle: { color: '#667eea' } },
+                { id: 'bridge-keyword', name: 'Keyword Bridge', category: 1, x: 350, y: 400, symbolSize: 40, itemStyle: { color: '#667eea' } },
+                
+                // Knowledge Graph Nodes (Right Side)
+                { id: 'node-faq', name: 'FAQ Content Node', category: 2, x: 600, y: 150, symbolSize: 75, itemStyle: { color: '#4facfe' } },
+                { id: 'node-product', name: 'Product Pages Node', category: 2, x: 600, y: 200, symbolSize: 70, itemStyle: { color: '#4facfe' } },
+                { id: 'node-guides', name: 'Buyer Guides Node', category: 2, x: 600, y: 250, symbolSize: 65, itemStyle: { color: '#4facfe' } },
+                { id: 'node-comparison', name: 'Comparison Node', category: 2, x: 600, y: 300, symbolSize: 65, itemStyle: { color: '#4facfe' } },
+                { id: 'node-keywords', name: 'Keyword Cluster', category: 2, x: 600, y: 400, symbolSize: 60, itemStyle: { color: '#4facfe' } },
+                { id: 'node-intent', name: 'User Intent Node', category: 2, x: 600, y: 450, symbolSize: 60, itemStyle: { color: '#4facfe' } }
+            ];
+
+            const edges = [
+                // Schema to Bridge connections
+                { source: 'faqpage', target: 'bridge-content', value: 9, lineStyle: { width: 4, color: '#fa709a' } },
+                { source: 'product', target: 'bridge-intent', value: 8, lineStyle: { width: 4, color: '#fa709a' } },
+                { source: 'howto', target: 'bridge-keyword', value: 7, lineStyle: { width: 3, color: '#fa709a' } },
+                { source: 'qapage', target: 'bridge-content', value: 6, lineStyle: { width: 3, color: '#fa709a' } },
+                
+                // Bridge to Node connections
+                { source: 'bridge-content', target: 'node-faq', value: 9, lineStyle: { width: 4, color: '#667eea' } },
+                { source: 'bridge-content', target: 'node-guides', value: 7, lineStyle: { width: 3, color: '#667eea' } },
+                { source: 'bridge-intent', target: 'node-product', value: 8, lineStyle: { width: 4, color: '#667eea' } },
+                { source: 'bridge-intent', target: 'node-comparison', value: 7, lineStyle: { width: 3, color: '#667eea' } },
+                { source: 'bridge-keyword', target: 'node-keywords', value: 8, lineStyle: { width: 4, color: '#667eea' } },
+                { source: 'bridge-keyword', target: 'node-intent', value: 6, lineStyle: { width: 3, color: '#667eea' } },
+                
+                // Direct connections (high priority)
+                { source: 'faqpage', target: 'node-faq', value: 10, lineStyle: { width: 5, color: '#43e97b', type: 'dashed' } },
+                { source: 'product', target: 'node-product', value: 9, lineStyle: { width: 5, color: '#43e97b', type: 'dashed' } }
+            ];
+
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function(params) {
+                        if (params.dataType === 'node') {
+                            return `<b>${params.name}</b><br/>Type: ${params.data.category === 0 ? 'JSON-LD Schema' : params.data.category === 1 ? 'Bridge Layer' : 'Knowledge Graph Node'}`;
+                        } else if (params.dataType === 'edge') {
+                            return `${params.data.source} → ${params.data.target}<br/>Connection Strength: ${params.data.value}/10`;
+                        }
+                    }
+                },
+                legend: {
+                    data: ['JSON-LD Schemas', 'Bridge Layer', 'Knowledge Graph Nodes'],
+                    textStyle: { color: '#a8b2d1' },
+                    bottom: 10
+                },
+                series: [{
+                    type: 'graph',
+                    layout: 'none',
+                    data: nodes,
+                    edges: edges,
+                    roam: true,
+                    focusNodeAdjacency: true,
+                    itemStyle: {
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0, 0, 0, 0.3)'
+                    },
+                    label: {
+                        show: true,
+                        position: 'inside',
+                        color: '#fff',
+                        fontSize: 10,
+                        fontWeight: 'bold'
+                    },
+                    lineStyle: {
+                        curveness: 0.2,
+                        opacity: 0.8
+                    },
+                    emphasis: {
+                        focus: 'adjacency',
+                        label: {
+                            show: true,
+                            fontSize: 14
+                        },
+                        lineStyle: {
+                            width: 8,
+                            opacity: 1
+                        }
+                    }
+                }]
+            };
+
+            mappingChart.setOption(option);
+        }
+
+        // Initialize connection strength matrix
+        function initConnectionMatrix() {
+            const chartDom = document.getElementById('connectionMatrixChart');
+            matrixChart = echarts.init(chartDom);
+
+            const schemas = ['FAQPage', 'Product', 'HowTo', 'QAPage'];
+            const nodes = ['FAQ Content', 'Product Pages', 'Buyer Guides', 'Comparison', 'Keywords', 'User Intent'];
+            
+            const matrixData = [
+                [0, 0, 90], [0, 1, 45], [0, 2, 60], [0, 3, 30], [0, 4, 70], [0, 5, 55],
+                [1, 0, 25], [1, 1, 95], [1, 2, 40], [1, 3, 75], [1, 4, 60], [1, 5, 80],
+                [2, 0, 35], [2, 1, 50], [2, 2, 85], [2, 3, 45], [2, 4, 80], [2, 5, 40],
+                [3, 0, 60], [3, 1, 30], [3, 2, 25], [3, 3, 70], [3, 4, 45], [3, 5, 85]
+            ];
+
+            const option = {
+                tooltip: {
+                    position: 'top',
+                    formatter: function(params) {
+                        return schemas[params.data[0]] + ' → ' + nodes[params.data[1]] + '<br/>Strength: ' + params.data[2] + '%';
+                    }
+                },
+                grid: {
+                    height: '70%',
+                    top: '10%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: nodes,
+                    splitArea: { show: true },
+                    axisLabel: { 
+                        color: '#a8b2d1',
+                        rotate: 45,
+                        fontSize: 10
+                    }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: schemas,
+                    splitArea: { show: true },
+                    axisLabel: { color: '#a8b2d1', fontSize: 11 }
+                },
+                visualMap: {
+                    min: 0,
+                    max: 100,
+                    calculable: true,
+                    orient: 'horizontal',
+                    left: 'center',
+                    bottom: '5%',
+                    textStyle: { color: '#a8b2d1' },
+                    inRange: {
+                        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+                    }
+                },
+                series: [{
+                    name: 'Connection Strength',
+                    type: 'heatmap',
+                    data: matrixData,
+                    label: {
+                        show: true,
+                        color: '#fff',
+                        fontSize: 11
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }]
+            };
+
+            matrixChart.setOption(option);
+        }
+
+        // Initialize impact analysis chart
+        function initImpactAnalysis() {
+            const chartDom = document.getElementById('impactAnalysisChart');
+            impactChart = echarts.init(chartDom);
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' }
+                },
+                legend: {
+                    data: ['SEO Impact', 'User Engagement', 'Conversion Potential'],
+                    textStyle: { color: '#a8b2d1' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['FAQPage→FAQ Node', 'Product→Product Node', 'HowTo→Guide Node', 'QAPage→Intent Node'],
+                    axisLabel: { 
+                        color: '#a8b2d1',
+                        rotate: 45,
+                        fontSize: 10
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Impact Score',
+                    nameTextStyle: { color: '#a8b2d1' },
+                    axisLabel: { color: '#a8b2d1' },
+                    splitLine: { lineStyle: { color: '#2a3f5f' } }
+                },
+                series: [
+                    {
+                        name: 'SEO Impact',
+                        type: 'line',
+                        data: [95, 88, 75, 70],
+                        smooth: true,
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(250, 112, 154, 0.3)' },
+                                { offset: 1, color: 'rgba(250, 112, 154, 0.05)' }
+                            ])
+                        },
+                        itemStyle: { color: '#fa709a' }
+                    },
+                    {
+                        name: 'User Engagement',
+                        type: 'line',
+                        data: [85, 92, 80, 75],
+                        smooth: true,
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(79, 172, 254, 0.3)' },
+                                { offset: 1, color: 'rgba(79, 172, 254, 0.05)' }
+                            ])
+                        },
+                        itemStyle: { color: '#4facfe' }
+                    },
+                    {
+                        name: 'Conversion Potential',
+                        type: 'line',
+                        data: [70, 95, 60, 55],
+                        smooth: true,
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(67, 233, 123, 0.3)' },
+                                { offset: 1, color: 'rgba(67, 233, 123, 0.05)' }
+                            ])
+                        },
+                        itemStyle: { color: '#43e97b' }
+                    }
+                ]
+            };
+
+            impactChart.setOption(option);
+        }
+
+        // Initialize performance correlation
+        function initPerformanceCorrelation() {
+            const chartDom = document.getElementById('performanceCorrelationChart');
+            correlationChart = echarts.init(chartDom);
+
+            const data = [
+                { name: 'Collection Rate vs Schema Implementation', x: 85, y: 1.2, symbolSize: 120 },
+                { name: 'Completion Rate vs Knowledge Graph Depth', x: 90, y: 45, symbolSize: 100 },
+                { name: 'CTA Rate vs Node Connectivity', x: 75, y: 3.0, symbolSize: 90 },
+                { name: 'Comment Engagement vs Schema Richness', x: 80, y: 85, symbolSize: 110 }
+            ];
+
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function(params) {
+                        return params.data.name + '<br/>Implementation: ' + params.data.x + '%<br/>Performance: ' + params.data.y;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '7%',
+                    bottom: '7%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    name: 'Implementation Completeness (%)',
+                    nameTextStyle: { color: '#a8b2d1' },
+                    axisLabel: { color: '#a8b2d1' },
+                    splitLine: { lineStyle: { color: '#2a3f5f' } }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Performance Metric',
+                    nameTextStyle: { color: '#a8b2d1' },
+                    axisLabel: { color: '#a8b2d1' },
+                    splitLine: { lineStyle: { color: '#2a3f5f' } }
+                },
+                series: [{
+                    type: 'scatter',
+                    data: data,
+                    symbolSize: function(data) {
+                        return data[2];
+                    },
+                    itemStyle: {
+                        color: function(params) {
+                            const colors = ['#667eea', '#fa709a', '#4facfe', '#43e97b'];
+                            return colors[params.dataIndex % colors.length];
+                        },
+                        opacity: 0.8
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{b}',
+                        position: 'top',
+                        fontSize: 10,
+                        color: '#a8b2d1'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 12,
+                            color: '#fff'
+                        }
+                    }
+                }]
+            };
+
+            correlationChart.setOption(option);
+        }
+
+        // Initialize priority mapping
+        function initPriorityMapping() {
+            const chartDom = document.getElementById('priorityMappingChart');
+            priorityChart = echarts.init(chartDom);
+
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    bottom: '5%',
+                    textStyle: { color: '#a8b2d1' }
+                },
+                series: [{
+                    type: 'sunburst',
+                    data: [
+                        {
+                            name: 'P1 Priority Schemas',
+                            itemStyle: { color: '#fa709a' },
+                            children: [
+                                { name: 'FAQPage - Sleep Position', value: 25, itemStyle: { color: '#fa709a' } },
+                                { name: 'FAQPage - Firmness', value: 20, itemStyle: { color: '#f78da7' } },
+                                { name: 'Product - Commercial', value: 20, itemStyle: { color: '#f498b5' } },
+                                { name: 'FAQPage - Cooling', value: 15, itemStyle: { color: '#f1a4c3' } }
+                            ]
+                        },
+                        {
+                            name: 'P2 Priority Schemas',
+                            itemStyle: { color: '#4facfe' },
+                            children: [
+                                { name: 'HowTo - Setup Guides', value: 10, itemStyle: { color: '#4facfe' } },
+                                { name: 'QAPage - Community', value: 8, itemStyle: { color: '#6bb7fe' } },
+                                { name: 'Product - Reviews', value: 7, itemStyle: { color: '#87c2fe' } }
+                            ]
+                        },
+                        {
+                            name: 'P3 Priority Schemas',
+                            itemStyle: { color: '#43e97b' },
+                            children: [
+                                { name: 'HowTo - Maintenance', value: 3, itemStyle: { color: '#43e97b' } },
+                                { name: 'QAPage - Expert Q&A', value: 2, itemStyle: { color: '#65ec95' } }
+                            ]
+                        }
+                    ],
+                    radius: [0, '90%'],
+                    label: {
+                        rotate: 'radial',
+                        fontSize: 11,
+                        color: '#fff'
+                    },
+                    emphasis: {
+                        focus: 'ancestor'
+                    }
+                }]
+            };
+
+            priorityChart.setOption(option);
+        }
+
+        // Show specific schema mapping
+        function showMapping(schemaType) {
+            // Update button states
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                if (btn.onclick && btn.onclick.toString().includes(schemaType)) {
+                    btn.classList.add('active');
+                } else if (btn.parentElement.querySelector('.control-label').textContent.includes('Schema Focus')) {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Filter and update the main diagram based on schema type
+            // Implementation would filter the nodes and edges based on selected schema
+            console.log('Showing mapping for:', schemaType);
+        }
+
+        // Change view mode
+        function changeView(viewMode) {
+            // Update button states
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                if (btn.onclick && btn.onclick.toString().includes(viewMode)) {
+                    btn.classList.add('active');
+                } else if (btn.parentElement.querySelector('.control-label').textContent.includes('View Mode')) {
+                    btn.classList.remove('active');
+                }
+            });
+
+            console.log('Changed to view:', viewMode);
+        }
+
+        // Initialize all charts
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                initMappingDiagram();
+                initConnectionMatrix();
+                initImpactAnalysis();
+                initPerformanceCorrelation();
+                initPriorityMapping();
+            }, 500);
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            if (mappingChart) mappingChart.resize();
+            if (matrixChart) matrixChart.resize();
+            if (impactChart) impactChart.resize();
+            if (correlationChart) correlationChart.resize();
+            if (priorityChart) priorityChart.resize();
+        });
+    </script>
+</body>
+</html>

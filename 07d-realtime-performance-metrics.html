@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Performance Metrics - SweetNight GEO</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark-bg: #0f0f1e;
+            --card-bg: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a8b2d1;
+            --border-color: #2a3f5f;
+            --success-color: #48bb78;
+            --warning-color: #fee140;
+            --danger-color: #f56565;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary-gradient);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            position: relative;
+            z-index: 1;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            position: relative;
+            z-index: 1;
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .last-updated {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Real-time Status Bar */
+        .status-bar {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+
+        .status-dot.online { background: var(--success-color); }
+        .status-dot.warning { background: var(--warning-color); }
+        .status-dot.offline { background: var(--danger-color); }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .refresh-btn {
+            padding: 0.5rem 1rem;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-gradient);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .metric-icon {
+            font-size: 2.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .metric-trend {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            background: rgba(72, 187, 120, 0.2);
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            background: rgba(245, 101, 101, 0.2);
+            color: var(--danger-color);
+        }
+
+        .trend-stable {
+            background: rgba(254, 225, 64, 0.2);
+            color: var(--warning-color);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .metric-chart {
+            height: 80px;
+        }
+
+        /* Chart Grid */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-header h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .time-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .time-btn {
+            padding: 0.3rem 0.8rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .time-btn:hover,
+        .time-btn.active {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            color: var(--text-primary);
+        }
+
+        .chart-box {
+            width: 100%;
+            height: 350px;
+        }
+
+        /* System Health Panel */
+        .health-panel {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .health-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .health-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .health-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .health-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .health-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .health-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Alert Panel */
+        .alert-panel {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+
+        .alert-info { 
+            border-left-color: #4facfe; 
+            background: rgba(79, 172, 254, 0.1);
+        }
+
+        .alert-warning { 
+            border-left-color: #fee140; 
+            background: rgba(254, 225, 64, 0.1);
+        }
+
+        .alert-success { 
+            border-left-color: #48bb78; 
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Real-time Performance Metrics</h1>
+        <p>Live monitoring of JSON-LD implementation and GEO knowledge graph performance</p>
+        <div class="last-updated" id="lastUpdated">
+            <i class="fas fa-sync-alt"></i> Last updated: Loading...
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div style="display: flex; gap: 2rem;">
+                <div class="status-indicator">
+                    <div class="status-dot online"></div>
+                    <span>JSON-LD System: Online</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot online"></div>
+                    <span>Knowledge Graph: Active</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot warning"></div>
+                    <span>Schema Validation: 87%</span>
+                </div>
+            </div>
+            <button class="refresh-btn" onclick="refreshMetrics()">
+                <i class="fas fa-sync-alt"></i> Refresh Data
+            </button>
+        </div>
+
+        <!-- Key Metrics Cards -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="fas fa-code metric-icon"></i>
+                    <span class="metric-trend trend-up">+12% ↑</span>
+                </div>
+                <div class="metric-value" id="schemaImplementation">87%</div>
+                <div class="metric-label">Schema Implementation Rate</div>
+                <div id="schemaSparkline" class="metric-chart"></div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="fas fa-project-diagram metric-icon"></i>
+                    <span class="metric-trend trend-up">+8% ↑</span>
+                </div>
+                <div class="metric-value" id="graphConnectivity">73%</div>
+                <div class="metric-label">Knowledge Graph Connectivity</div>
+                <div id="graphSparkline" class="metric-chart"></div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="fas fa-search metric-icon"></i>
+                    <span class="metric-trend trend-up">+15% ↑</span>
+                </div>
+                <div class="metric-value" id="searchVisibility">1.4%</div>
+                <div class="metric-label">Search Result Collection Rate</div>
+                <div id="searchSparkline" class="metric-chart"></div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="fas fa-mouse-pointer metric-icon"></i>
+                    <span class="metric-trend trend-stable">±2% ~</span>
+                </div>
+                <div class="metric-value" id="completionRate">47%</div>
+                <div class="metric-label">Content Completion Rate</div>
+                <div id="completionSparkline" class="metric-chart"></div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="fas fa-link metric-icon"></i>
+                    <span class="metric-trend trend-up">+22% ↑</span>
+                </div>
+                <div class="metric-value" id="ctaClickRate">3.2%</div>
+                <div class="metric-label">CTA Click-through Rate</div>
+                <div id="ctaSparkline" class="metric-chart"></div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="fas fa-comments metric-icon"></i>
+                    <span class="metric-trend trend-up">+5% ↑</span>
+                </div>
+                <div class="metric-value" id="engagementScore">89</div>
+                <div class="metric-label">User Engagement Score</div>
+                <div id="engagementSparkline" class="metric-chart"></div>
+            </div>
+        </div>
+
+        <!-- System Health Panel -->
+        <div class="health-panel">
+            <h2 style="margin-bottom: 0;">System Health Overview</h2>
+            <div class="health-grid">
+                <div class="health-item">
+                    <div class="health-icon" style="background: var(--success-color);">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="health-info">
+                        <h4>JSON-LD Processing</h4>
+                        <p>Operational • 99.2% uptime</p>
+                    </div>
+                </div>
+                <div class="health-item">
+                    <div class="health-icon" style="background: var(--success-color);">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="health-info">
+                        <h4>Graph Connectivity</h4>
+                        <p>Healthy • 42 nodes active</p>
+                    </div>
+                </div>
+                <div class="health-item">
+                    <div class="health-icon" style="background: var(--warning-color);">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="health-info">
+                        <h4>Schema Validation</h4>
+                        <p>Minor Issues • 3 warnings</p>
+                    </div>
+                </div>
+                <div class="health-item">
+                    <div class="health-icon" style="background: var(--success-color);">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <div class="health-info">
+                        <h4>Performance</h4>
+                        <p>Excellent • <2s response</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Panel -->
+        <div class="alert-panel">
+            <h2 style="margin-bottom: 1rem;">Recent Alerts & Updates</h2>
+            <div class="alert-item alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div>
+                    <strong>Schema Deployment Complete</strong> - FAQPage schemas for sleep position keywords now live across 8 pages
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">2 minutes ago</div>
+                </div>
+            </div>
+            <div class="alert-item alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Performance Threshold Alert</strong> - Knowledge graph node connectivity dropped to 73% (target: 80%)
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">5 minutes ago</div>
+                </div>
+            </div>
+            <div class="alert-item alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>New Competitor Data</strong> - Updated keyword analysis for Purple and Casper detected 15 new opportunities
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">12 minutes ago</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Charts -->
+        <div class="chart-grid">
+            <!-- Real-time Performance Timeline -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Performance Timeline</h3>
+                    <div class="time-selector">
+                        <button class="time-btn active">1H</button>
+                        <button class="time-btn">6H</button>
+                        <button class="time-btn">24H</button>
+                        <button class="time-btn">7D</button>
+                    </div>
+                </div>
+                <div id="performanceTimelineChart" class="chart-box"></div>
+            </div>
+
+            <!-- Schema Performance Gauge -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Schema Performance Score</h3>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Target: 90%+</div>
+                </div>
+                <div id="schemaGaugeChart" class="chart-box"></div>
+            </div>
+
+            <!-- Knowledge Graph Health -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Knowledge Graph Health Metrics</h3>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Node connectivity & relationships</div>
+                </div>
+                <div id="graphHealthChart" class="chart-box"></div>
+            </div>
+
+            <!-- Live Schema Validation -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Live Schema Validation Status</h3>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Real-time validation results</div>
+                </div>
+                <div id="validationChart" class="chart-box"></div>
+            </div>
+
+            <!-- Keyword Performance Heatmap -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Keyword Performance Heatmap</h3>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Schema-enhanced keyword visibility</div>
+                </div>
+                <div id="keywordHeatmapChart" class="chart-box"></div>
+            </div>
+
+            <!-- User Journey Funnel -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>User Journey Performance Funnel</h3>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">From search to conversion</div>
+                </div>
+                <div id="journeyFunnelChart" class="chart-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const authToken = localStorage.getItem('authToken');
+        const sessionExpiry = localStorage.getItem('sessionExpiry');
+        const currentTime = new Date().getTime();
+
+        if (!authToken || !sessionExpiry || currentTime > parseInt(sessionExpiry)) {
+            window.location.href = 'login.html';
+        }
+
+        // Update timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('lastUpdated').innerHTML = 
+                `<i class="fas fa-sync-alt"></i> Last updated: ${now.toLocaleTimeString()}`;
+        }
+
+        // Generate realistic time-series data
+        function generateTimeSeriesData(points = 24, baseValue = 50, volatility = 10) {
+            const data = [];
+            let value = baseValue;
+            const now = new Date();
+            
+            for (let i = points - 1; i >= 0; i--) {
+                const time = new Date(now.getTime() - i * 60 * 60 * 1000); // hourly data
+                value += (Math.random() - 0.5) * volatility;
+                value = Math.max(0, Math.min(100, value)); // keep in bounds
+                data.push([time, Math.round(value * 100) / 100]);
+            }
+            
+            return data;
+        }
+
+        // Initialize sparkline charts for metric cards
+        function initSparklines() {
+            const sparklineIds = ['schemaSparkline', 'graphSparkline', 'searchSparkline', 'completionSparkline', 'ctaSparkline', 'engagementSparkline'];
+            const colors = ['#fa709a', '#4facfe', '#43e97b', '#fee140', '#f093fb', '#667eea'];
+            
+            sparklineIds.forEach((id, index) => {
+                const chart = echarts.init(document.getElementById(id));
+                const data = generateTimeSeriesData(12, 50 + index * 5, 5);
+                
+                const option = {
+                    grid: { top: 0, bottom: 0, left: 0, right: 0 },
+                    xAxis: { 
+                        type: 'time', 
+                        show: false 
+                    },
+                    yAxis: { 
+                        type: 'value', 
+                        show: false 
+                    },
+                    series: [{
+                        type: 'line',
+                        data: data,
+                        smooth: true,
+                        symbol: 'none',
+                        lineStyle: {
+                            color: colors[index],
+                            width: 2
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: colors[index] + '40' },
+                                { offset: 1, color: colors[index] + '10' }
+                            ])
+                        }
+                    }]
+                };
+                
+                chart.setOption(option);
+                
+                // Auto-refresh sparklines every 30 seconds
+                setInterval(() => {
+                    const newData = generateTimeSeriesData(12, 50 + index * 5, 5);
+                    chart.setOption({
+                        series: [{ data: newData }]
+                    });
+                }, 30000);
+            });
+        }
+
+        // Initialize main performance timeline
+        function initPerformanceTimeline() {
+            const chart = echarts.init(document.getElementById('performanceTimelineChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' }
+                },
+                legend: {
+                    data: ['Schema Score', 'Graph Connectivity', 'User Engagement'],
+                    textStyle: { color: '#a8b2d1' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'time',
+                    axisLabel: { color: '#a8b2d1' },
+                    splitLine: { lineStyle: { color: '#2a3f5f' } }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Score (%)',
+                    nameTextStyle: { color: '#a8b2d1' },
+                    axisLabel: { color: '#a8b2d1' },
+                    splitLine: { lineStyle: { color: '#2a3f5f' } }
+                },
+                series: [
+                    {
+                        name: 'Schema Score',
+                        type: 'line',
+                        data: generateTimeSeriesData(24, 85, 5),
+                        smooth: true,
+                        itemStyle: { color: '#fa709a' },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(250, 112, 154, 0.3)' },
+                                { offset: 1, color: 'rgba(250, 112, 154, 0.05)' }
+                            ])
+                        }
+                    },
+                    {
+                        name: 'Graph Connectivity',
+                        type: 'line',
+                        data: generateTimeSeriesData(24, 73, 8),
+                        smooth: true,
+                        itemStyle: { color: '#4facfe' }
+                    },
+                    {
+                        name: 'User Engagement',
+                        type: 'line',
+                        data: generateTimeSeriesData(24, 89, 6),
+                        smooth: true,
+                        itemStyle: { color: '#43e97b' }
+                    }
+                ]
+            };
+
+            chart.setOption(option);
+            return chart;
+        }
+
+        // Initialize schema gauge
+        function initSchemaGauge() {
+            const chart = echarts.init(document.getElementById('schemaGaugeChart'));
+            
+            const option = {
+                series: [{
+                    type: 'gauge',
+                    center: ['50%', '60%'],
+                    startAngle: 200,
+                    endAngle: -40,
+                    min: 0,
+                    max: 100,
+                    splitNumber: 10,
+                    itemStyle: {
+                        color: '#667eea'
+                    },
+                    progress: {
+                        show: true,
+                        roundCap: true,
+                        width: 18
+                    },
+                    pointer: {
+                        icon: 'path://M2090.36389,615.30999 L2090.36389,615.30999 C2091.48372,615.30999 2092.40383,616.194028 2092.44859,617.312956 L2096.90698,728.755929 C2097.05155,732.369577 2094.1214,735.359382 2090.50773,735.359382 L2090.50773,735.359382 C2086.89407,735.359382 2083.96384,732.369577 2084.10842,728.755929 L2088.56681,617.312956 C2088.61157,616.194028 2089.53168,615.30999 2090.65151,615.30999 Z',
+                        length: '75%',
+                        width: 16,
+                        offsetCenter: [0, '5%']
+                    },
+                    axisLine: {
+                        roundCap: true,
+                        lineStyle: { width: 18 }
+                    },
+                    axisTick: { show: false },
+                    splitLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        distance: 25,
+                        color: '#a8b2d1',
+                        fontSize: 11
+                    },
+                    title: {
+                        show: true,
+                        offsetCenter: [0, '20%'],
+                        color: '#a8b2d1'
+                    },
+                    detail: {
+                        fontSize: 30,
+                        offsetCenter: [0, '0%'],
+                        color: '#667eea',
+                        formatter: '{value}%'
+                    },
+                    data: [{ value: 87, name: 'Schema Score' }]
+                }]
+            };
+
+            chart.setOption(option);
+            
+            // Animate gauge value changes
+            setInterval(() => {
+                const newValue = 85 + Math.random() * 10;
+                chart.setOption({
+                    series: [{
+                        data: [{ value: Math.round(newValue), name: 'Schema Score' }]
+                    }]
+                });
+                document.getElementById('schemaImplementation').textContent = Math.round(newValue) + '%';
+            }, 5000);
+            
+            return chart;
+        }
+
+        // Initialize graph health radar
+        function initGraphHealth() {
+            const chart = echarts.init(document.getElementById('graphHealthChart'));
+            
+            const option = {
+                tooltip: {},
+                radar: {
+                    indicator: [
+                        { name: 'Node Connectivity', max: 100 },
+                        { name: 'Schema Integration', max: 100 },
+                        { name: 'Content Coverage', max: 100 },
+                        { name: 'Keyword Density', max: 100 },
+                        { name: 'User Path Clarity', max: 100 },
+                        { name: 'Competition Edge', max: 100 }
+                    ],
+                    axisName: { color: '#a8b2d1' }
+                },
+                series: [{
+                    name: 'Health Metrics',
+                    type: 'radar',
+                    data: [{
+                        value: [73, 87, 92, 68, 85, 79],
+                        name: 'Current State',
+                        areaStyle: {
+                            color: new echarts.graphic.RadialGradient(0.5, 0.5, 1, [
+                                { color: '#4facfe', offset: 0 },
+                                { color: '#00f2fe', offset: 1 }
+                            ])
+                        }
+                    }, {
+                        value: [80, 90, 95, 75, 90, 85],
+                        name: 'Target Goals',
+                        areaStyle: {
+                            color: new echarts.graphic.RadialGradient(0.5, 0.5, 1, [
+                                { color: '#43e97b', offset: 0 },
+                                { color: '#38f9d7', offset: 1 }
+                            ])
+                        }
+                    }]
+                }]
+            };
+
+            chart.setOption(option);
+            return chart;
+        }
+
+        // Initialize validation status
+        function initValidationChart() {
+            const chart = echarts.init(document.getElementById('validationChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    bottom: '5%',
+                    textStyle: { color: '#a8b2d1' }
+                },
+                series: [{
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['50%', '45%'],
+                    data: [
+                        { value: 87, name: 'Valid Schemas', itemStyle: { color: '#48bb78' } },
+                        { value: 8, name: 'Warnings', itemStyle: { color: '#fee140' } },
+                        { value: 3, name: 'Errors', itemStyle: { color: '#f56565' } },
+                        { value: 2, name: 'Pending', itemStyle: { color: '#a8b2d1' } }
+                    ],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{b}\n{d}%'
+                    }
+                }]
+            };
+
+            chart.setOption(option);
+            return chart;
+        }
+
+        // Initialize keyword heatmap
+        function initKeywordHeatmap() {
+            const chart = echarts.init(document.getElementById('keywordHeatmapChart'));
+            
+            const keywords = ['Sleep Position', 'Firmness', 'Cooling', 'Motion Isolation', 'Pressure Relief'];
+            const schemas = ['FAQPage', 'Product', 'HowTo', 'QAPage'];
+            
+            const heatmapData = [
+                [0, 0, 95], [0, 1, 45], [0, 2, 60], [0, 3, 70],
+                [1, 0, 40], [1, 1, 88], [1, 2, 55], [1, 3, 35],
+                [2, 0, 65], [2, 1, 70], [2, 2, 92], [2, 3, 40],
+                [3, 0, 75], [3, 1, 50], [3, 2, 45], [3, 3, 80],
+                [4, 0, 80], [4, 1, 60], [4, 2, 35], [4, 3, 25]
+            ];
+
+            const option = {
+                tooltip: {
+                    position: 'top',
+                    formatter: function(params) {
+                        return keywords[params.data[1]] + ' + ' + schemas[params.data[0]] + '<br/>Performance: ' + params.data[2] + '%';
+                    }
+                },
+                grid: {
+                    height: '70%',
+                    top: '10%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: schemas,
+                    splitArea: { show: true },
+                    axisLabel: { color: '#a8b2d1' }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: keywords,
+                    splitArea: { show: true },
+                    axisLabel: { color: '#a8b2d1' }
+                },
+                visualMap: {
+                    min: 0,
+                    max: 100,
+                    calculable: true,
+                    orient: 'horizontal',
+                    left: 'center',
+                    bottom: '5%',
+                    textStyle: { color: '#a8b2d1' },
+                    inRange: {
+                        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#fee090', '#fdae61', '#f46d43', '#d73027']
+                    }
+                },
+                series: [{
+                    name: 'Performance Score',
+                    type: 'heatmap',
+                    data: heatmapData,
+                    label: {
+                        show: true,
+                        color: '#fff',
+                        fontSize: 10
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }]
+            };
+
+            chart.setOption(option);
+            return chart;
+        }
+
+        // Initialize user journey funnel
+        function initJourneyFunnel() {
+            const chart = echarts.init(document.getElementById('journeyFunnelChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} users ({d}%)'
+                },
+                series: [{
+                    name: 'User Journey',
+                    type: 'funnel',
+                    left: '10%',
+                    width: '80%',
+                    label: {
+                        show: true,
+                        position: 'inside'
+                    },
+                    labelLine: {
+                        length: 10,
+                        lineStyle: {
+                            width: 1,
+                            type: 'solid'
+                        }
+                    },
+                    itemStyle: {
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    },
+                    emphasis: {
+                        label: {
+                            fontSize: 16
+                        }
+                    },
+                    data: [
+                        { value: 1000, name: 'Search Results Shown', itemStyle: { color: '#667eea' } },
+                        { value: 850, name: 'Rich Snippets Displayed', itemStyle: { color: '#764ba2' } },
+                        { value: 650, name: 'Click-through to Site', itemStyle: { color: '#f093fb' } },
+                        { value: 480, name: 'Content Engagement', itemStyle: { color: '#f5576c' } },
+                        { value: 320, name: 'Deep Page Navigation', itemStyle: { color: '#4facfe' } },
+                        { value: 180, name: 'CTA Interaction', itemStyle: { color: '#00f2fe' } },
+                        { value: 95, name: 'Conversion Action', itemStyle: { color: '#43e97b' } }
+                    ]
+                }]
+            };
+
+            chart.setOption(option);
+            return chart;
+        }
+
+        // Refresh all metrics
+        function refreshMetrics() {
+            updateTimestamp();
+            
+            // Simulate metric updates
+            const metrics = [
+                { id: 'schemaImplementation', value: 85 + Math.random() * 10, suffix: '%' },
+                { id: 'graphConnectivity', value: 70 + Math.random() * 15, suffix: '%' },
+                { id: 'searchVisibility', value: 1.2 + Math.random() * 0.4, suffix: '%' },
+                { id: 'completionRate', value: 45 + Math.random() * 8, suffix: '%' },
+                { id: 'ctaClickRate', value: 2.8 + Math.random() * 0.8, suffix: '%' },
+                { id: 'engagementScore', value: 85 + Math.random() * 10, suffix: '' }
+            ];
+            
+            metrics.forEach(metric => {
+                const element = document.getElementById(metric.id);
+                if (element) {
+                    const value = Math.round(metric.value * 10) / 10;
+                    element.textContent = value + metric.suffix;
+                }
+            });
+            
+            // Add refresh animation
+            document.querySelector('.refresh-btn').style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                document.querySelector('.refresh-btn').style.transform = 'rotate(0deg)';
+            }, 500);
+        }
+
+        // Initialize all charts
+        let timelineChart, gaugeChart, healthChart, validationChart, heatmapChart, funnelChart;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateTimestamp();
+            
+            setTimeout(() => {
+                initSparklines();
+                timelineChart = initPerformanceTimeline();
+                gaugeChart = initSchemaGauge();
+                healthChart = initGraphHealth();
+                validationChart = initValidationChart();
+                heatmapChart = initKeywordHeatmap();
+                funnelChart = initJourneyFunnel();
+                
+                // Auto-refresh every 2 minutes
+                setInterval(refreshMetrics, 120000);
+            }, 500);
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            if (timelineChart) timelineChart.resize();
+            if (gaugeChart) gaugeChart.resize();
+            if (healthChart) healthChart.resize();
+            if (validationChart) validationChart.resize();
+            if (heatmapChart) heatmapChart.resize();
+            if (funnelChart) funnelChart.resize();
+        });
+    </script>
+</body>
+</html>

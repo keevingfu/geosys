@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Support - SweetNightGEO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="shared-ui-components.css">
+    <script src="shared-components.js"></script>
+    <script>
+        // Authentication check
+        (function() {
+            const authToken = localStorage.getItem('authToken');
+            const sessionExpiry = localStorage.getItem('sessionExpiry');
+            
+            if (!authToken || !sessionExpiry || new Date().getTime() > parseInt(sessionExpiry)) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('sessionExpiry');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header header-fixed">
+        <div class="logo">
+            <i class="fas fa-question-circle"></i>
+            Help & Support
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="current-user">Admin User</span>
+            </div>
+            <button class="logout-btn" onclick="AuthManager.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="content-area">
+        <div class="help-layout">
+            <!-- Help Navigation -->
+            <aside class="help-sidebar">
+                <div class="help-search">
+                    <input type="text" id="help-search" placeholder="Search help articles..." class="form-input">
+                    <i class="fas fa-search"></i>
+                </div>
+
+                <nav class="help-nav">
+                    <div class="nav-section">
+                        <h4>Getting Started</h4>
+                        <ul>
+                            <li><a href="#overview" class="active" onclick="showHelpSection('overview')">
+                                <i class="fas fa-home"></i> Platform Overview
+                            </a></li>
+                            <li><a href="#quick-start" onclick="showHelpSection('quick-start')">
+                                <i class="fas fa-rocket"></i> Quick Start Guide
+                            </a></li>
+                            <li><a href="#user-guide" onclick="showHelpSection('user-guide')">
+                                <i class="fas fa-book"></i> User Guide
+                            </a></li>
+                        </ul>
+                    </div>
+
+                    <div class="nav-section">
+                        <h4>Features</h4>
+                        <ul>
+                            <li><a href="#analytics" onclick="showHelpSection('analytics')">
+                                <i class="fas fa-chart-bar"></i> Analytics Dashboard
+                            </a></li>
+                            <li><a href="#content-management" onclick="showHelpSection('content-management')">
+                                <i class="fas fa-edit"></i> Content Management
+                            </a></li>
+                            <li><a href="#monitoring" onclick="showHelpSection('monitoring')">
+                                <i class="fas fa-eye"></i> Real-time Monitoring
+                            </a></li>
+                            <li><a href="#api-usage" onclick="showHelpSection('api-usage')">
+                                <i class="fas fa-code"></i> API Usage
+                            </a></li>
+                        </ul>
+                    </div>
+
+                    <div class="nav-section">
+                        <h4>Account & Settings</h4>
+                        <ul>
+                            <li><a href="#account-setup" onclick="showHelpSection('account-setup')">
+                                <i class="fas fa-user-cog"></i> Account Setup
+                            </a></li>
+                            <li><a href="#permissions" onclick="showHelpSection('permissions')">
+                                <i class="fas fa-shield-alt"></i> Permissions
+                            </a></li>
+                            <li><a href="#integrations" onclick="showHelpSection('integrations')">
+                                <i class="fas fa-plug"></i> Integrations
+                            </a></li>
+                        </ul>
+                    </div>
+
+                    <div class="nav-section">
+                        <h4>Troubleshooting</h4>
+                        <ul>
+                            <li><a href="#common-issues" onclick="showHelpSection('common-issues')">
+                                <i class="fas fa-exclamation-triangle"></i> Common Issues
+                            </a></li>
+                            <li><a href="#error-codes" onclick="showHelpSection('error-codes')">
+                                <i class="fas fa-bug"></i> Error Codes
+                            </a></li>
+                            <li><a href="#performance" onclick="showHelpSection('performance')">
+                                <i class="fas fa-tachometer-alt"></i> Performance Tips
+                            </a></li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <div class="help-contact">
+                    <h4>Need More Help?</h4>
+                    <div class="contact-options">
+                        <button class="contact-btn" onclick="openLiveChat()">
+                            <i class="fas fa-comments"></i>
+                            Live Chat
+                        </button>
+                        <button class="contact-btn" onclick="createTicket()">
+                            <i class="fas fa-ticket-alt"></i>
+                            Create Ticket
+                        </button>
+                        <button class="contact-btn" onclick="scheduleCall()">
+                            <i class="fas fa-phone"></i>
+                            Schedule Call
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Help Content -->
+            <main class="help-content">
+                <!-- Platform Overview -->
+                <section id="overview" class="help-section active">
+                    <div class="section-header">
+                        <h1>Platform Overview</h1>
+                        <p>Welcome to SweetNightGEO - your comprehensive solution for content intelligence and analytics.</p>
+                    </div>
+
+                    <div class="overview-cards">
+                        <div class="overview-card">
+                            <div class="card-icon bg-primary">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Analytics Dashboard</h3>
+                                <p>Monitor your content performance with real-time analytics, detailed reports, and actionable insights.</p>
+                                <a href="#analytics" onclick="showHelpSection('analytics')" class="card-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="overview-card">
+                            <div class="card-icon bg-success">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Content Management</h3>
+                                <p>Create, organize, and optimize your content with our powerful content management tools.</p>
+                                <a href="#content-management" onclick="showHelpSection('content-management')" class="card-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="overview-card">
+                            <div class="card-icon bg-info">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Real-time Monitoring</h3>
+                                <p>Stay informed with real-time alerts, notifications, and monitoring of your content performance.</p>
+                                <a href="#monitoring" onclick="showHelpSection('monitoring')" class="card-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="overview-card">
+                            <div class="card-icon bg-warning">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>API Integration</h3>
+                                <p>Integrate with your existing systems using our comprehensive RESTful API.</p>
+                                <a href="#api-usage" onclick="showHelpSection('api-usage')" class="card-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="getting-started-video">
+                        <h3>Getting Started Video</h3>
+                        <div class="video-placeholder">
+                            <div class="video-icon">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <div class="video-info">
+                                <h4>Platform Introduction (5:30)</h4>
+                                <p>A comprehensive overview of the SweetNight GEO platform features and capabilities.</p>
+                                <button class="btn btn-primary" onclick="playVideo('intro')">
+                                    <i class="fas fa-play"></i>
+                                    Watch Video
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Start Guide -->
+                <section id="quick-start" class="help-section">
+                    <div class="section-header">
+                        <h1>Quick Start Guide</h1>
+                        <p>Get up and running with SweetNight GEO in just a few minutes.</p>
+                    </div>
+
+                    <div class="quick-start-steps">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Set Up Your Account</h3>
+                                <p>Complete your profile and configure basic settings to get started.</p>
+                                <div class="step-actions">
+                                    <button class="btn btn-primary" onclick="navigateTo('06a-user-management.html')">
+                                        <i class="fas fa-user-cog"></i>
+                                        Manage Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Connect Your Data Sources</h3>
+                                <p>Import your content and connect to external data sources for comprehensive analysis.</p>
+                                <div class="step-actions">
+                                    <button class="btn btn-primary" onclick="navigateTo('06c-data-tools.html')">
+                                        <i class="fas fa-database"></i>
+                                        Import Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Explore Your Dashboard</h3>
+                                <p>Familiarize yourself with the analytics dashboard and available reports.</p>
+                                <div class="step-actions">
+                                    <button class="btn btn-primary" onclick="navigateTo('index.html')">
+                                        <i class="fas fa-chart-bar"></i>
+                                        View Dashboard
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-item">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h3>Configure Monitoring</h3>
+                                <p>Set up alerts and notifications to stay informed about important changes.</p>
+                                <div class="step-actions">
+                                    <button class="btn btn-primary" onclick="navigateTo('06b-notification-center.html')">
+                                        <i class="fas fa-bell"></i>
+                                        Setup Alerts
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quick-tips">
+                        <h3>Quick Tips</h3>
+                        <div class="tips-grid">
+                            <div class="tip-item">
+                                <i class="fas fa-lightbulb"></i>
+                                <div>
+                                    <h4>Use Keyboard Shortcuts</h4>
+                                    <p>Press <kbd>Ctrl + K</kbd> to quickly search across the platform.</p>
+                                </div>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-bookmark"></i>
+                                <div>
+                                    <h4>Bookmark Important Pages</h4>
+                                    <p>Save frequently accessed reports and dashboards as bookmarks.</p>
+                                </div>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-mobile-alt"></i>
+                                <div>
+                                    <h4>Mobile Optimized</h4>
+                                    <p>Access your dashboard on mobile devices for monitoring on-the-go.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Common Issues -->
+                <section id="common-issues" class="help-section">
+                    <div class="section-header">
+                        <h1>Common Issues</h1>
+                        <p>Find solutions to frequently encountered problems and issues.</p>
+                    </div>
+
+                    <div class="faq-list">
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFAQ(this)">
+                                <h3>Why is my data not updating in real-time?</h3>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Real-time data updates depend on several factors:</p>
+                                <ul>
+                                    <li>Check your internet connection stability</li>
+                                    <li>Verify that real-time monitoring is enabled in Settings</li>
+                                    <li>Ensure your data sources are properly connected</li>
+                                    <li>Check if you've exceeded your API rate limits</li>
+                                </ul>
+                                <p>If the issue persists, try refreshing the page or clearing your browser cache.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFAQ(this)">
+                                <h3>How do I reset my password?</h3>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>To reset your password:</p>
+                                <ol>
+                                    <li>Go to the login page</li>
+                                    <li>Click "Forgot Password" link</li>
+                                    <li>Enter your email address</li>
+                                    <li>Check your email for reset instructions</li>
+                                    <li>Follow the link and create a new password</li>
+                                </ol>
+                                <p>If you don't receive the reset email, check your spam folder or contact support.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFAQ(this)">
+                                <h3>Why are my charts not displaying correctly?</h3>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Chart display issues can be caused by:</p>
+                                <ul>
+                                    <li><strong>Browser compatibility:</strong> Ensure you're using a supported browser</li>
+                                    <li><strong>JavaScript disabled:</strong> Enable JavaScript in your browser settings</li>
+                                    <li><strong>Ad blockers:</strong> Temporarily disable ad blockers</li>
+                                    <li><strong>Insufficient data:</strong> Some charts require minimum data points</li>
+                                </ul>
+                                <p>Try refreshing the page or switching to a different browser if issues persist.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFAQ(this)">
+                                <h3>How do I export my data?</h3>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>You can export data in several ways:</p>
+                                <ul>
+                                    <li><strong>Dashboard exports:</strong> Use the export button on individual charts</li>
+                                    <li><strong>Bulk export:</strong> Go to Data Tools → Export to download large datasets</li>
+                                    <li><strong>API access:</strong> Use our API endpoints for programmatic data access</li>
+                                    <li><strong>Scheduled exports:</strong> Set up automated exports in the Data Tools section</li>
+                                </ul>
+                                <p>Supported formats include CSV, Excel, JSON, and PDF for reports.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFAQ(this)">
+                                <h3>Can I customize my dashboard?</h3>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Yes! You can customize your dashboard in several ways:</p>
+                                <ul>
+                                    <li><strong>Widget arrangement:</strong> Drag and drop widgets to rearrange</li>
+                                    <li><strong>Chart types:</strong> Change visualization types for your data</li>
+                                    <li><strong>Time ranges:</strong> Adjust default time periods for reports</li>
+                                    <li><strong>Filters:</strong> Save custom filter combinations</li>
+                                    <li><strong>Themes:</strong> Choose from available color themes</li>
+                                </ul>
+                                <p>Changes are saved automatically to your user profile.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- API Usage -->
+                <section id="api-usage" class="help-section">
+                    <div class="section-header">
+                        <h1>API Usage</h1>
+                        <p>Learn how to integrate with the SweetNight GEO API for custom applications.</p>
+                    </div>
+
+                    <div class="api-quickstart">
+                        <h3>API Quick Start</h3>
+                        <div class="code-example">
+                            <div class="code-header">
+                                <span>Basic API Request</span>
+                                <button class="copy-btn" onclick="copyToClipboard(document.querySelector('#basic-api-code').textContent)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <pre id="basic-api-code"><code>curl -X GET "https://api.sweetnightgeo.com/v1/analytics/overview" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"</code></pre>
+                        </div>
+
+                        <div class="api-actions">
+                            <button class="btn btn-primary" onclick="navigateTo('06d-api-documentation.html')">
+                                <i class="fas fa-book"></i>
+                                Full API Documentation
+                            </button>
+                            <button class="btn btn-secondary" onclick="generateApiKey()">
+                                <i class="fas fa-key"></i>
+                                Get API Key
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="api-examples">
+                        <h3>Common Use Cases</h3>
+                        <div class="examples-grid">
+                            <div class="example-item">
+                                <h4><i class="fas fa-chart-bar"></i> Fetch Analytics Data</h4>
+                                <p>Retrieve performance metrics and analytics data programmatically.</p>
+                                <code>GET /v1/analytics/overview</code>
+                            </div>
+                            <div class="example-item">
+                                <h4><i class="fas fa-users"></i> Manage Users</h4>
+                                <p>Create, update, and manage user accounts through the API.</p>
+                                <code>POST /v1/users</code>
+                            </div>
+                            <div class="example-item">
+                                <h4><i class="fas fa-upload"></i> Import Content</h4>
+                                <p>Programmatically upload and import content data.</p>
+                                <code>POST /v1/content/import</code>
+                            </div>
+                            <div class="example-item">
+                                <h4><i class="fas fa-bell"></i> Set Alerts</h4>
+                                <p>Configure monitoring alerts and notifications via API.</p>
+                                <code>POST /v1/alerts</code>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <style>
+        .help-layout {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        /* Help Sidebar */
+        .help-sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .help-search {
+            position: relative;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .help-search i {
+            position: absolute;
+            right: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+        }
+
+        .help-nav {
+            padding: 20px 0;
+        }
+
+        .help-nav .nav-section {
+            margin-bottom: 28px;
+        }
+
+        .help-nav .nav-section h4 {
+            padding: 8px 20px 12px;
+            margin: 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .help-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 12px 0 0 0;
+        }
+
+        .help-nav li {
+            margin: 0;
+        }
+
+        .help-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            color: var(--gray-700);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .help-nav a:hover,
+        .help-nav a.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .help-nav a i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .help-contact {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            background: var(--gray-50);
+        }
+
+        .help-contact h4 {
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .contact-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            color: var(--gray-700);
+            text-align: left;
+            cursor: pointer;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+
+        .contact-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Help Content */
+        .help-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            background: var(--gray-50);
+        }
+
+        .help-section {
+            display: none;
+            max-width: 800px;
+        }
+
+        .help-section.active {
+            display: block;
+        }
+
+        .section-header {
+            margin-bottom: 32px;
+        }
+
+        .section-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            color: var(--gray-600);
+            font-size: 16px;
+            margin: 0;
+        }
+
+        /* Overview Cards */
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .overview-card {
+            display: flex;
+            gap: 16px;
+            background: white;
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .overview-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .card-content {
+            flex: 1;
+        }
+
+        .card-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .card-content p {
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .card-link:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Getting Started Video */
+        .getting-started-video {
+            background: white;
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 32px;
+        }
+
+        .getting-started-video h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 16px;
+        }
+
+        .video-placeholder {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            border: 2px dashed var(--border);
+            border-radius: var(--border-radius);
+            background: var(--gray-50);
+        }
+
+        .video-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .video-info {
+            flex: 1;
+        }
+
+        .video-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .video-info p {
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        /* Quick Start Steps */
+        .quick-start-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 20px;
+            background: white;
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* Quick Tips */
+        .quick-tips {
+            background: white;
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quick-tips h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 16px;
+        }
+
+        .tips-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .tip-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: var(--border-radius);
+        }
+
+        .tip-item i {
+            color: var(--warning);
+            font-size: 20px;
+            margin-top: 2px;
+        }
+
+        .tip-item h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .tip-item p {
+            font-size: 13px;
+            color: var(--gray-600);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .tip-item kbd {
+            background: var(--dark);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        /* FAQ */
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .faq-question:hover {
+            background: var(--gray-50);
+        }
+
+        .faq-question h3 {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .faq-question i {
+            color: var(--gray-500);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px;
+            max-height: 500px;
+        }
+
+        .faq-answer p {
+            color: var(--gray-700);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .faq-answer ul,
+        .faq-answer ol {
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+
+        .faq-answer li {
+            color: var(--gray-700);
+            font-size: 14px;
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+
+        /* API Examples */
+        .api-quickstart {
+            background: white;
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 32px;
+        }
+
+        .api-quickstart h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 16px;
+        }
+
+        .code-example {
+            background: var(--dark);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--gray-800);
+            border-bottom: 1px solid var(--gray-600);
+            color: var(--gray-300);
+            font-size: 12px;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .copy-btn:hover {
+            color: white;
+            background: var(--gray-700);
+        }
+
+        .code-example pre {
+            margin: 0;
+            padding: 16px;
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        .api-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .api-examples h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .example-item {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--primary);
+        }
+
+        .example-item h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .example-item h4 i {
+            color: var(--primary);
+        }
+
+        .example-item p {
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .example-item code {
+            background: var(--gray-100);
+            color: var(--primary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .help-layout {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .help-sidebar {
+                width: 100%;
+            }
+            
+            .overview-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .video-placeholder {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .step-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .api-actions {
+                flex-direction: column;
+            }
+            
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script>
+        function initializeHelpSupport() {
+            // Set current user info
+            const currentUser = AuthManager.getCurrentUser();
+            if (currentUser) {
+                document.getElementById('current-user').textContent = currentUser.name || 'Admin User';
+            }
+
+            // Setup search
+            document.getElementById('help-search').addEventListener('input', 
+                DataUtils.debounce(searchHelp, 300));
+        }
+
+        function showHelpSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.help-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+            }
+
+            // Update navigation
+            document.querySelectorAll('.help-nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            const activeLink = document.querySelector(`a[href="#${sectionId}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+
+            // Scroll to top
+            document.querySelector('.help-content').scrollTop = 0;
+        }
+
+        function searchHelp() {
+            const query = document.getElementById('help-search').value.toLowerCase();
+            
+            if (!query) {
+                // Show all nav items
+                document.querySelectorAll('.help-nav li').forEach(li => {
+                    li.style.display = 'block';
+                });
+                return;
+            }
+
+            // Filter nav items
+            document.querySelectorAll('.help-nav li').forEach(li => {
+                const link = li.querySelector('a');
+                const text = link.textContent.toLowerCase();
+                li.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        }
+
+        function toggleFAQ(questionElement) {
+            const faqItem = questionElement.parentElement;
+            const isActive = faqItem.classList.contains('active');
+            
+            // Close all FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Toggle current item
+            if (!isActive) {
+                faqItem.classList.add('active');
+            }
+        }
+
+        function openLiveChat() {
+            UIComponents.showModal(
+                'Live Chat Support',
+                `
+                <div class="chat-info">
+                    <div class="chat-status">
+                        <div class="status-indicator status-online"></div>
+                        <span>Support agents are online</span>
+                    </div>
+                    <p>Connect with our support team for immediate assistance.</p>
+                    <div class="chat-hours">
+                        <h4>Support Hours:</h4>
+                        <p>Monday - Friday: 9:00 AM - 6:00 PM PST<br>
+                        Saturday: 10:00 AM - 4:00 PM PST<br>
+                        Sunday: Closed</p>
+                    </div>
+                </div>
+                <style>
+                    .chat-info {
+                        text-align: center;
+                        padding: 20px;
+                    }
+                    .chat-status {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                        margin-bottom: 16px;
+                        font-weight: 500;
+                        color: var(--success);
+                    }
+                    .chat-hours {
+                        background: var(--gray-50);
+                        padding: 16px;
+                        border-radius: 8px;
+                        margin-top: 16px;
+                    }
+                    .chat-hours h4 {
+                        margin-bottom: 8px;
+                        color: var(--dark);
+                    }
+                    .chat-hours p {
+                        font-size: 14px;
+                        color: var(--gray-600);
+                        margin: 0;
+                        line-height: 1.5;
+                    }
+                </style>
+                `,
+                {
+                    confirmText: 'Start Chat',
+                    onConfirm: () => {
+                        UIComponents.showNotification('Starting live chat session...', 'info');
+                        // In a real app, this would open a chat widget
+                    }
+                }
+            );
+        }
+
+        function createTicket() {
+            const ticketContent = `
+                <form id="ticket-form">
+                    <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" name="subject" class="form-input" placeholder="Brief description of your issue">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select name="category" class="form-select">
+                            <option value="">Select Category</option>
+                            <option value="technical">Technical Issue</option>
+                            <option value="account">Account & Billing</option>
+                            <option value="feature">Feature Request</option>
+                            <option value="bug">Bug Report</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <select name="priority" class="form-select">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-textarea" rows="6" placeholder="Please provide detailed information about your issue, including steps to reproduce if applicable."></textarea>
+                    </div>
+                </form>
+            `;
+
+            UIComponents.showModal('Create Support Ticket', ticketContent, {
+                confirmText: 'Create Ticket',
+                onConfirm: () => {
+                    if (FormUtils.validateForm('ticket-form', {
+                        subject: { required: true },
+                        category: { required: true },
+                        description: { required: true, minLength: 10 }
+                    })) {
+                        const ticketId = 'TKT-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+                        UIComponents.showNotification(`Support ticket ${ticketId} created successfully!`, 'success');
+                    }
+                }
+            });
+        }
+
+        function scheduleCall() {
+            const callContent = `
+                <form id="call-form">
+                    <div class="form-group">
+                        <label class="form-label">Preferred Date</label>
+                        <input type="date" name="date" class="form-input" min="${new Date().toISOString().split('T')[0]}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Preferred Time</label>
+                        <select name="time" class="form-select">
+                            <option value="">Select Time</option>
+                            <option value="09:00">9:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="15:00">3:00 PM</option>
+                            <option value="16:00">4:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" name="phone" class="form-input" placeholder="+1 (555) 123-4567">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Topic</label>
+                        <textarea name="topic" class="form-textarea" rows="3" placeholder="What would you like to discuss?"></textarea>
+                    </div>
+                </form>
+            `;
+
+            UIComponents.showModal('Schedule Support Call', callContent, {
+                confirmText: 'Schedule Call',
+                onConfirm: () => {
+                    if (FormUtils.validateForm('call-form', {
+                        date: { required: true },
+                        time: { required: true },
+                        phone: { required: true },
+                        topic: { required: true }
+                    })) {
+                        UIComponents.showNotification('Support call scheduled successfully!', 'success');
+                    }
+                }
+            });
+        }
+
+        function playVideo(videoId) {
+            UIComponents.showNotification('Loading video...', 'info');
+            // In a real app, this would open a video player or modal
+            setTimeout(() => {
+                UIComponents.showNotification('Video feature coming soon!', 'info');
+            }, 1000);
+        }
+
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        function generateApiKey() {
+            // This would typically redirect to the API docs page
+            navigateTo('06d-api-documentation.html');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                UIComponents.showNotification('Copied to clipboard!', 'success');
+            }).catch(() => {
+                UIComponents.showNotification('Failed to copy', 'error');
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeHelpSupport);
+    </script>
+</body>
+</html>

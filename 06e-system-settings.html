@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings - SweetNightGEO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="shared-ui-components.css">
+    <script src="shared-components.js"></script>
+    <script>
+        // Authentication check
+        (function() {
+            const authToken = localStorage.getItem('authToken');
+            const sessionExpiry = localStorage.getItem('sessionExpiry');
+            
+            if (!authToken || !sessionExpiry || new Date().getTime() > parseInt(sessionExpiry)) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('sessionExpiry');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header header-fixed">
+        <div class="logo">
+            <i class="fas fa-cog"></i>
+            System Settings
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="current-user">Admin User</span>
+            </div>
+            <button class="logout-btn" onclick="AuthManager.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="content-area">
+        <div class="settings-layout">
+            <!-- Settings Navigation -->
+            <aside class="settings-sidebar">
+                <nav class="settings-nav">
+                    <div class="nav-section">
+                        <h4>General</h4>
+                        <ul>
+                            <li><a href="#general" class="active" onclick="showSettingsSection('general')">
+                                <i class="fas fa-cog"></i> General Settings
+                            </a></li>
+                            <li><a href="#appearance" onclick="showSettingsSection('appearance')">
+                                <i class="fas fa-palette"></i> Appearance
+                            </a></li>
+                            <li><a href="#notifications" onclick="showSettingsSection('notifications')">
+                                <i class="fas fa-bell"></i> Notifications
+                            </a></li>
+                        </ul>
+                    </div>
+
+                    <div class="nav-section">
+                        <h4>Security</h4>
+                        <ul>
+                            <li><a href="#security" onclick="showSettingsSection('security')">
+                                <i class="fas fa-shield-alt"></i> Security Settings
+                            </a></li>
+                            <li><a href="#api-keys" onclick="showSettingsSection('api-keys')">
+                                <i class="fas fa-key"></i> API Keys
+                            </a></li>
+                            <li><a href="#audit-logs" onclick="showSettingsSection('audit-logs')">
+                                <i class="fas fa-clipboard-list"></i> Audit Logs
+                            </a></li>
+                        </ul>
+                    </div>
+
+                    <div class="nav-section">
+                        <h4>System</h4>
+                        <ul>
+                            <li><a href="#performance" onclick="showSettingsSection('performance')">
+                                <i class="fas fa-tachometer-alt"></i> Performance
+                            </a></li>
+                            <li><a href="#maintenance" onclick="showSettingsSection('maintenance')">
+                                <i class="fas fa-tools"></i> Maintenance
+                            </a></li>
+                            <li><a href="#backups" onclick="showSettingsSection('backups')">
+                                <i class="fas fa-database"></i> Backups
+                            </a></li>
+                            <li><a href="#integrations" onclick="showSettingsSection('integrations')">
+                                <i class="fas fa-plug"></i> Integrations
+                            </a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Settings Content -->
+            <main class="settings-content">
+                <!-- General Settings -->
+                <section id="general" class="settings-section active">
+                    <div class="section-header">
+                        <h2>General Settings</h2>
+                        <p>Configure basic system preferences and default values</p>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Basic Configuration</h3>
+                        <form class="settings-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">System Name</label>
+                                    <input type="text" class="form-input" value="SweetNightGEO">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Default Language</label>
+                                    <select class="form-select">
+                                        <option value="en" selected>English</option>
+                                        <option value="es">Spanish</option>
+                                        <option value="fr">French</option>
+                                        <option value="de">German</option>
+                                        <option value="zh">Chinese</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Timezone</label>
+                                    <select class="form-select">
+                                        <option value="UTC">UTC</option>
+                                        <option value="America/New_York">Eastern Time</option>
+                                        <option value="America/Chicago">Central Time</option>
+                                        <option value="America/Denver">Mountain Time</option>
+                                        <option value="America/Los_Angeles" selected>Pacific Time</option>
+                                        <option value="Europe/London">London</option>
+                                        <option value="Asia/Tokyo">Tokyo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Date Format</label>
+                                    <select class="form-select">
+                                        <option value="MM/DD/YYYY" selected>MM/DD/YYYY</option>
+                                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Default Page Size</label>
+                                <select class="form-select">
+                                    <option value="10">10 items per page</option>
+                                    <option value="20" selected>20 items per page</option>
+                                    <option value="50">50 items per page</option>
+                                    <option value="100">100 items per page</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Feature Toggles</h3>
+                        <div class="toggles-grid">
+                            <div class="toggle-item">
+                                <div class="toggle-content">
+                                    <h4>Analytics Dashboard</h4>
+                                    <p>Enable advanced analytics and reporting features</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="toggle-item">
+                                <div class="toggle-content">
+                                    <h4>Real-time Monitoring</h4>
+                                    <p>Enable real-time system monitoring and alerts</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="toggle-item">
+                                <div class="toggle-content">
+                                    <h4>API Rate Limiting</h4>
+                                    <p>Enable rate limiting for API endpoints</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="toggle-item">
+                                <div class="toggle-content">
+                                    <h4>Debug Mode</h4>
+                                    <p>Enable debug logging and error details</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="saveGeneralSettings()">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetGeneralSettings()">
+                            <i class="fas fa-undo"></i>
+                            Reset to Default
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Appearance Settings -->
+                <section id="appearance" class="settings-section">
+                    <div class="section-header">
+                        <h2>Appearance Settings</h2>
+                        <p>Customize the look and feel of the application</p>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Theme Configuration</h3>
+                        <div class="theme-options">
+                            <div class="theme-option active" data-theme="default">
+                                <div class="theme-preview default-theme">
+                                    <div class="preview-header"></div>
+                                    <div class="preview-sidebar"></div>
+                                    <div class="preview-content"></div>
+                                </div>
+                                <h4>Default</h4>
+                            </div>
+
+                            <div class="theme-option" data-theme="dark">
+                                <div class="theme-preview dark-theme">
+                                    <div class="preview-header"></div>
+                                    <div class="preview-sidebar"></div>
+                                    <div class="preview-content"></div>
+                                </div>
+                                <h4>Dark Mode</h4>
+                            </div>
+
+                            <div class="theme-option" data-theme="blue">
+                                <div class="theme-preview blue-theme">
+                                    <div class="preview-header"></div>
+                                    <div class="preview-sidebar"></div>
+                                    <div class="preview-content"></div>
+                                </div>
+                                <h4>Ocean Blue</h4>
+                            </div>
+
+                            <div class="theme-option" data-theme="green">
+                                <div class="theme-preview green-theme">
+                                    <div class="preview-header"></div>
+                                    <div class="preview-sidebar"></div>
+                                    <div class="preview-content"></div>
+                                </div>
+                                <h4>Forest Green</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Layout Options</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Sidebar Position</label>
+                                <select class="form-select">
+                                    <option value="left" selected>Left</option>
+                                    <option value="right">Right</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Sidebar Size</label>
+                                <select class="form-select">
+                                    <option value="compact">Compact</option>
+                                    <option value="normal" selected>Normal</option>
+                                    <option value="wide">Wide</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-content">
+                                <h4>Fixed Header</h4>
+                                <p>Keep the header fixed when scrolling</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="saveAppearanceSettings()">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Security Settings -->
+                <section id="security" class="settings-section">
+                    <div class="section-header">
+                        <h2>Security Settings</h2>
+                        <p>Configure security policies and access controls</p>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Password Policy</h3>
+                        <div class="security-options">
+                            <div class="form-group">
+                                <label class="form-label">Minimum Password Length</label>
+                                <select class="form-select">
+                                    <option value="6">6 characters</option>
+                                    <option value="8" selected>8 characters</option>
+                                    <option value="10">10 characters</option>
+                                    <option value="12">12 characters</option>
+                                </select>
+                            </div>
+
+                            <div class="security-toggles">
+                                <div class="toggle-item">
+                                    <div class="toggle-content">
+                                        <h4>Require Uppercase Letters</h4>
+                                        <p>Passwords must contain at least one uppercase letter</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-item">
+                                    <div class="toggle-content">
+                                        <h4>Require Numbers</h4>
+                                        <p>Passwords must contain at least one number</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-item">
+                                    <div class="toggle-content">
+                                        <h4>Require Special Characters</h4>
+                                        <p>Passwords must contain at least one special character</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Session Management</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Session Timeout</label>
+                                <select class="form-select">
+                                    <option value="30">30 minutes</option>
+                                    <option value="60">1 hour</option>
+                                    <option value="120">2 hours</option>
+                                    <option value="480" selected>8 hours</option>
+                                    <option value="1440">24 hours</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Max Failed Login Attempts</label>
+                                <select class="form-select">
+                                    <option value="3">3 attempts</option>
+                                    <option value="5" selected>5 attempts</option>
+                                    <option value="10">10 attempts</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-content">
+                                <h4>Two-Factor Authentication</h4>
+                                <p>Require 2FA for all admin users</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="saveSecuritySettings()">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Performance Settings -->
+                <section id="performance" class="settings-section">
+                    <div class="section-header">
+                        <h2>Performance Settings</h2>
+                        <p>Optimize system performance and resource usage</p>
+                    </div>
+
+                    <div class="performance-overview">
+                        <div class="perf-stats">
+                            <div class="perf-stat">
+                                <div class="stat-icon bg-success">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-value">23%</div>
+                                    <div class="stat-label">CPU Usage</div>
+                                </div>
+                            </div>
+
+                            <div class="perf-stat">
+                                <div class="stat-icon bg-info">
+                                    <i class="fas fa-memory"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-value">1.2GB</div>
+                                    <div class="stat-label">Memory Used</div>
+                                </div>
+                            </div>
+
+                            <div class="perf-stat">
+                                <div class="stat-icon bg-warning">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-value">45GB</div>
+                                    <div class="stat-label">Storage Used</div>
+                                </div>
+                            </div>
+
+                            <div class="perf-stat">
+                                <div class="stat-icon bg-success">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-value">89ms</div>
+                                    <div class="stat-label">Avg Response</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Cache Configuration</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Cache TTL (seconds)</label>
+                                <input type="number" class="form-input" value="3600" min="60" max="86400">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Max Cache Size (MB)</label>
+                                <input type="number" class="form-input" value="512" min="64" max="2048">
+                            </div>
+                        </div>
+
+                        <div class="cache-actions">
+                            <button class="btn btn-secondary" onclick="clearCache()">
+                                <i class="fas fa-trash"></i>
+                                Clear Cache
+                            </button>
+                            <button class="btn btn-secondary" onclick="refreshCache()">
+                                <i class="fas fa-sync"></i>
+                                Refresh Cache
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Database Optimization</h3>
+                        <div class="db-optimization">
+                            <div class="optimization-item">
+                                <div class="optimization-info">
+                                    <h4>Auto-Vacuum</h4>
+                                    <p>Automatically clean up unused database space</p>
+                                    <span class="status-badge status-active">Enabled</span>
+                                </div>
+                                <button class="btn btn-ghost" onclick="runDatabaseVacuum()">
+                                    <i class="fas fa-play"></i>
+                                    Run Now
+                                </button>
+                            </div>
+
+                            <div class="optimization-item">
+                                <div class="optimization-info">
+                                    <h4>Index Optimization</h4>
+                                    <p>Optimize database indexes for better query performance</p>
+                                    <span class="status-badge status-pending">Scheduled</span>
+                                </div>
+                                <button class="btn btn-ghost" onclick="optimizeIndexes()">
+                                    <i class="fas fa-play"></i>
+                                    Run Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="savePerformanceSettings()">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Maintenance Settings -->
+                <section id="maintenance" class="settings-section">
+                    <div class="section-header">
+                        <h2>Maintenance Settings</h2>
+                        <p>Schedule and manage system maintenance tasks</p>
+                    </div>
+
+                    <div class="maintenance-status">
+                        <div class="status-card">
+                            <div class="status-header">
+                                <h3>System Status</h3>
+                                <span class="status-indicator status-online"></span>
+                                <span class="status-text">Operational</span>
+                            </div>
+                            <div class="status-details">
+                                <div class="detail-item">
+                                    <span>Uptime:</span>
+                                    <span>15 days, 7 hours</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Last Maintenance:</span>
+                                    <span>January 5, 2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Next Scheduled:</span>
+                                    <span>January 20, 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Scheduled Maintenance</h3>
+                        <div class="maintenance-schedule">
+                            <div class="schedule-item">
+                                <div class="schedule-info">
+                                    <h4>System Backup</h4>
+                                    <p>Full system backup including database and files</p>
+                                    <div class="schedule-time">Every Sunday at 2:00 AM</div>
+                                </div>
+                                <div class="schedule-actions">
+                                    <button class="btn btn-ghost" onclick="runBackupNow()">
+                                        <i class="fas fa-play"></i>
+                                        Run Now
+                                    </button>
+                                    <button class="btn btn-ghost" onclick="editSchedule('backup')">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="schedule-item">
+                                <div class="schedule-info">
+                                    <h4>Log Cleanup</h4>
+                                    <p>Clean up old log files and archived data</p>
+                                    <div class="schedule-time">Daily at 3:00 AM</div>
+                                </div>
+                                <div class="schedule-actions">
+                                    <button class="btn btn-ghost" onclick="runLogCleanup()">
+                                        <i class="fas fa-play"></i>
+                                        Run Now
+                                    </button>
+                                    <button class="btn btn-ghost" onclick="editSchedule('logs')">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="schedule-item">
+                                <div class="schedule-info">
+                                    <h4>Security Scan</h4>
+                                    <p>Automated security vulnerability scanning</p>
+                                    <div class="schedule-time">Weekly on Wednesday at 1:00 AM</div>
+                                </div>
+                                <div class="schedule-actions">
+                                    <button class="btn btn-ghost" onclick="runSecurityScan()">
+                                        <i class="fas fa-play"></i>
+                                        Run Now
+                                    </button>
+                                    <button class="btn btn-ghost" onclick="editSchedule('security')">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Maintenance Mode</h3>
+                        <div class="maintenance-mode">
+                            <div class="mode-info">
+                                <h4>Enable Maintenance Mode</h4>
+                                <p>Put the system in maintenance mode to perform updates or repairs. Users will see a maintenance message.</p>
+                            </div>
+                            <button class="btn btn-warning" onclick="enableMaintenanceMode()">
+                                <i class="fas fa-tools"></i>
+                                Enable Maintenance Mode
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <style>
+        .settings-layout {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        /* Settings Sidebar */
+        .settings-sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .settings-nav {
+            padding: 24px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 32px;
+        }
+
+        .nav-section h4 {
+            padding: 0 24px 12px;
+            margin: 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-section ul {
+            list-style: none;
+            margin: 0;
+            padding: 12px 0 0 0;
+        }
+
+        .nav-section li {
+            margin: 0;
+        }
+
+        .nav-section a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: var(--gray-700);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-section a i {
+            width: 16px;
+            text-align: center;
+        }
+
+        /* Settings Content */
+        .settings-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            background: var(--gray-50);
+        }
+
+        .settings-section {
+            display: none;
+            max-width: 800px;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        .section-header {
+            margin-bottom: 32px;
+        }
+
+        .section-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            color: var(--gray-600);
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .settings-group {
+            background: white;
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+        }
+
+        .settings-group h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+
+        .settings-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* Toggle Switches */
+        .toggles-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            background: var(--gray-50);
+        }
+
+        .toggle-content h4 {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .toggle-content p {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray-300);
+            border-radius: 24px;
+            transition: var(--transition);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Theme Options */
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .theme-option {
+            text-align: center;
+            padding: 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-option:hover,
+        .theme-option.active {
+            border-color: var(--primary);
+        }
+
+        .theme-preview {
+            width: 100%;
+            height: 80px;
+            border-radius: 6px;
+            position: relative;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .default-theme {
+            background: #f7fafc;
+        }
+
+        .dark-theme {
+            background: #2d3748;
+        }
+
+        .blue-theme {
+            background: #ebf8ff;
+        }
+
+        .green-theme {
+            background: #f0fff4;
+        }
+
+        .preview-header {
+            height: 20px;
+            background: var(--primary);
+        }
+
+        .preview-sidebar {
+            position: absolute;
+            left: 0;
+            top: 20px;
+            bottom: 0;
+            width: 25%;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .preview-content {
+            position: absolute;
+            right: 0;
+            top: 20px;
+            bottom: 0;
+            width: 75%;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-theme .preview-sidebar {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .preview-content {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Performance Stats */
+        .performance-overview {
+            background: white;
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+        }
+
+        .perf-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .perf-stat {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            background: var(--gray-50);
+        }
+
+        .perf-stat .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 2px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+
+        /* Cache Actions */
+        .cache-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        /* Maintenance */
+        .maintenance-status {
+            margin-bottom: 32px;
+        }
+
+        .status-card {
+            background: white;
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .status-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .status-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .detail-item span:first-child {
+            color: var(--gray-600);
+        }
+
+        .detail-item span:last-child {
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .maintenance-schedule {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            background: var(--gray-50);
+        }
+
+        .schedule-info h4 {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .schedule-info p {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+
+        .schedule-time {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .schedule-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .maintenance-mode {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid var(--warning);
+            border-radius: var(--border-radius);
+            background: var(--warning-light);
+        }
+
+        .mode-info h4 {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .mode-info p {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .settings-layout {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .settings-sidebar {
+                width: 100%;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .theme-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .perf-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .schedule-item,
+            .maintenance-mode {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            
+            .schedule-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+
+    <script>
+        function initializeSystemSettings() {
+            // Set current user info
+            const currentUser = AuthManager.getCurrentUser();
+            if (currentUser) {
+                document.getElementById('current-user').textContent = currentUser.name || 'Admin User';
+            }
+
+            // Initialize theme selection
+            initializeThemeSelection();
+        }
+
+        function showSettingsSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.settings-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+            }
+
+            // Update navigation
+            document.querySelectorAll('.settings-nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            const activeLink = document.querySelector(`a[href="#${sectionId}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+        }
+
+        function initializeThemeSelection() {
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    document.querySelectorAll('.theme-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    
+                    // Add active class to selected option
+                    this.classList.add('active');
+                    
+                    const theme = this.getAttribute('data-theme');
+                    UIComponents.showNotification(`Theme "${theme}" selected`, 'success');
+                });
+            });
+        }
+
+        function saveGeneralSettings() {
+            UIComponents.showNotification('General settings saved successfully!', 'success');
+        }
+
+        function resetGeneralSettings() {
+            UIComponents.showModal(
+                'Reset Settings',
+                '<p>Are you sure you want to reset all general settings to their default values?</p>',
+                {
+                    confirmText: 'Reset',
+                    onConfirm: () => {
+                        UIComponents.showNotification('Settings reset to default values', 'info');
+                    }
+                }
+            );
+        }
+
+        function saveAppearanceSettings() {
+            UIComponents.showNotification('Appearance settings saved successfully!', 'success');
+        }
+
+        function saveSecuritySettings() {
+            UIComponents.showNotification('Security settings saved successfully!', 'success');
+        }
+
+        function savePerformanceSettings() {
+            UIComponents.showNotification('Performance settings saved successfully!', 'success');
+        }
+
+        function clearCache() {
+            UIComponents.showModal(
+                'Clear Cache',
+                '<p>Are you sure you want to clear all cached data? This may temporarily slow down the application.</p>',
+                {
+                    confirmText: 'Clear Cache',
+                    onConfirm: () => {
+                        UIComponents.showNotification('Cache cleared successfully', 'success');
+                    }
+                }
+            );
+        }
+
+        function refreshCache() {
+            UIComponents.showNotification('Cache refreshed successfully', 'success');
+        }
+
+        function runDatabaseVacuum() {
+            UIComponents.showNotification('Database vacuum started...', 'info');
+            // Simulate vacuum process
+            setTimeout(() => {
+                UIComponents.showNotification('Database vacuum completed', 'success');
+            }, 3000);
+        }
+
+        function optimizeIndexes() {
+            UIComponents.showNotification('Index optimization started...', 'info');
+            // Simulate optimization process
+            setTimeout(() => {
+                UIComponents.showNotification('Database indexes optimized', 'success');
+            }, 5000);
+        }
+
+        function runBackupNow() {
+            UIComponents.showNotification('System backup started...', 'info');
+            // Simulate backup process
+            setTimeout(() => {
+                UIComponents.showNotification('System backup completed successfully', 'success');
+            }, 8000);
+        }
+
+        function runLogCleanup() {
+            UIComponents.showNotification('Log cleanup started...', 'info');
+            // Simulate cleanup process
+            setTimeout(() => {
+                UIComponents.showNotification('Log cleanup completed', 'success');
+            }, 2000);
+        }
+
+        function runSecurityScan() {
+            UIComponents.showNotification('Security scan started...', 'info');
+            // Simulate security scan
+            setTimeout(() => {
+                UIComponents.showNotification('Security scan completed - No vulnerabilities found', 'success');
+            }, 10000);
+        }
+
+        function editSchedule(taskType) {
+            const scheduleContent = `
+                <form id="schedule-form">
+                    <div class="form-group">
+                        <label class="form-label">Task: ${taskType.charAt(0).toUpperCase() + taskType.slice(1)}</label>
+                        <input type="text" class="form-input" value="${taskType.charAt(0).toUpperCase() + taskType.slice(1)} Task" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Schedule</label>
+                        <select class="form-select">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Time</label>
+                        <input type="time" class="form-input" value="02:00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Day (for weekly/monthly)</label>
+                        <select class="form-select">
+                            <option value="sunday">Sunday</option>
+                            <option value="monday">Monday</option>
+                            <option value="tuesday">Tuesday</option>
+                            <option value="wednesday">Wednesday</option>
+                            <option value="thursday">Thursday</option>
+                            <option value="friday">Friday</option>
+                            <option value="saturday">Saturday</option>
+                        </select>
+                    </div>
+                </form>
+            `;
+
+            UIComponents.showModal('Edit Schedule', scheduleContent, {
+                confirmText: 'Save Schedule',
+                onConfirm: () => {
+                    UIComponents.showNotification(`${taskType} schedule updated`, 'success');
+                }
+            });
+        }
+
+        function enableMaintenanceMode() {
+            const maintenanceContent = `
+                <form id="maintenance-form">
+                    <div class="form-group">
+                        <label class="form-label">Maintenance Message</label>
+                        <textarea class="form-textarea" rows="3" placeholder="We're performing scheduled maintenance. Please try again later.">We're performing scheduled maintenance to improve our services. We'll be back shortly!</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estimated Duration</label>
+                        <select class="form-select">
+                            <option value="30">30 minutes</option>
+                            <option value="60">1 hour</option>
+                            <option value="120">2 hours</option>
+                            <option value="240">4 hours</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked> Allow admin access during maintenance
+                        </label>
+                    </div>
+                </form>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Warning:</strong> Enabling maintenance mode will make the system unavailable to regular users.
+                </div>
+                <style>
+                    .alert {
+                        padding: 12px;
+                        border-radius: 6px;
+                        margin-top: 16px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                    .alert-warning {
+                        background: var(--warning-light);
+                        color: var(--warning);
+                        border: 1px solid var(--warning);
+                    }
+                    .checkbox-label {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        font-size: 14px;
+                        cursor: pointer;
+                    }
+                </style>
+            `;
+
+            UIComponents.showModal('Enable Maintenance Mode', maintenanceContent, {
+                confirmText: 'Enable Maintenance Mode',
+                onConfirm: () => {
+                    UIComponents.showNotification('Maintenance mode enabled', 'warning');
+                }
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeSystemSettings);
+    </script>
+</body>
+</html>

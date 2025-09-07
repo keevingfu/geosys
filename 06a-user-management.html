@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - SweetNightGEO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="shared-ui-components.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="shared-components.js"></script>
+    <script>
+        // Authentication check
+        (function() {
+            const authToken = localStorage.getItem('authToken');
+            const sessionExpiry = localStorage.getItem('sessionExpiry');
+            
+            if (!authToken || !sessionExpiry || new Date().getTime() > parseInt(sessionExpiry)) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('sessionExpiry');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header header-fixed">
+        <div class="logo">
+            <i class="fas fa-users"></i>
+            User Management Center
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="current-user">Admin User</span>
+            </div>
+            <button class="logout-btn" onclick="AuthManager.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="content-area">
+        <div class="container">
+            <!-- Breadcrumbs -->
+            <nav class="breadcrumb">
+                <a href="index.html" class="breadcrumb-item">Dashboard</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-item">User Management</span>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">User Management</h1>
+                <p class="page-subtitle">Manage user accounts, permissions, and access controls</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-primary">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">147</div>
+                                <div class="stat-label">Total Users</div>
+                                <div class="stat-change text-success">+12 this month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-success">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">132</div>
+                                <div class="stat-label">Active Users</div>
+                                <div class="stat-change text-success">89.8% online rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-warning">
+                                <i class="fas fa-user-clock"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">8</div>
+                                <div class="stat-label">Pending Approval</div>
+                                <div class="stat-change text-warning">Review required</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon bg-error">
+                                <i class="fas fa-user-slash"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">7</div>
+                                <div class="stat-label">Blocked Users</div>
+                                <div class="stat-change text-error">Security review</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Actions Bar -->
+            <div class="actions-bar">
+                <div class="actions-left">
+                    <button class="btn btn-primary" onclick="showAddUserModal()">
+                        <i class="fas fa-plus"></i>
+                        Add New User
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportUsers()">
+                        <i class="fas fa-download"></i>
+                        Export Users
+                    </button>
+                    <button class="btn btn-warning" onclick="showBulkActionsModal()">
+                        <i class="fas fa-tasks"></i>
+                        Bulk Actions
+                    </button>
+                </div>
+                <div class="actions-right">
+                    <div class="search-box">
+                        <input type="text" id="user-search" placeholder="Search users..." class="form-input">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <select id="role-filter" class="form-select">
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="manager">Manager</option>
+                        <option value="analyst">Analyst</option>
+                        <option value="user">User</option>
+                    </select>
+                    <select id="status-filter" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="pending">Pending</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">User Directory</h3>
+                    <div class="card-actions">
+                        <button class="btn btn-ghost" onclick="refreshUserList()">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table" id="users-table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="select-all"></th>
+                                    <th>User</th>
+                                    <th>Role</th>
+                                    <th>Department</th>
+                                    <th>Status</th>
+                                    <th>Last Login</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody">
+                                <!-- Users will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            Showing <span id="showing-start">1</span> to <span id="showing-end">20</span> 
+                            of <span id="total-users">147</span> users
+                        </div>
+                        <div class="pagination" id="pagination">
+                            <!-- Pagination will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .page-header {
+            margin-bottom: 32px;
+        }
+        
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: var(--gray-600);
+            font-size: 16px;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+        }
+        
+        .stat-change {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .actions-left, .actions-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table th {
+            font-weight: 600;
+            color: var(--dark);
+            background: var(--gray-100);
+        }
+        
+        .user-info-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-details h4 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+            color: var(--dark);
+        }
+        
+        .user-details p {
+            font-size: 12px;
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .role-admin { background: var(--error-light); color: var(--error); }
+        .role-manager { background: var(--warning-light); color: var(--warning); }
+        .role-analyst { background: var(--info-light); color: var(--info); }
+        .role-user { background: var(--success-light); color: var(--success); }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: var(--success-light);
+            color: var(--success);
+        }
+        
+        .status-inactive {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+        
+        .status-pending {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+        
+        .status-blocked {
+            background: var(--error-light);
+            color: var(--error);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .action-btn-edit {
+            background: var(--info-light);
+            color: var(--info);
+        }
+        
+        .action-btn-edit:hover {
+            background: var(--info);
+            color: white;
+        }
+        
+        .action-btn-delete {
+            background: var(--error-light);
+            color: var(--error);
+        }
+        
+        .action-btn-delete:hover {
+            background: var(--error);
+            color: white;
+        }
+        
+        .action-btn-more {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+        
+        .action-btn-more:hover {
+            background: var(--gray-400);
+            color: white;
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .pagination-info {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+        
+        .pagination {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .pagination-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .pagination-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 768px) {
+            .actions-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .actions-left, .actions-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .actions-right {
+                flex-wrap: wrap;
+            }
+            
+            .stat-number {
+                font-size: 24px;
+            }
+            
+            .stat-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+        }
+    </style>
+
+    <script>
+        // Mock user data
+        const mockUsers = [
+            {
+                id: 1,
+                name: "Alice Johnson",
+                email: "alice.johnson@company.com",
+                role: "admin",
+                department: "IT",
+                status: "active",
+                lastLogin: "2024-01-15 09:30",
+                created: "2023-08-15"
+            },
+            {
+                id: 2,
+                name: "Bob Smith",
+                email: "bob.smith@company.com",
+                role: "manager",
+                department: "Marketing",
+                status: "active",
+                lastLogin: "2024-01-14 16:45",
+                created: "2023-09-20"
+            },
+            {
+                id: 3,
+                name: "Carol Davis",
+                email: "carol.davis@company.com",
+                role: "analyst",
+                department: "Analytics",
+                status: "pending",
+                lastLogin: "Never",
+                created: "2024-01-10"
+            },
+            {
+                id: 4,
+                name: "David Wilson",
+                email: "david.wilson@company.com",
+                role: "user",
+                department: "Sales",
+                status: "inactive",
+                lastLogin: "2023-12-28 14:20",
+                created: "2023-07-05"
+            },
+            {
+                id: 5,
+                name: "Emma Brown",
+                email: "emma.brown@company.com",
+                role: "analyst",
+                department: "Analytics",
+                status: "active",
+                lastLogin: "2024-01-15 11:15",
+                created: "2023-11-12"
+            }
+        ];
+
+        let currentPage = 1;
+        let usersPerPage = 20;
+        let filteredUsers = [...mockUsers];
+
+        function initializeUserManagement() {
+            // Set current user info
+            const currentUser = AuthManager.getCurrentUser();
+            if (currentUser) {
+                document.getElementById('current-user').textContent = currentUser.name || 'Admin User';
+            }
+
+            // Initialize table
+            renderUsersTable();
+            setupFilters();
+            setupPagination();
+            
+            // Setup event listeners
+            document.getElementById('select-all').addEventListener('change', toggleSelectAll);
+            document.getElementById('user-search').addEventListener('input', 
+                DataUtils.debounce(filterUsers, 300));
+            document.getElementById('role-filter').addEventListener('change', filterUsers);
+            document.getElementById('status-filter').addEventListener('change', filterUsers);
+        }
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-tbody');
+            const startIndex = (currentPage - 1) * usersPerPage;
+            const endIndex = startIndex + usersPerPage;
+            const usersToShow = filteredUsers.slice(startIndex, endIndex);
+
+            tbody.innerHTML = usersToShow.map(user => `
+                <tr>
+                    <td><input type="checkbox" class="user-select" data-user-id="${user.id}"></td>
+                    <td>
+                        <div class="user-info-cell">
+                            <div class="user-avatar">
+                                ${user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="user-details">
+                                <h4>${user.name}</h4>
+                                <p>${user.email}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="role-badge role-${user.role}">
+                            ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                        </span>
+                    </td>
+                    <td>${user.department}</td>
+                    <td>
+                        <span class="status-badge status-${user.status}">
+                            <i class="fas fa-circle status-indicator"></i>
+                            ${user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                        </span>
+                    </td>
+                    <td>${user.lastLogin}</td>
+                    <td>${DataUtils.formatDate(user.created)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-edit" onclick="editUser(${user.id})" title="Edit User">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" onclick="deleteUser(${user.id})" title="Delete User">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="action-btn action-btn-more" onclick="showUserActions(${user.id})" title="More Actions">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            updatePaginationInfo();
+        }
+
+        function setupFilters() {
+            // Initial filter setup is done in the HTML
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('user-search').value.toLowerCase();
+            const roleFilter = document.getElementById('role-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            filteredUsers = mockUsers.filter(user => {
+                const matchesSearch = user.name.toLowerCase().includes(searchTerm) ||
+                                    user.email.toLowerCase().includes(searchTerm);
+                const matchesRole = !roleFilter || user.role === roleFilter;
+                const matchesStatus = !statusFilter || user.status === statusFilter;
+
+                return matchesSearch && matchesRole && matchesStatus;
+            });
+
+            currentPage = 1; // Reset to first page
+            renderUsersTable();
+            setupPagination();
+        }
+
+        function setupPagination() {
+            const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+            const pagination = document.getElementById('pagination');
+
+            let paginationHtml = '';
+
+            // Previous button
+            paginationHtml += `
+                <button class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} 
+                        onclick="changePage(${currentPage - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage || i === 1 || i === totalPages || 
+                    (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    paginationHtml += `
+                        <button class="pagination-btn ${i === currentPage ? 'active' : ''}" 
+                                onclick="changePage(${i})">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === 2 && currentPage > 4) {
+                    paginationHtml += '<span class="pagination-ellipsis">...</span>';
+                } else if (i === totalPages - 1 && currentPage < totalPages - 3) {
+                    paginationHtml += '<span class="pagination-ellipsis">...</span>';
+                }
+            }
+
+            // Next button
+            paginationHtml += `
+                <button class="pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} 
+                        onclick="changePage(${currentPage + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+
+            pagination.innerHTML = paginationHtml;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderUsersTable();
+                setupPagination();
+            }
+        }
+
+        function updatePaginationInfo() {
+            const startIndex = (currentPage - 1) * usersPerPage + 1;
+            const endIndex = Math.min(currentPage * usersPerPage, filteredUsers.length);
+            
+            document.getElementById('showing-start').textContent = startIndex;
+            document.getElementById('showing-end').textContent = endIndex;
+            document.getElementById('total-users').textContent = filteredUsers.length;
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('select-all');
+            const checkboxes = document.querySelectorAll('.user-select');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+
+        function showAddUserModal() {
+            const modalContent = `
+                <form id="add-user-form">
+                    <div class="grid grid-cols-2">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="name" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Role</label>
+                            <select name="role" class="form-select" required>
+                                <option value="">Select Role</option>
+                                <option value="admin">Admin</option>
+                                <option value="manager">Manager</option>
+                                <option value="analyst">Analyst</option>
+                                <option value="user">User</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <select name="department" class="form-select" required>
+                                <option value="">Select Department</option>
+                                <option value="IT">IT</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Analytics">Analytics</option>
+                                <option value="Sales">Sales</option>
+                                <option value="HR">HR</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Initial Password</label>
+                        <input type="password" name="password" class="form-input" required>
+                    </div>
+                </form>
+            `;
+
+            UIComponents.showModal('Add New User', modalContent, {
+                confirmText: 'Create User',
+                onConfirm: () => {
+                    if (FormUtils.validateForm('add-user-form', {
+                        name: { required: true },
+                        email: { required: true, email: true },
+                        role: { required: true },
+                        department: { required: true },
+                        password: { required: true, minLength: 6 }
+                    })) {
+                        const formData = FormUtils.serializeForm('add-user-form');
+                        // Add user logic here
+                        UIComponents.showNotification('User created successfully!', 'success');
+                        refreshUserList();
+                    }
+                }
+            });
+        }
+
+        function editUser(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            const modalContent = `
+                <form id="edit-user-form">
+                    <div class="grid grid-cols-2">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="name" class="form-input" value="${user.name}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-input" value="${user.email}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Role</label>
+                            <select name="role" class="form-select" required>
+                                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager</option>
+                                <option value="analyst" ${user.role === 'analyst' ? 'selected' : ''}>Analyst</option>
+                                <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <select name="department" class="form-select" required>
+                                <option value="IT" ${user.department === 'IT' ? 'selected' : ''}>IT</option>
+                                <option value="Marketing" ${user.department === 'Marketing' ? 'selected' : ''}>Marketing</option>
+                                <option value="Analytics" ${user.department === 'Analytics' ? 'selected' : ''}>Analytics</option>
+                                <option value="Sales" ${user.department === 'Sales' ? 'selected' : ''}>Sales</option>
+                                <option value="HR" ${user.department === 'HR' ? 'selected' : ''}>HR</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select" required>
+                            <option value="active" ${user.status === 'active' ? 'selected' : ''}>Active</option>
+                            <option value="inactive" ${user.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+                            <option value="pending" ${user.status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="blocked" ${user.status === 'blocked' ? 'selected' : ''}>Blocked</option>
+                        </select>
+                    </div>
+                </form>
+            `;
+
+            UIComponents.showModal('Edit User', modalContent, {
+                confirmText: 'Update User',
+                onConfirm: () => {
+                    const formData = FormUtils.serializeForm('edit-user-form');
+                    // Update user logic here
+                    UIComponents.showNotification('User updated successfully!', 'success');
+                    refreshUserList();
+                }
+            });
+        }
+
+        function deleteUser(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            UIComponents.showModal(
+                'Delete User',
+                `<p>Are you sure you want to delete <strong>${user.name}</strong>?</p>
+                 <p class="text-error">This action cannot be undone.</p>`,
+                {
+                    confirmText: 'Delete User',
+                    onConfirm: () => {
+                        // Delete user logic here
+                        UIComponents.showNotification('User deleted successfully!', 'success');
+                        refreshUserList();
+                    }
+                }
+            );
+        }
+
+        function showUserActions(userId) {
+            // Show dropdown menu with additional actions
+            UIComponents.showNotification('More actions feature coming soon!', 'info');
+        }
+
+        function refreshUserList() {
+            UIComponents.showNotification('User list refreshed', 'success');
+            renderUsersTable();
+        }
+
+        function exportUsers() {
+            // Export users to CSV
+            UIComponents.showNotification('Export functionality coming soon!', 'info');
+        }
+
+        function showBulkActionsModal() {
+            const selectedUsers = document.querySelectorAll('.user-select:checked');
+            if (selectedUsers.length === 0) {
+                UIComponents.showNotification('Please select users first', 'warning');
+                return;
+            }
+
+            const modalContent = `
+                <p>Selected ${selectedUsers.length} user(s). Choose bulk action:</p>
+                <div class="form-group">
+                    <label class="form-label">Action</label>
+                    <select id="bulk-action" class="form-select">
+                        <option value="">Select Action</option>
+                        <option value="activate">Activate Users</option>
+                        <option value="deactivate">Deactivate Users</option>
+                        <option value="delete">Delete Users</option>
+                        <option value="change-role">Change Role</option>
+                    </select>
+                </div>
+                <div class="form-group" id="role-selection" style="display: none;">
+                    <label class="form-label">New Role</label>
+                    <select id="new-role" class="form-select">
+                        <option value="admin">Admin</option>
+                        <option value="manager">Manager</option>
+                        <option value="analyst">Analyst</option>
+                        <option value="user">User</option>
+                    </select>
+                </div>
+            `;
+
+            UIComponents.showModal('Bulk Actions', modalContent, {
+                confirmText: 'Execute Action',
+                onConfirm: () => {
+                    const action = document.getElementById('bulk-action').value;
+                    if (action) {
+                        UIComponents.showNotification(`Bulk action "${action}" executed!`, 'success');
+                        refreshUserList();
+                    }
+                }
+            });
+
+            // Show role selection when needed
+            setTimeout(() => {
+                const bulkActionSelect = document.getElementById('bulk-action');
+                const roleSelection = document.getElementById('role-selection');
+                
+                if (bulkActionSelect && roleSelection) {
+                    bulkActionSelect.addEventListener('change', (e) => {
+                        roleSelection.style.display = e.target.value === 'change-role' ? 'block' : 'none';
+                    });
+                }
+            }, 100);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeUserManagement);
+    </script>
+</body>
+</html>
