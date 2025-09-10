@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON-LD & AI Platform Knowledge Graph Connection - Dymesty</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --success: #4facfe;
+            --warning: #fa709a;
+            --danger: #f5576c;
+            --info: #00f2fe;
+            --bg-dark: #0f0f1e;
+            --bg-card: #1a1a2e;
+            --bg-hover: #252540;
+            --text-primary: #ffffff;
+            --text-secondary: #a8b2d1;
+            --border: #2a3f5f;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--gradient-1);
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            position: relative;
+            z-index: 1;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            position: relative;
+            z-index: 1;
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Overview Cards */
+        .overview-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .overview-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .overview-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .overview-card:nth-child(2)::before {
+            background: var(--gradient-2);
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+
+        .overview-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .overview-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            background: var(--gradient-1);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .overview-card:nth-child(2) .overview-icon {
+            background: var(--gradient-2);
+        }
+
+        .overview-header h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .overview-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .overview-list li {
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .overview-list li:last-child {
+            border-bottom: none;
+        }
+
+        .overview-list li:hover {
+            padding-left: 1rem;
+            background: var(--bg-hover);
+            margin: 0 -1rem;
+            padding-right: 1rem;
+            border-radius: 8px;
+        }
+
+        .overview-list i {
+            color: var(--success);
+            font-size: 1.2rem;
+            min-width: 25px;
+        }
+
+        .overview-stat {
+            font-weight: 600;
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        /* Main Diagram Container */
+        .diagram-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+
+        .diagram-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .diagram-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .diagram-title h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .diagram-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        #connectionDiagram {
+            width: 100%;
+            height: 900px;
+            border-radius: 10px;
+            background: var(--bg-dark);
+        }
+
+        /* Connection Cards */
+        .connections-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .connection-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .connection-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .connection-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .connection-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+
+        .connection-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .connection-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            background: var(--gradient-1);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .connection-card:nth-child(2) .connection-icon {
+            background: var(--gradient-2);
+        }
+
+        .connection-card:nth-child(3) .connection-icon {
+            background: var(--gradient-3);
+        }
+
+        .connection-card:nth-child(4) .connection-icon {
+            background: var(--gradient-4);
+        }
+
+        .connection-content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .connection-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .connection-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: var(--bg-hover);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .flow-item {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flow-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+        }
+
+        .flow-arrow {
+            color: var(--primary);
+            font-size: 1.5rem;
+            animation: arrowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes arrowPulse {
+            0%, 100% { transform: translateX(0); opacity: 0.6; }
+            50% { transform: translateX(5px); opacity: 1; }
+        }
+
+        .connection-description {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            padding: 1rem;
+            background: var(--bg-hover);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Data Flow Section */
+        .data-flow-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+
+        .data-flow-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .data-flow-header h2 {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .data-flow-header i {
+            font-size: 2rem;
+            background: var(--gradient-3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #dataFlowChart {
+            width: 100%;
+            height: 600px;
+            border-radius: 10px;
+            background: var(--bg-dark);
+        }
+
+        /* Insights Section */
+        .insights-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+
+        .insights-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .insights-header h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .insights-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .insight-box {
+            background: var(--bg-hover);
+            border-radius: 10px;
+            padding: 2rem;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .insight-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            transform: translate(30px, -30px);
+        }
+
+        .insight-box:nth-child(1) { border-left-color: var(--primary); }
+        .insight-box:nth-child(2) { border-left-color: var(--success); }
+        .insight-box:nth-child(3) { border-left-color: var(--warning); }
+        .insight-box:nth-child(4) { border-left-color: var(--info); }
+
+        .insight-box:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+
+        .insight-box h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .insight-box h3 i {
+            font-size: 1.5rem;
+            opacity: 0.8;
+        }
+
+        .insight-box p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary);
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .overview-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .connections-section {
+                grid-template-columns: 1fr;
+            }
+            
+            #connectionDiagram {
+                height: 600px;
+            }
+            
+            .diagram-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .connection-flow {
+                flex-direction: column;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>JSON-LD & AI Platform Knowledge Graph Connection</h1>
+        <p>Understanding the synergy between structured data implementation and AI platform optimization for Dymesty AI Glasses</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Overview Section -->
+        <div class="overview-section">
+            <div class="overview-card">
+                <div class="overview-header">
+                    <div class="overview-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h2>JSON-LD Content Strategy</h2>
+                </div>
+                <ul class="overview-list">
+                    <li><i class="fas fa-check-circle"></i> <span class="overview-stat">15</span> Schema Types for AI Glasses</li>
+                    <li><i class="fas fa-bullseye"></i> <span class="overview-stat">Product Schema</span> 80% Priority</li>
+                    <li><i class="fas fa-chart-line"></i> <span class="overview-stat">60%+</span> Target Completion Rate</li>
+                    <li><i class="fas fa-network-wired"></i> <span class="overview-stat">10</span> AI Platform Channels</li>
+                    <li><i class="fas fa-tags"></i> <span class="overview-stat">P1 Priority:</span> Translation, Privacy, Lightweight</li>
+                </ul>
+            </div>
+            <div class="overview-card">
+                <div class="overview-header">
+                    <div class="overview-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h2>AI Platform Knowledge Graph</h2>
+                </div>
+                <ul class="overview-list">
+                    <li><i class="fas fa-circle-nodes"></i> <span class="overview-stat">45</span> Strategic Nodes</li>
+                    <li><i class="fas fa-link"></i> <span class="overview-stat">120+</span> Connections</li>
+                    <li><i class="fas fa-layer-group"></i> <span class="overview-stat">8</span> Node Categories</li>
+                    <li><i class="fas fa-sitemap"></i> <span class="overview-stat">4</span> Layout Modes</li>
+                    <li><i class="fas fa-brain"></i> <span class="overview-stat">AI-Driven</span> Content Intelligence</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Connection Diagram -->
+        <div class="diagram-container">
+            <div class="diagram-header">
+                <div class="diagram-title">
+                    <h2>Interactive Connection Map</h2>
+                </div>
+                <div class="diagram-controls">
+                    <button class="control-btn" onclick="changeView('schema')">
+                        <i class="fas fa-code"></i> Schema Focus
+                    </button>
+                    <button class="control-btn" onclick="changeView('platform')">
+                        <i class="fas fa-robot"></i> Platform Focus
+                    </button>
+                    <button class="control-btn" onclick="resetView()">
+                        <i class="fas fa-sync"></i> Reset
+                    </button>
+                </div>
+            </div>
+            <div id="connectionDiagram">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading Interactive Map...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Connections Grid -->
+        <div class="connections-section">
+            <div class="connection-card">
+                <div class="connection-header">
+                    <div class="connection-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <div class="connection-content">
+                        <h3>Schema to Knowledge Node Mapping</h3>
+                        <p>Direct correlation between JSON-LD schemas and graph nodes</p>
+                    </div>
+                </div>
+                <div class="connection-flow">
+                    <div class="flow-item">Product Schema</div>
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    <div class="flow-item">AI Glasses Features</div>
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    <div class="flow-item">Translation Keywords</div>
+                </div>
+                <p class="connection-description">
+                    Each JSON-LD schema type directly maps to content nodes in the knowledge graph, 
+                    creating a structured information architecture optimized for AI platform understanding.
+                </p>
+            </div>
+
+            <div class="connection-card">
+                <div class="connection-header">
+                    <div class="connection-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <div class="connection-content">
+                        <h3>User Intent Pathway</h3>
+                        <p>From structured data to user journey</p>
+                    </div>
+                </div>
+                <div class="connection-flow">
+                    <div class="flow-item">HowTo Schema</div>
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    <div class="flow-item">Tutorial Intent</div>
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    <div class="flow-item">Professional User</div>
+                </div>
+                <p class="connection-description">
+                    JSON-LD schemas enable AI platforms to understand content intent, 
+                    which maps directly to user personas and their specific needs in the knowledge graph.
+                </p>
+            </div>
+
+            <div class="connection-card">
+                <div class="connection-header">
+                    <div class="connection-icon">
+                        <i class="fas fa-broadcast-tower"></i>
+                    </div>
+                    <div class="connection-content">
+                        <h3>AI Platform Distribution</h3>
+                        <p>Content distribution across AI platforms</p>
+                    </div>
+                </div>
+                <div class="connection-flow">
+                    <div class="flow-item">ChatGPT Channel</div>
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    <div class="flow-item">Schema Markup</div>
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    <div class="flow-item">AI Visibility</div>
+                </div>
+                <p class="connection-description">
+                    Distribution channels identified in JSON-LD strategy feed into the knowledge graph's 
+                    content distribution nodes, maximizing AI platform visibility.
+                </p>
+            </div>
+
+            <div class="connection-card">
+                <div class="connection-header">
+                    <div class="connection-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="connection-content">
+                        <h3>Competitive Intelligence Layer</h3>
+                        <p>Schema advantages over competitors</p>
+                    </div>
+                </div>
+                <div class="connection-flow">
+                    <div class="flow-item">Product Schema</div>
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    <div class="flow-item">Competitor Nodes</div>
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    <div class="flow-item">Differentiation</div>
+                </div>
+                <p class="connection-description">
+                    Structured data implementation creates competitive advantages visible in the 
+                    knowledge graph's competitor analysis, highlighting Dymesty's unique positioning.
+                </p>
+            </div>
+        </div>
+
+        <!-- Data Flow Visualization -->
+        <div class="data-flow-section">
+            <div class="data-flow-header">
+                <i class="fas fa-stream"></i>
+                <h2>Data Flow Architecture</h2>
+            </div>
+            <div id="dataFlowChart">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading Data Flow...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights Section -->
+        <div class="insights-section">
+            <div class="insights-header">
+                <h2>Strategic Integration Insights</h2>
+                <p>How JSON-LD and AI Platform Knowledge Graph work together to maximize Dymesty AI Glasses visibility</p>
+            </div>
+            <div class="insights-grid">
+                <div class="insight-box">
+                    <h3><i class="fas fa-lightbulb"></i> Schema-First AI Strategy</h3>
+                    <p>Product Schema implementation for Dymesty AI Glasses directly enhances AI platform understanding of our translation features, privacy focus, and lightweight design, creating a foundation for superior AI visibility.</p>
+                </div>
+                <div class="insight-box">
+                    <h3><i class="fas fa-link"></i> Unified Architecture</h3>
+                    <p>JSON-LD and Knowledge Graph systems work in harmony to optimize Dymesty's presence across ChatGPT, Perplexity, Claude, and other AI platforms, ensuring consistent and accurate information delivery.</p>
+                </div>
+                <div class="insight-box">
+                    <h3><i class="fas fa-chart-line"></i> Performance Amplification</h3>
+                    <p>The 60%+ completion rate target for Product Schema implementation directly feeds into the AI platform optimization metrics, driving measurable visibility gains and user engagement.</p>
+                </div>
+                <div class="insight-box">
+                    <h3><i class="fas fa-brain"></i> AI-Powered Intelligence</h3>
+                    <p>The knowledge graph uses JSON-LD patterns to optimize Dymesty AI Glasses content relationships, while structured data benefits from AI platform insights and user behavior patterns.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const authToken = localStorage.getItem('authToken');
+        const sessionExpiry = localStorage.getItem('sessionExpiry');
+        const currentTime = new Date().getTime();
+
+        if (!authToken || !sessionExpiry || currentTime > parseInt(sessionExpiry)) {
+            window.location.href = 'login.html';
+        }
+
+        // Global variables
+        let connectionChart = null;
+        let dataFlowChart = null;
+        let currentView = 'all';
+
+        // Node and edge data for the connection diagram
+        const connectionData = {
+            nodes: [
+                // Central Hub
+                { id: 'hub', name: 'JSON-LD & AI Platform Integration', category: 0, symbolSize: 120, x: 500, y: 350 },
+                
+                // JSON-LD Side (Left)
+                { id: 'jsonld-core', name: 'JSON-LD Strategy', category: 1, symbolSize: 100, x: 200, y: 200 },
+                { id: 'product-schema', name: 'Product Schema (80%)', category: 2, symbolSize: 85, x: 100, y: 100 },
+                { id: 'org-schema', name: 'Organization Schema', category: 2, symbolSize: 70, x: 100, y: 200 },
+                { id: 'howto-schema', name: 'HowTo Schema', category: 2, symbolSize: 70, x: 100, y: 300 },
+                { id: 'faq-schema', name: 'FAQ Schema', category: 2, symbolSize: 65, x: 100, y: 400 },
+                { id: 'review-schema', name: 'Review Schema', category: 2, symbolSize: 65, x: 100, y: 500 },
+                
+                // AI Platform Side (Right)
+                { id: 'ai-platform', name: 'AI Platform Graph', category: 1, symbolSize: 100, x: 800, y: 200 },
+                { id: 'content-db', name: 'Content Database', category: 3, symbolSize: 80, x: 900, y: 100 },
+                { id: 'keywords', name: 'Keyword Strategy', category: 3, symbolSize: 80, x: 900, y: 200 },
+                { id: 'schema-mapping', name: 'Schema Mapping', category: 3, symbolSize: 80, x: 900, y: 300 },
+                { id: 'competitors', name: 'Competitor Analysis', category: 3, symbolSize: 75, x: 900, y: 400 },
+                { id: 'personas', name: 'User Personas', category: 3, symbolSize: 75, x: 900, y: 500 },
+                
+                // Bridge Content Nodes (Middle)
+                { id: 'features', name: 'AI Glasses Features', category: 4, symbolSize: 70, x: 350, y: 150 },
+                { id: 'tutorials', name: 'Tutorial Content', category: 4, symbolSize: 70, x: 350, y: 250 },
+                { id: 'products', name: 'Product Pages', category: 4, symbolSize: 70, x: 350, y: 350 },
+                { id: 'comparisons', name: 'Comparison Content', category: 4, symbolSize: 65, x: 350, y: 450 },
+                { id: 'faqs', name: 'FAQ Content', category: 4, symbolSize: 65, x: 350, y: 550 },
+                
+                // Keywords (Middle-Right)
+                { id: 'kw-translation', name: 'Translation Keywords', category: 5, symbolSize: 60, x: 650, y: 100 },
+                { id: 'kw-privacy', name: 'Privacy Keywords', category: 5, symbolSize: 60, x: 650, y: 200 },
+                { id: 'kw-lightweight', name: 'Lightweight Keywords', category: 5, symbolSize: 60, x: 650, y: 300 },
+                { id: 'kw-battery', name: 'Battery Life Keywords', category: 5, symbolSize: 60, x: 650, y: 400 },
+                { id: 'kw-titanium', name: 'Titanium Keywords', category: 5, symbolSize: 55, x: 650, y: 500 },
+                
+                // AI Platform Channels (Bottom)
+                { id: 'chatgpt', name: 'ChatGPT', category: 6, symbolSize: 65, x: 200, y: 650 },
+                { id: 'perplexity', name: 'Perplexity', category: 6, symbolSize: 65, x: 350, y: 650 },
+                { id: 'claude', name: 'Claude', category: 6, symbolSize: 65, x: 500, y: 650 },
+                { id: 'gemini', name: 'Gemini', category: 6, symbolSize: 65, x: 650, y: 650 },
+                { id: 'you-com', name: 'You.com', category: 6, symbolSize: 60, x: 800, y: 650 },
+                
+                // Performance Metrics (Top)
+                { id: 'metric-visibility', name: 'AI Visibility Score', category: 7, symbolSize: 55, x: 300, y: 50 },
+                { id: 'metric-completion', name: 'Schema Completion', category: 7, symbolSize: 55, x: 500, y: 50 },
+                { id: 'metric-engagement', name: 'User Engagement', category: 7, symbolSize: 55, x: 700, y: 50 }
+            ],
+            edges: [
+                // Hub connections
+                { source: 'hub', target: 'jsonld-core', value: 10, lineStyle: { width: 5 } },
+                { source: 'hub', target: 'ai-platform', value: 10, lineStyle: { width: 5 } },
+                
+                // JSON-LD to schemas
+                { source: 'jsonld-core', target: 'product-schema', value: 9 },
+                { source: 'jsonld-core', target: 'org-schema', value: 7 },
+                { source: 'jsonld-core', target: 'howto-schema', value: 7 },
+                { source: 'jsonld-core', target: 'faq-schema', value: 6 },
+                { source: 'jsonld-core', target: 'review-schema', value: 6 },
+                
+                // AI Platform connections
+                { source: 'ai-platform', target: 'content-db', value: 8 },
+                { source: 'ai-platform', target: 'keywords', value: 8 },
+                { source: 'ai-platform', target: 'schema-mapping', value: 9 },
+                { source: 'ai-platform', target: 'competitors', value: 7 },
+                { source: 'ai-platform', target: 'personas', value: 7 },
+                
+                // Schema to content mappings
+                { source: 'product-schema', target: 'products', value: 9 },
+                { source: 'howto-schema', target: 'tutorials', value: 8 },
+                { source: 'org-schema', target: 'features', value: 7 },
+                { source: 'faq-schema', target: 'faqs', value: 8 },
+                { source: 'review-schema', target: 'comparisons', value: 6 },
+                
+                // Content to keywords
+                { source: 'features', target: 'kw-translation', value: 7 },
+                { source: 'features', target: 'kw-privacy', value: 7 },
+                { source: 'products', target: 'kw-lightweight', value: 6 },
+                { source: 'products', target: 'kw-titanium', value: 6 },
+                { source: 'tutorials', target: 'kw-battery', value: 5 },
+                
+                // Keywords to AI platform
+                { source: 'kw-translation', target: 'content-db', value: 6 },
+                { source: 'kw-privacy', target: 'keywords', value: 6 },
+                { source: 'kw-lightweight', target: 'keywords', value: 6 },
+                { source: 'kw-battery', target: 'content-db', value: 5 },
+                { source: 'kw-titanium', target: 'keywords', value: 5 },
+                
+                // Platform channel connections
+                { source: 'jsonld-core', target: 'chatgpt', value: 5 },
+                { source: 'jsonld-core', target: 'perplexity', value: 5 },
+                { source: 'jsonld-core', target: 'claude', value: 5 },
+                { source: 'jsonld-core', target: 'gemini', value: 5 },
+                { source: 'jsonld-core', target: 'you-com', value: 4 },
+                
+                { source: 'chatgpt', target: 'hub', value: 4 },
+                { source: 'perplexity', target: 'hub', value: 4 },
+                { source: 'claude', target: 'hub', value: 4 },
+                { source: 'gemini', target: 'hub', value: 4 },
+                { source: 'you-com', target: 'hub', value: 3 },
+                
+                // Metrics connections
+                { source: 'metric-visibility', target: 'hub', value: 5 },
+                { source: 'metric-completion', target: 'jsonld-core', value: 5 },
+                { source: 'metric-engagement', target: 'ai-platform', value: 5 },
+                
+                // Cross-system bridges
+                { source: 'schema-mapping', target: 'product-schema', value: 8, lineStyle: { type: 'dashed' } },
+                { source: 'content-db', target: 'features', value: 7, lineStyle: { type: 'dashed' } },
+                { source: 'personas', target: 'tutorials', value: 5, lineStyle: { type: 'dashed' } },
+                { source: 'competitors', target: 'comparisons', value: 6, lineStyle: { type: 'dashed' } }
+            ]
+        };
+
+        // Category colors
+        const categoryColors = [
+            '#667eea', // Hub
+            '#764ba2', // Core Systems
+            '#fa709a', // Schema Types
+            '#4facfe', // AI Platform Components
+            '#43e97b', // Content Types
+            '#fee140', // Keywords
+            '#f093fb', // Channels
+            '#30cfd0'  // Metrics
+        ];
+
+        // Initialize connection diagram
+        function initConnectionDiagram() {
+            const chartDom = document.getElementById('connectionDiagram');
+            connectionChart = echarts.init(chartDom);
+
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function(params) {
+                        if (params.dataType === 'node') {
+                            return `<b>${params.name}</b><br/>Category: ${getCategoryName(params.data.category)}`;
+                        } else {
+                            return `${params.data.source} → ${params.data.target}<br/>Connection Strength: ${params.data.value}`;
+                        }
+                    }
+                },
+                animationDuration: 1500,
+                series: [{
+                    name: 'Connection Network',
+                    type: 'graph',
+                    layout: 'force',
+                    data: connectionData.nodes.map(node => ({
+                        ...node,
+                        itemStyle: {
+                            color: categoryColors[node.category],
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.3)'
+                        }
+                    })),
+                    edges: connectionData.edges,
+                    roam: true,
+                    focusNodeAdjacency: true,
+                    force: {
+                        repulsion: 1000,
+                        gravity: 0.1,
+                        edgeLength: 200,
+                        layoutAnimation: true
+                    },
+                    label: {
+                        show: true,
+                        position: 'bottom',
+                        color: '#a8b2d1',
+                        fontSize: 11
+                    },
+                    lineStyle: {
+                        color: 'source',
+                        curveness: 0.3,
+                        opacity: 0.7
+                    },
+                    emphasis: {
+                        focus: 'adjacency',
+                        label: {
+                            show: true,
+                            fontSize: 14,
+                            color: '#fff'
+                        },
+                        lineStyle: {
+                            width: 4,
+                            opacity: 1
+                        }
+                    }
+                }]
+            };
+
+            connectionChart.setOption(option);
+            return connectionChart;
+        }
+
+        // Initialize data flow chart
+        function initDataFlowChart() {
+            const chartDom = document.getElementById('dataFlowChart');
+            dataFlowChart = echarts.init(chartDom);
+
+            // Define colors for different levels and paths
+            const levelColors = {
+                'User Search Query': '#ff6b6b',           // Level 1 - Red
+                'AI Platform Processing': '#4ecdc4',      // Level 2 - Teal
+                'JSON-LD Recognition': '#45b7d1',         // Level 3 - Blue
+                'Schema Understanding': '#96ceb4',        // Level 3 - Green
+                'Knowledge Graph Mapping': '#ffeaa7',     // Level 3 - Yellow
+                'Content Retrieval': '#dda0dd',           // Level 4 - Plum
+                'Keyword Matching': '#98d8c8',            // Level 4 - Mint
+                'User Intent Analysis': '#f7dc6f',        // Level 4 - Light Yellow
+                'Rich Results Generation': '#bb8fce',     // Level 4 - Light Purple
+                'AI Response Delivery': '#85c1e9',        // Level 5 - Light Blue
+                'Performance Analytics': '#58d68d'        // Level 6 - Green
+            };
+
+            const pathColors = [
+                '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7',
+                '#dda0dd', '#98d8c8', '#f7dc6f', '#bb8fce', '#85c1e9',
+                '#58d68d', '#fd79a8', '#fdcb6e'
+            ];
+
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    triggerOn: 'mousemove',
+                    formatter: function(params) {
+                        if (params.dataType === 'node') {
+                            return `<div style="padding: 10px;">
+                                <div style="font-weight: bold; font-size: 14px; color: ${levelColors[params.name] || '#fff'};">${params.name}</div>
+                                <div style="color: #a8b2d1; margin-top: 5px;">Data Processing Level</div>
+                            </div>`;
+                        } else {
+                            return `<div style="padding: 10px;">
+                                <div style="font-weight: bold;">${params.data.source} → ${params.data.target}</div>
+                                <div style="color: #a8b2d1;">Flow Volume: ${params.data.value}%</div>
+                            </div>`;
+                        }
+                    }
+                },
+                series: [{
+                    type: 'sankey',
+                    layout: 'none',
+                    emphasis: {
+                        focus: 'adjacency'
+                    },
+                    nodeGap: 15,
+                    data: [
+                        { name: 'User Search Query', itemStyle: { color: levelColors['User Search Query'] } },
+                        { name: 'AI Platform Processing', itemStyle: { color: levelColors['AI Platform Processing'] } },
+                        { name: 'JSON-LD Recognition', itemStyle: { color: levelColors['JSON-LD Recognition'] } },
+                        { name: 'Schema Understanding', itemStyle: { color: levelColors['Schema Understanding'] } },
+                        { name: 'Knowledge Graph Mapping', itemStyle: { color: levelColors['Knowledge Graph Mapping'] } },
+                        { name: 'Content Retrieval', itemStyle: { color: levelColors['Content Retrieval'] } },
+                        { name: 'Keyword Matching', itemStyle: { color: levelColors['Keyword Matching'] } },
+                        { name: 'User Intent Analysis', itemStyle: { color: levelColors['User Intent Analysis'] } },
+                        { name: 'Rich Results Generation', itemStyle: { color: levelColors['Rich Results Generation'] } },
+                        { name: 'AI Response Delivery', itemStyle: { color: levelColors['AI Response Delivery'] } },
+                        { name: 'Performance Analytics', itemStyle: { color: levelColors['Performance Analytics'] } }
+                    ],
+                    links: [
+                        { source: 'User Search Query', target: 'AI Platform Processing', value: 100, 
+                          lineStyle: { color: pathColors[0], opacity: 0.8 } },
+                        { source: 'AI Platform Processing', target: 'JSON-LD Recognition', value: 95, 
+                          lineStyle: { color: pathColors[1], opacity: 0.8 } },
+                        { source: 'JSON-LD Recognition', target: 'Schema Understanding', value: 90, 
+                          lineStyle: { color: pathColors[2], opacity: 0.8 } },
+                        { source: 'Schema Understanding', target: 'Rich Results Generation', value: 85, 
+                          lineStyle: { color: pathColors[3], opacity: 0.8 } },
+                        { source: 'AI Platform Processing', target: 'Knowledge Graph Mapping', value: 90, 
+                          lineStyle: { color: pathColors[4], opacity: 0.8 } },
+                        { source: 'Knowledge Graph Mapping', target: 'Content Retrieval', value: 80, 
+                          lineStyle: { color: pathColors[5], opacity: 0.8 } },
+                        { source: 'Knowledge Graph Mapping', target: 'Keyword Matching', value: 75, 
+                          lineStyle: { color: pathColors[6], opacity: 0.8 } },
+                        { source: 'Knowledge Graph Mapping', target: 'User Intent Analysis', value: 70, 
+                          lineStyle: { color: pathColors[7], opacity: 0.8 } },
+                        { source: 'Content Retrieval', target: 'AI Response Delivery', value: 75, 
+                          lineStyle: { color: pathColors[8], opacity: 0.8 } },
+                        { source: 'Keyword Matching', target: 'AI Response Delivery', value: 70, 
+                          lineStyle: { color: pathColors[9], opacity: 0.8 } },
+                        { source: 'User Intent Analysis', target: 'AI Response Delivery', value: 65, 
+                          lineStyle: { color: pathColors[10], opacity: 0.8 } },
+                        { source: 'Rich Results Generation', target: 'AI Response Delivery', value: 80, 
+                          lineStyle: { color: pathColors[11], opacity: 0.8 } },
+                        { source: 'AI Response Delivery', target: 'Performance Analytics', value: 100, 
+                          lineStyle: { color: pathColors[12], opacity: 0.8 } }
+                    ],
+                    lineStyle: {
+                        curveness: 0.5,
+                        opacity: 0.8
+                    },
+                    itemStyle: {
+                        borderColor: '#1a1a2e',
+                        borderWidth: 2,
+                        shadowBlur: 8,
+                        shadowColor: 'rgba(0, 0, 0, 0.3)'
+                    },
+                    label: {
+                        color: '#ffffff',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        formatter: '{b}',
+                        textBorderColor: 'rgba(0, 0, 0, 0.5)',
+                        textBorderWidth: 1
+                    },
+                    emphasis: {
+                        focus: 'adjacency',
+                        itemStyle: {
+                            borderWidth: 3,
+                            shadowBlur: 15,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        },
+                        lineStyle: {
+                            opacity: 1,
+                            width: 6
+                        },
+                        label: {
+                            fontSize: 14,
+                            fontWeight: 700
+                        }
+                    }
+                }]
+            };
+
+            dataFlowChart.setOption(option);
+            return dataFlowChart;
+        }
+
+        // Helper function to get category name
+        function getCategoryName(category) {
+            const categories = [
+                'Integration Hub',
+                'Core Systems',
+                'Schema Types',
+                'AI Platform Components',
+                'Content Types',
+                'Keywords',
+                'AI Channels',
+                'Performance Metrics'
+            ];
+            return categories[category] || 'Unknown';
+        }
+
+        // Change view focus
+        function changeView(view) {
+            if (!connectionChart) return;
+
+            currentView = view;
+            let filteredNodes = connectionData.nodes;
+            let filteredEdges = connectionData.edges;
+
+            if (view === 'schema') {
+                // Focus on JSON-LD side
+                const schemaCategories = [0, 1, 2, 4];
+                filteredNodes = connectionData.nodes.filter(node => 
+                    schemaCategories.includes(node.category)
+                );
+            } else if (view === 'platform') {
+                // Focus on AI Platform side
+                const platformCategories = [0, 1, 3, 5, 6];
+                filteredNodes = connectionData.nodes.filter(node => 
+                    platformCategories.includes(node.category)
+                );
+            }
+
+            if (view !== 'all') {
+                const nodeIds = new Set(filteredNodes.map(n => n.id));
+                filteredEdges = connectionData.edges.filter(edge => 
+                    nodeIds.has(edge.source) && nodeIds.has(edge.target)
+                );
+            }
+
+            connectionChart.setOption({
+                series: [{
+                    data: filteredNodes.map(node => ({
+                        ...node,
+                        itemStyle: {
+                            color: categoryColors[node.category],
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.3)'
+                        },
+                        label: {
+                            show: true,
+                            position: 'bottom',
+                            color: '#a8b2d1',
+                            fontSize: 11,
+                            fontWeight: 500
+                        }
+                    })),
+                    edges: filteredEdges
+                }]
+            });
+        }
+
+        // Reset view
+        function resetView() {
+            currentView = 'all';
+            if (connectionChart) {
+                initConnectionDiagram();
+            }
+        }
+
+        // Simple initialization that works
+        window.onload = function() {
+            console.log('Window loaded, initializing charts...');
+            if (typeof echarts === 'undefined') {
+                console.error('ECharts not loaded!');
+                return;
+            }
+            
+            try {
+                initConnectionDiagram();
+                initDataFlowChart();
+                console.log('Charts initialized successfully');
+                
+                // Handle window resize
+                window.addEventListener('resize', function() {
+                    if (connectionChart) connectionChart.resize();
+                    if (dataFlowChart) dataFlowChart.resize();
+                });
+            } catch (error) {
+                console.error('Error initializing charts:', error);
+            }
+        };
+    </script>
+</body>
+</html>

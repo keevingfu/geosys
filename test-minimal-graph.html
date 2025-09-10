@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Graph Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body { margin: 0; padding: 20px; background: #0f0f1e; color: white; }
+        #chart { width: 800px; height: 600px; border: 1px solid #666; margin: 20px auto; }
+        .status { text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="status">
+        <h1>Minimal ECharts Graph Test</h1>
+        <p id="status">Loading...</p>
+    </div>
+    <div id="chart"></div>
+
+    <script>
+        // Direct initialization without any checks
+        window.onload = function() {
+            const statusEl = document.getElementById('status');
+            const chartDom = document.getElementById('chart');
+            
+            try {
+                // Initialize chart
+                const myChart = echarts.init(chartDom);
+                statusEl.textContent = 'Chart initialized, setting options...';
+                
+                // Simple graph data
+                const option = {
+                    tooltip: {},
+                    series: [{
+                        type: 'graph',
+                        layout: 'force',
+                        data: [
+                            {id: 'a', name: 'Node A', x: 100, y: 100},
+                            {id: 'b', name: 'Node B', x: 200, y: 200},
+                            {id: 'c', name: 'Node C', x: 300, y: 100}
+                        ],
+                        edges: [
+                            {source: 'a', target: 'b'},
+                            {source: 'b', target: 'c'},
+                            {source: 'c', target: 'a'}
+                        ],
+                        roam: true,
+                        force: {
+                            repulsion: 100,
+                            gravity: 0.1,
+                            edgeLength: 100
+                        }
+                    }]
+                };
+                
+                myChart.setOption(option);
+                statusEl.textContent = '✓ Chart rendered successfully!';
+                
+            } catch (error) {
+                statusEl.textContent = '❌ Error: ' + error.message;
+                console.error(error);
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dymesty FAQ Analytics Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f6fa;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .dashboard-nav {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .nav-tab:hover {
+            transform: translateY(-2px);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .metric-value {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .metric-change {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .metric-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .metric-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .chart-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .chart-title {
+            font-size: 1.5em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .chart-select {
+            padding: 8px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chart-select:focus {
+            border-color: #667eea;
+        }
+
+        .chart-container {
+            height: 400px;
+            width: 100%;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .table-title {
+            font-size: 1.5em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .table-search {
+            padding: 10px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s;
+            width: 300px;
+        }
+
+        .table-search:focus {
+            border-color: #667eea;
+        }
+
+        .data-table-content {
+            overflow-x: auto;
+        }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #555;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .status-high {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .insight-card::before {
+            content: '\f085';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 2em;
+            opacity: 0.2;
+        }
+
+        .insight-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .insight-content {
+            line-height: 1.7;
+            font-size: 1.05em;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .export-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .chart-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .chart-controls {
+                justify-content: center;
+            }
+
+            .table-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .table-search {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <h1><i class="fas fa-chart-line"></i> FAQ Analytics Dashboard</h1>
+        <p>Real-time insights and performance metrics for Dymesty AI Glasses FAQ system</p>
+    </div>
+
+    <div class="container">
+        <div class="dashboard-nav">
+            <div class="nav-tab active" onclick="showSection('overview')">
+                <i class="fas fa-tachometer-alt"></i> Overview
+            </div>
+            <div class="nav-tab" onclick="showSection('engagement')">
+                <i class="fas fa-users"></i> User Engagement
+            </div>
+            <div class="nav-tab" onclick="showSection('content')">
+                <i class="fas fa-file-alt"></i> Content Performance
+            </div>
+            <div class="nav-tab" onclick="showSection('ai-insights')">
+                <i class="fas fa-brain"></i> AI Insights
+            </div>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overview-section" class="dashboard-section">
+            <div class="insight-card">
+                <div class="insight-title"><i class="fas fa-lightbulb"></i> Key Insights</div>
+                <div class="insight-content">
+                    Battery-related questions show highest engagement (73% increase), while privacy concerns are trending upward. Translation accuracy queries peak during business hours, suggesting professional use cases.
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="totalViews">15,847</div>
+                    <div class="metric-label">Total FAQ Views</div>
+                    <div class="metric-change positive">+23.5% vs last month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="uniqueQueries">3,294</div>
+                    <div class="metric-label">Unique Search Queries</div>
+                    <div class="metric-change positive">+15.2% vs last month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="avgSatisfaction">4.7</div>
+                    <div class="metric-label">Average Satisfaction</div>
+                    <div class="metric-change positive">+0.3 vs last month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="resolvedQueries">89.3%</div>
+                    <div class="metric-label">Query Resolution Rate</div>
+                    <div class="metric-change positive">+5.1% vs last month</div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-header">
+                    <div class="chart-title">FAQ Views Over Time</div>
+                    <div class="chart-controls">
+                        <select class="chart-select" onchange="updateTimeChart(this.value)">
+                            <option value="7days">Last 7 Days</option>
+                            <option value="30days">Last 30 Days</option>
+                            <option value="90days">Last 90 Days</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="viewsChart" class="chart-container"></div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-header">
+                    <div class="chart-title">FAQ Categories Performance</div>
+                </div>
+                <div id="categoriesChart" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- Engagement Section -->
+        <div id="engagement-section" class="dashboard-section" style="display: none;">
+            <div class="insight-card">
+                <div class="insight-title"><i class="fas fa-users"></i> User Engagement Analysis</div>
+                <div class="insight-content">
+                    Peak usage occurs between 9 AM - 11 AM and 2 PM - 4 PM, indicating professional usage patterns. Mobile users spend 2.3x more time on translation-related FAQs.
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="metric-card">
+                    <div class="metric-value">2m 34s</div>
+                    <div class="metric-label">Avg. Session Duration</div>
+                    <div class="metric-change positive">+18% vs last month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">3.2</div>
+                    <div class="metric-label">Avg. FAQs per Session</div>
+                    <div class="metric-change positive">+12% vs last month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">68%</div>
+                    <div class="metric-label">Return User Rate</div>
+                    <div class="metric-change positive">+8% vs last month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">42%</div>
+                    <div class="metric-label">Mobile Usage</div>
+                    <div class="metric-change positive">+5% vs last month</div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-header">
+                    <div class="chart-title">Hourly Usage Pattern</div>
+                </div>
+                <div id="hourlyChart" class="chart-container"></div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-header">
+                    <div class="chart-title">User Journey Heatmap</div>
+                </div>
+                <div id="heatmapChart" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- Content Performance Section -->
+        <div id="content-section" class="dashboard-section" style="display: none;">
+            <div class="insight-card">
+                <div class="insight-title"><i class="fas fa-file-alt"></i> Content Performance Insights</div>
+                <div class="insight-content">
+                    "Battery life optimization" FAQ has 92% satisfaction rate. Privacy-related content needs updating - 23% of users request more detailed information.
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">
+                    <div class="table-title">Top Performing FAQs</div>
+                    <input type="text" class="table-search" placeholder="Search FAQs..." oninput="filterFAQTable(this.value)">
+                </div>
+                <div class="data-table-content">
+                    <table id="faqPerformanceTable">
+                        <thead>
+                            <tr>
+                                <th>FAQ Title</th>
+                                <th>Views</th>
+                                <th>Satisfaction</th>
+                                <th>Avg. Time</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>How long does the battery last?</td>
+                                <td>2,847</td>
+                                <td>4.9/5</td>
+                                <td>1m 23s</td>
+                                <td><span class="status-badge status-high">High</span></td>
+                            </tr>
+                            <tr>
+                                <td>What languages are supported for translation?</td>
+                                <td>2,341</td>
+                                <td>4.8/5</td>
+                                <td>1m 45s</td>
+                                <td><span class="status-badge status-high">High</span></td>
+                            </tr>
+                            <tr>
+                                <td>How accurate is the real-time translation?</td>
+                                <td>1,923</td>
+                                <td>4.6/5</td>
+                                <td>2m 12s</td>
+                                <td><span class="status-badge status-high">High</span></td>
+                            </tr>
+                            <tr>
+                                <td>Are my conversations recorded or stored?</td>
+                                <td>1,654</td>
+                                <td>4.2/5</td>
+                                <td>2m 34s</td>
+                                <td><span class="status-badge status-medium">Medium</span></td>
+                            </tr>
+                            <tr>
+                                <td>What devices are compatible?</td>
+                                <td>1,432</td>
+                                <td>4.5/5</td>
+                                <td>1m 18s</td>
+                                <td><span class="status-badge status-medium">Medium</span></td>
+                            </tr>
+                            <tr>
+                                <td>How do I clean and maintain the glasses?</td>
+                                <td>987</td>
+                                <td>4.1/5</td>
+                                <td>1m 56s</td>
+                                <td><span class="status-badge status-medium">Medium</span></td>
+                            </tr>
+                            <tr>
+                                <td>Can I get prescription lenses?</td>
+                                <td>743</td>
+                                <td>3.8/5</td>
+                                <td>2m 03s</td>
+                                <td><span class="status-badge status-low">Low</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-header">
+                    <div class="chart-title">Content Gap Analysis</div>
+                </div>
+                <div id="contentGapChart" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- AI Insights Section -->
+        <div id="ai-insights-section" class="dashboard-section" style="display: none;">
+            <div class="insight-card">
+                <div class="insight-title"><i class="fas fa-brain"></i> AI-Powered Content Recommendations</div>
+                <div class="insight-content">
+                    Suggested new FAQs: "Using glasses in cold weather", "Prescription lens compatibility", "Enterprise bulk ordering". Predicted to increase satisfaction by 12%.
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="metric-card">
+                    <div class="metric-value">94.2%</div>
+                    <div class="metric-label">AI Search Accuracy</div>
+                    <div class="metric-change positive">+2.1% vs last month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">1.8s</div>
+                    <div class="metric-label">Avg. AI Response Time</div>
+                    <div class="metric-change positive">-0.3s vs last month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">76%</div>
+                    <div class="metric-label">AI Recommendation CTR</div>
+                    <div class="metric-change positive">+9% vs last month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">23</div>
+                    <div class="metric-label">Content Gaps Identified</div>
+                    <div class="metric-change negative">-5 vs last month</div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-header">
+                    <div class="chart-title">AI Search vs Traditional Search</div>
+                </div>
+                <div id="aiComparisonChart" class="chart-container"></div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">
+                    <div class="table-title">AI-Recommended Content Updates</div>
+                </div>
+                <div class="data-table-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Recommendation</th>
+                                <th>Priority</th>
+                                <th>Expected Impact</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Add FAQ about cold weather usage</td>
+                                <td><span class="status-badge status-high">High</span></td>
+                                <td>+15% satisfaction</td>
+                                <td>Pending</td>
+                            </tr>
+                            <tr>
+                                <td>Update privacy policy explanation</td>
+                                <td><span class="status-badge status-high">High</span></td>
+                                <td>+12% satisfaction</td>
+                                <td>In Review</td>
+                            </tr>
+                            <tr>
+                                <td>Expand translation accuracy details</td>
+                                <td><span class="status-badge status-medium">Medium</span></td>
+                                <td>+8% satisfaction</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>Add enterprise pricing information</td>
+                                <td><span class="status-badge status-medium">Medium</span></td>
+                                <td>+10% conversion</td>
+                                <td>Pending</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <h3><i class="fas fa-download"></i> Export Analytics Data</h3>
+            <p>Download comprehensive analytics reports in your preferred format</p>
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportData('pdf')">
+                    <i class="fas fa-file-pdf"></i> Export PDF Report
+                </button>
+                <button class="export-btn" onclick="exportData('excel')">
+                    <i class="fas fa-file-excel"></i> Export Excel Data
+                </button>
+                <button class="export-btn" onclick="exportData('csv')">
+                    <i class="fas fa-file-csv"></i> Export CSV Data
+                </button>
+                <button class="export-btn" onclick="exportData('json')">
+                    <i class="fas fa-code"></i> Export JSON Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API configuration
+        const API_BASE = 'http://localhost:4000/api';
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadAnalyticsData();
+        });
+
+        // Show section
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.dashboard-section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionName + '-section').style.display = 'block';
+            event.target.classList.add('active');
+
+            // Load section-specific data
+            switch(sectionName) {
+                case 'engagement':
+                    loadEngagementData();
+                    break;
+                case 'content':
+                    loadContentData();
+                    break;
+                case 'ai-insights':
+                    loadAIInsights();
+                    break;
+            }
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            createViewsChart();
+            createCategoriesChart();
+        }
+
+        // Create views over time chart
+        function createViewsChart() {
+            const chart = echarts.init(document.getElementById('viewsChart'));
+            const option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['FAQ Views', 'Search Queries', 'AI Searches']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: 'FAQ Views',
+                        type: 'line',
+                        data: [2340, 2890, 3200, 2800, 3100, 2200, 1800],
+                        smooth: true,
+                        itemStyle: {
+                            color: '#667eea'
+                        }
+                    },
+                    {
+                        name: 'Search Queries',
+                        type: 'line',
+                        data: [1200, 1450, 1800, 1600, 1750, 1300, 950],
+                        smooth: true,
+                        itemStyle: {
+                            color: '#764ba2'
+                        }
+                    },
+                    {
+                        name: 'AI Searches',
+                        type: 'line',
+                        data: [450, 620, 780, 890, 950, 680, 520],
+                        smooth: true,
+                        itemStyle: {
+                            color: '#f093fb'
+                        }
+                    }
+                ]
+            };
+            chart.setOption(option);
+
+            // Make chart responsive
+            window.addEventListener('resize', function() {
+                chart.resize();
+            });
+        }
+
+        // Create categories performance chart
+        function createCategoriesChart() {
+            const chart = echarts.init(document.getElementById('categoriesChart'));
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)'
+                },
+                legend: {
+                    bottom: '0%',
+                    left: 'center'
+                },
+                series: [
+                    {
+                        name: 'FAQ Categories',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '18',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        data: [
+                            {value: 3847, name: 'Product Features', itemStyle: {color: '#667eea'}},
+                            {value: 2934, name: 'Technology', itemStyle: {color: '#764ba2'}},
+                            {value: 2456, name: 'Privacy & Security', itemStyle: {color: '#f093fb'}},
+                            {value: 1832, name: 'Support', itemStyle: {color: '#48cae4'}},
+                            {value: 1245, name: 'Compatibility', itemStyle: {color: '#06ffa5'}},
+                            {value: 987, name: 'Business Use', itemStyle: {color: '#ffbe0b'}}
+                        ]
+                    }
+                ]
+            };
+            chart.setOption(option);
+
+            window.addEventListener('resize', function() {
+                chart.resize();
+            });
+        }
+
+        // Load engagement data
+        function loadEngagementData() {
+            createHourlyChart();
+            createHeatmapChart();
+        }
+
+        // Create hourly usage chart
+        function createHourlyChart() {
+            const chart = echarts.init(document.getElementById('hourlyChart'));
+            const option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['0h', '2h', '4h', '6h', '8h', '10h', '12h', '14h', '16h', '18h', '20h', '22h']
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Users'
+                },
+                series: [
+                    {
+                        name: 'Hourly Users',
+                        type: 'bar',
+                        data: [45, 23, 18, 34, 89, 234, 345, 289, 367, 298, 234, 123],
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {offset: 0, color: '#667eea'},
+                                {offset: 1, color: '#764ba2'}
+                            ])
+                        }
+                    }
+                ]
+            };
+            chart.setOption(option);
+        }
+
+        // Create user journey heatmap
+        function createHeatmapChart() {
+            const chart = echarts.init(document.getElementById('heatmapChart'));
+            
+            const hours = ['12am', '1am', '2am', '3am', '4am', '5am', '6am',
+                          '7am', '8am', '9am', '10am', '11am',
+                          '12pm', '1pm', '2pm', '3pm', '4pm', '5pm',
+                          '6pm', '7pm', '8pm', '9pm', '10pm', '11pm'];
+            const days = ['Saturday', 'Friday', 'Thursday', 'Wednesday', 'Tuesday', 'Monday', 'Sunday'];
+            
+            const data = [];
+            for (let i = 0; i < 7; i++) {
+                for (let j = 0; j < 24; j++) {
+                    data.push([j, i, Math.random() * 100]);
+                }
+            }
+
+            const option = {
+                tooltip: {
+                    position: 'top'
+                },
+                grid: {
+                    height: '50%',
+                    top: '10%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: hours,
+                    splitArea: {
+                        show: true
+                    }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: days,
+                    splitArea: {
+                        show: true
+                    }
+                },
+                visualMap: {
+                    min: 0,
+                    max: 100,
+                    calculable: true,
+                    orient: 'horizontal',
+                    left: 'center',
+                    bottom: '15%',
+                    inRange: {
+                        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+                    }
+                },
+                series: [{
+                    name: 'User Activity',
+                    type: 'heatmap',
+                    data: data,
+                    label: {
+                        show: false
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }]
+            };
+            
+            chart.setOption(option);
+        }
+
+        // Load content performance data
+        function loadContentData() {
+            createContentGapChart();
+        }
+
+        // Create content gap analysis chart
+        function createContentGapChart() {
+            const chart = echarts.init(document.getElementById('contentGapChart'));
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['Current Coverage', 'Gap Identified', 'User Demand']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value'
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ['Weather Usage', 'Enterprise Features', 'Prescription Options', 'Repair Services', 'Bulk Ordering', 'International Shipping']
+                },
+                series: [
+                    {
+                        name: 'Current Coverage',
+                        type: 'bar',
+                        data: [20, 45, 30, 60, 25, 40],
+                        itemStyle: {
+                            color: '#667eea'
+                        }
+                    },
+                    {
+                        name: 'Gap Identified',
+                        type: 'bar',
+                        data: [60, 30, 50, 15, 45, 35],
+                        itemStyle: {
+                            color: '#f093fb'
+                        }
+                    },
+                    {
+                        name: 'User Demand',
+                        type: 'bar',
+                        data: [80, 75, 80, 75, 70, 75],
+                        itemStyle: {
+                            color: '#48cae4'
+                        }
+                    }
+                ]
+            };
+            chart.setOption(option);
+        }
+
+        // Load AI insights
+        function loadAIInsights() {
+            createAIComparisonChart();
+        }
+
+        // Create AI vs traditional search comparison
+        function createAIComparisonChart() {
+            const chart = echarts.init(document.getElementById('aiComparisonChart'));
+            const option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['AI Search Satisfaction', 'Traditional Search Satisfaction', 'AI Usage %']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Satisfaction',
+                        min: 0,
+                        max: 5,
+                        axisLabel: {
+                            formatter: '{value}⭐'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: 'Usage %',
+                        min: 0,
+                        max: 100,
+                        axisLabel: {
+                            formatter: '{value}%'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: 'AI Search Satisfaction',
+                        type: 'line',
+                        data: [4.2, 4.3, 4.5, 4.6, 4.7, 4.8, 4.9],
+                        itemStyle: {
+                            color: '#667eea'
+                        }
+                    },
+                    {
+                        name: 'Traditional Search Satisfaction',
+                        type: 'line',
+                        data: [3.8, 3.9, 4.0, 4.1, 4.0, 4.1, 4.2],
+                        itemStyle: {
+                            color: '#764ba2'
+                        }
+                    },
+                    {
+                        name: 'AI Usage %',
+                        type: 'bar',
+                        yAxisIndex: 1,
+                        data: [15, 23, 31, 42, 48, 56, 63],
+                        itemStyle: {
+                            color: '#f093fb'
+                        }
+                    }
+                ]
+            };
+            chart.setOption(option);
+        }
+
+        // Update time chart based on selection
+        function updateTimeChart(period) {
+            // This would typically fetch new data based on the selected period
+            console.log('Updating chart for period:', period);
+            // For demo purposes, just recreate the chart
+            createViewsChart();
+        }
+
+        // Filter FAQ table
+        function filterFAQTable(searchTerm) {
+            const table = document.getElementById('faqPerformanceTable');
+            const rows = table.getElementsByTagName('tr');
+            
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let showRow = false;
+                
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j].textContent.toLowerCase().includes(searchTerm.toLowerCase())) {
+                        showRow = true;
+                        break;
+                    }
+                }
+                
+                rows[i].style.display = showRow ? '' : 'none';
+            }
+        }
+
+        // Export data
+        async function exportData(format) {
+            try {
+                // Fetch analytics data from API
+                const analyticsData = await fetchAnalyticsData();
+                
+                switch(format) {
+                    case 'json':
+                        exportJSON(analyticsData);
+                        break;
+                    case 'csv':
+                        exportCSV(analyticsData);
+                        break;
+                    case 'excel':
+                        exportExcel(analyticsData);
+                        break;
+                    case 'pdf':
+                        exportPDF(analyticsData);
+                        break;
+                    default:
+                        console.error('Unknown export format:', format);
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Failed to export data. Please ensure the API server is running.');
+            }
+        }
+        
+        // Fetch analytics data from API
+        async function fetchAnalyticsData() {
+            try {
+                // Fetch all necessary data
+                const [faqs, categories, analyticsOverview] = await Promise.all([
+                    fetch(`${API_BASE}/faqs`).then(r => r.json()),
+                    fetch(`${API_BASE}/categories`).then(r => r.json()),
+                    fetch(`${API_BASE}/analytics/overview`).then(r => r.json()).catch(() => ({}))
+                ]);
+                
+                // Calculate metrics
+                const metrics = {
+                    totalViews: 15847,
+                    uniqueQueries: 3294,
+                    avgSatisfaction: 4.7,
+                    resolvedQueries: 89.3,
+                    totalFAQs: faqs.length,
+                    totalCategories: categories.length
+                };
+                
+                // Top performing FAQs (simulated data)
+                const topFAQs = [
+                    { title: 'How long does the battery last?', views: 2847, satisfaction: 4.9, avgTime: '1m 23s' },
+                    { title: 'What languages are supported for translation?', views: 2341, satisfaction: 4.8, avgTime: '1m 45s' },
+                    { title: 'How accurate is the real-time translation?', views: 1923, satisfaction: 4.6, avgTime: '2m 12s' },
+                    { title: 'Are my conversations recorded or stored?', views: 1654, satisfaction: 4.2, avgTime: '2m 34s' },
+                    { title: 'What devices are compatible?', views: 1432, satisfaction: 4.5, avgTime: '1m 18s' }
+                ];
+                
+                return {
+                    metrics,
+                    faqs: faqs.slice(0, 10), // Top 10 FAQs
+                    categories,
+                    topFAQs,
+                    exportDate: new Date().toISOString(),
+                    platform: 'Dymesty AI Glasses FAQ Analytics'
+                };
+            } catch (error) {
+                console.error('Failed to fetch analytics data:', error);
+                // Return sample data if API fails
+                return getSampleAnalyticsData();
+            }
+        }
+        
+        // Export as JSON
+        function exportJSON(data) {
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dymesty-faq-analytics-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Export as CSV
+        function exportCSV(data) {
+            // Create CSV header
+            let csv = 'Dymesty FAQ Analytics Report\n';
+            csv += `Export Date: ${new Date().toLocaleString()}\n\n`;
+            
+            // Metrics section
+            csv += 'Key Metrics\n';
+            csv += 'Metric,Value\n';
+            csv += `Total Views,${data.metrics.totalViews}\n`;
+            csv += `Unique Queries,${data.metrics.uniqueQueries}\n`;
+            csv += `Average Satisfaction,${data.metrics.avgSatisfaction}\n`;
+            csv += `Resolution Rate,${data.metrics.resolvedQueries}%\n`;
+            csv += `Total FAQs,${data.metrics.totalFAQs}\n`;
+            csv += `Total Categories,${data.metrics.totalCategories}\n\n`;
+            
+            // Top performing FAQs
+            csv += 'Top Performing FAQs\n';
+            csv += 'Question,Views,Satisfaction,Average Time\n';
+            data.topFAQs.forEach(faq => {
+                csv += `"${faq.title}",${faq.views},${faq.satisfaction},${faq.avgTime}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dymesty-faq-analytics-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Export as Excel (using CSV format that Excel can open)
+        function exportExcel(data) {
+            // For true Excel export, we would need a library like SheetJS
+            // For now, export as CSV that Excel can open
+            exportCSV(data);
+        }
+        
+        // Export as PDF (simplified HTML version)
+        function exportPDF(data) {
+            // Create printable HTML report
+            const report = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dymesty FAQ Analytics Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #667eea; }
+        h2 { color: #764ba2; margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; font-weight: bold; }
+        .metric { display: inline-block; margin: 10px 20px; }
+        .metric-value { font-size: 24px; color: #667eea; font-weight: bold; }
+        .metric-label { color: #666; }
+        @media print { body { margin: 20px; } }
+    </style>
+</head>
+<body>
+    <h1>Dymesty AI Glasses - FAQ Analytics Report</h1>
+    <p>Generated on: ${new Date().toLocaleString()}</p>
+    
+    <h2>Key Performance Metrics</h2>
+    <div>
+        <div class="metric">
+            <div class="metric-value">${data.metrics.totalViews.toLocaleString()}</div>
+            <div class="metric-label">Total Views</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">${data.metrics.uniqueQueries.toLocaleString()}</div>
+            <div class="metric-label">Unique Queries</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">${data.metrics.avgSatisfaction}</div>
+            <div class="metric-label">Avg Satisfaction</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">${data.metrics.resolvedQueries}%</div>
+            <div class="metric-label">Resolution Rate</div>
+        </div>
+    </div>
+    
+    <h2>Top Performing FAQs</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Views</th>
+                <th>Satisfaction</th>
+                <th>Avg Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${data.topFAQs.map(faq => `
+            <tr>
+                <td>${faq.title}</td>
+                <td>${faq.views.toLocaleString()}</td>
+                <td>${faq.satisfaction}/5</td>
+                <td>${faq.avgTime}</td>
+            </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    
+    <h2>Category Distribution</h2>
+    <p>Total Categories: ${data.categories.length}</p>
+    <ul>
+        ${data.categories.map(cat => `<li>${cat.name}</li>`).join('')}
+    </ul>
+</body>
+</html>
+            `;
+            
+            // Open in new window for printing/saving as PDF
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(report);
+            printWindow.document.close();
+            
+            // Trigger print dialog after a short delay
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+        }
+        
+        // Get sample analytics data (fallback)
+        function getSampleAnalyticsData() {
+            return {
+                metrics: {
+                    totalViews: 15847,
+                    uniqueQueries: 3294,
+                    avgSatisfaction: 4.7,
+                    resolvedQueries: 89.3,
+                    totalFAQs: 86,
+                    totalCategories: 6
+                },
+                faqs: [],
+                categories: [
+                    { name: 'Product Features' },
+                    { name: 'Technology' },
+                    { name: 'Privacy & Security' },
+                    { name: 'Support' },
+                    { name: 'Compatibility' },
+                    { name: 'Business Use' }
+                ],
+                topFAQs: [
+                    { title: 'How long does the battery last?', views: 2847, satisfaction: 4.9, avgTime: '1m 23s' },
+                    { title: 'What languages are supported for translation?', views: 2341, satisfaction: 4.8, avgTime: '1m 45s' },
+                    { title: 'How accurate is the real-time translation?', views: 1923, satisfaction: 4.6, avgTime: '2m 12s' },
+                    { title: 'Are my conversations recorded or stored?', views: 1654, satisfaction: 4.2, avgTime: '2m 34s' },
+                    { title: 'What devices are compatible?', views: 1432, satisfaction: 4.5, avgTime: '1m 18s' }
+                ],
+                exportDate: new Date().toISOString(),
+                platform: 'Dymesty AI Glasses FAQ Analytics'
+            };
+        }
+
+        // Load analytics data (simulated)
+        function loadAnalyticsData() {
+            // Simulate loading delay
+            setTimeout(() => {
+                updateMetrics();
+            }, 500);
+        }
+
+        // Update metrics with real-time data (simulated)
+        function updateMetrics() {
+            // This would typically fetch real data from your API
+            const metrics = {
+                totalViews: Math.floor(Math.random() * 5000) + 12000,
+                uniqueQueries: Math.floor(Math.random() * 1000) + 3000,
+                avgSatisfaction: (Math.random() * 0.5 + 4.5).toFixed(1),
+                resolvedQueries: (Math.random() * 10 + 85).toFixed(1) + '%'
+            };
+
+            // Animate counter updates
+            Object.keys(metrics).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    animateValue(element, element.textContent, metrics[key], 1000);
+                }
+            });
+        }
+
+        // Animate value changes
+        function animateValue(element, start, end, duration) {
+            const startValue = parseFloat(start.replace(/[^\d.]/g, '')) || 0;
+            const endValue = parseFloat(end.toString().replace(/[^\d.]/g, ''));
+            const range = endValue - startValue;
+            const increment = range / (duration / 16);
+            let current = startValue;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= endValue) || (increment < 0 && current <= endValue)) {
+                    current = endValue;
+                    clearInterval(timer);
+                }
+                element.textContent = typeof end === 'string' && end.includes('%') 
+                    ? current.toFixed(1) + '%' 
+                    : Math.floor(current).toLocaleString();
+            }, 16);
+        }
+    </script>
+</body>
+</html>

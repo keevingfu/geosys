@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dymesty AI-Powered FAQ Search</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 0;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .ai-search-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-modes {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .search-mode {
+            padding: 12px 24px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .search-mode.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .search-mode:hover {
+            transform: translateY(-2px);
+        }
+
+        .ai-search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .ai-search-input {
+            flex: 1;
+            padding: 20px 25px;
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .ai-search-input:focus {
+            border-color: #667eea;
+        }
+
+        .ai-search-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.3s;
+            min-width: 150px;
+        }
+
+        .ai-search-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .ai-search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .search-suggestions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .suggestion {
+            background: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            border: 1px solid #e1e5e9;
+        }
+
+        .suggestion:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .search-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .search-info.show {
+            display: block;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 30px;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .recommendation-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .recommendation-card:hover {
+            background: #e3f2fd;
+            border-left-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .recommendation-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .recommendation-meta {
+            font-size: 0.85em;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .results-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .ai-response {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .ai-response::before {
+            content: '\f085';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5em;
+            opacity: 0.3;
+        }
+
+        .ai-response h3 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .ai-response-content {
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+
+        .confidence-score {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .related-results {
+            margin-top: 30px;
+        }
+
+        .related-results h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .result-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .result-header {
+            padding: 20px;
+            background: white;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .result-question {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .result-relevance {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .result-preview {
+            padding: 20px;
+            background: #f8f9fa;
+            color: #555;
+            line-height: 1.7;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .result-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #e9ecef;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e1e5e9;
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .analytics-widget {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .widget-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .trend-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .trend-item:last-child {
+            border-bottom: none;
+        }
+
+        .trend-query {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .trend-count {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ai-search-box {
+                flex-direction: column;
+            }
+
+            .search-modes {
+                justify-content: center;
+            }
+
+            .search-suggestions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-brain"></i> AI-Powered FAQ Search</h1>
+            <p>Advanced intelligent search with personalized recommendations</p>
+        </div>
+
+        <div class="ai-search-section">
+            <div class="search-modes">
+                <div class="search-mode active" data-mode="natural">
+                    <i class="fas fa-comments"></i> Natural Language
+                </div>
+                <div class="search-mode" data-mode="semantic">
+                    <i class="fas fa-project-diagram"></i> Semantic Search
+                </div>
+                <div class="search-mode" data-mode="contextual">
+                    <i class="fas fa-lightbulb"></i> Smart Recommendations
+                </div>
+            </div>
+
+            <div class="ai-search-box">
+                <textarea id="aiSearchInput" class="ai-search-input" 
+                         placeholder="Ask anything about Dymesty AI Glasses... (e.g., 'How long does the battery last during continuous translation?', 'Are my conversations private?')"
+                         rows="3"></textarea>
+                <button id="aiSearchBtn" class="ai-search-btn">
+                    <i class="fas fa-magic"></i> AI Search
+                </button>
+            </div>
+
+            <div class="search-suggestions">
+                <div class="suggestion" data-query="How accurate is the real-time translation?">Translation accuracy</div>
+                <div class="suggestion" data-query="Can I use them while exercising?">Sports & fitness</div>
+                <div class="suggestion" data-query="How do they protect my privacy?">Privacy features</div>
+                <div class="suggestion" data-query="What phones are compatible?">Device compatibility</div>
+                <div class="suggestion" data-query="How long do they take to charge?">Charging time</div>
+            </div>
+
+            <div id="searchInfo" class="search-info">
+                <i class="fas fa-info-circle"></i>
+                <span id="searchInfoText">Using natural language processing to understand your question...</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3><i class="fas fa-chart-line"></i> Search Trends</h3>
+                <div class="analytics-widget">
+                    <div class="widget-title">Popular Queries</div>
+                    <div id="trendingQueries">
+                        <div class="trend-item">
+                            <span class="trend-query">Battery life</span>
+                            <span class="trend-count">127</span>
+                        </div>
+                        <div class="trend-item">
+                            <span class="trend-query">Translation languages</span>
+                            <span class="trend-count">89</span>
+                        </div>
+                        <div class="trend-item">
+                            <span class="trend-query">Privacy protection</span>
+                            <span class="trend-count">76</span>
+                        </div>
+                        <div class="trend-item">
+                            <span class="trend-query">Weight and comfort</span>
+                            <span class="trend-count">54</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px;"><i class="fas fa-history"></i> Recent Searches</h3>
+                <div id="recentSearches" class="analytics-widget">
+                    <!-- Recent searches will be loaded here -->
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div id="aiResponse" style="display: none;">
+                    <!-- AI response will be displayed here -->
+                </div>
+
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>AI is processing your question...</p>
+                </div>
+
+                <div id="relatedResults" class="related-results" style="display: none;">
+                    <h3><i class="fas fa-list"></i> Related FAQs</h3>
+                    <div id="resultsList">
+                        <!-- Search results will be displayed here -->
+                    </div>
+                </div>
+
+                <div id="welcomeMessage" class="ai-response">
+                    <h3><i class="fas fa-robot"></i> Welcome to AI Search</h3>
+                    <div class="ai-response-content">
+                        Ask me anything about Dymesty AI Glasses! I can understand natural language questions and provide intelligent, contextual answers based on our comprehensive FAQ database.
+                        
+                        <br><br>Try asking:
+                        <ul style="margin-top: 15px; margin-left: 20px;">
+                            <li>"What makes these glasses different from competitors?"</li>
+                            <li>"How does the translation feature work in noisy environments?"</li>
+                            <li>"Can I customize the audio settings?"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <h3><i class="fas fa-thumbs-up"></i> Personalized</h3>
+                <div id="personalizedRecommendations">
+                    <div class="recommendation-card" onclick="searchRecommendation('How secure is the data processing?')">
+                        <div class="recommendation-title">Data Security</div>
+                        <div class="recommendation-meta">
+                            <span>High relevance</span>
+                            <span>92%</span>
+                        </div>
+                    </div>
+                    <div class="recommendation-card" onclick="searchRecommendation('What is the warranty coverage?')">
+                        <div class="recommendation-title">Warranty Info</div>
+                        <div class="recommendation-meta">
+                            <span>Frequently asked</span>
+                            <span>87%</span>
+                        </div>
+                    </div>
+                    <div class="recommendation-card" onclick="searchRecommendation('Can I get prescription lenses?')">
+                        <div class="recommendation-title">Prescription Options</div>
+                        <div class="recommendation-meta">
+                            <span>User interest</span>
+                            <span>84%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px;"><i class="fas fa-star"></i> Top Rated</h3>
+                <div class="analytics-widget">
+                    <div class="widget-title">Most Helpful FAQs</div>
+                    <div id="topRatedFaqs">
+                        <div class="trend-item">
+                            <span class="trend-query">Battery optimization</span>
+                            <span class="trend-count">4.9★</span>
+                        </div>
+                        <div class="trend-item">
+                            <span class="trend-query">Setup guide</span>
+                            <span class="trend-count">4.8★</span>
+                        </div>
+                        <div class="trend-item">
+                            <span class="trend-query">Troubleshooting</span>
+                            <span class="trend-count">4.7★</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:4000/api';
+        let currentSearchMode = 'natural';
+        let searchHistory = JSON.parse(localStorage.getItem('dymesty_search_history') || '[]');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadRecentSearches();
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search modes
+            document.querySelectorAll('.search-mode').forEach(mode => {
+                mode.addEventListener('click', function() {
+                    document.querySelectorAll('.search-mode').forEach(m => m.classList.remove('active'));
+                    this.classList.add('active');
+                    currentSearchMode = this.dataset.mode;
+                    updateSearchInfo();
+                });
+            });
+
+            // Search functionality
+            document.getElementById('aiSearchBtn').addEventListener('click', performAISearch);
+            document.getElementById('aiSearchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    performAISearch();
+                }
+            });
+
+            // Search suggestions
+            document.querySelectorAll('.suggestion').forEach(suggestion => {
+                suggestion.addEventListener('click', function() {
+                    document.getElementById('aiSearchInput').value = this.dataset.query;
+                    performAISearch();
+                });
+            });
+        }
+
+        // Update search info based on mode
+        function updateSearchInfo() {
+            const infoTexts = {
+                natural: 'Using natural language processing to understand your question...',
+                semantic: 'Analyzing semantic meaning and context for better results...',
+                contextual: 'Providing personalized recommendations based on user patterns...'
+            };
+            document.getElementById('searchInfoText').textContent = infoTexts[currentSearchMode];
+        }
+
+        // Perform AI-powered search
+        async function performAISearch() {
+            const query = document.getElementById('aiSearchInput').value.trim();
+            if (!query) return;
+
+            showLoading(true);
+            hideWelcomeMessage();
+            showSearchInfo(true);
+
+            // Add to search history
+            addToSearchHistory(query);
+
+            try {
+                // Simulate AI processing delay
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Perform search based on mode
+                let results;
+                switch (currentSearchMode) {
+                    case 'natural':
+                        results = await performNaturalLanguageSearch(query);
+                        break;
+                    case 'semantic':
+                        results = await performSemanticSearch(query);
+                        break;
+                    case 'contextual':
+                        results = await performContextualSearch(query);
+                        break;
+                }
+
+                displayAIResponse(query, results);
+                displaySearchResults(results.faqs);
+
+                showLoading(false);
+                showSearchInfo(false);
+
+            } catch (error) {
+                console.error('AI search error:', error);
+                showError('AI search is currently unavailable. Falling back to standard search.');
+                
+                // Fallback to regular search
+                try {
+                    const response = await fetch(`${API_BASE}/faqs/search?q=${encodeURIComponent(query)}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Search API error: ${response.status}`);
+                    }
+                    
+                    const results = await response.json();
+                    
+                    // Display results even if empty
+                    if (!results || results.length === 0) {
+                        displayAIResponse(query, {
+                            mode: 'fallback',
+                            query,
+                            aiAnalysis: `No results found for "${query}". Please try different keywords or check the FAQ categories.`,
+                            confidence: 0.5,
+                            faqs: []
+                        });
+                        displaySearchResults([]);
+                    } else {
+                        displayAIResponse(query, {
+                            mode: 'fallback',
+                            query,
+                            aiAnalysis: `Found ${results.length} FAQ(s) matching your search.`,
+                            confidence: 0.7,
+                            faqs: results
+                        });
+                        displaySearchResults(results);
+                    }
+                } catch (fallbackError) {
+                    console.error('Fallback search error:', fallbackError);
+                    showError('Search functionality is currently unavailable. Please check if the API server is running.');
+                }
+                
+                showLoading(false);
+                showSearchInfo(false);
+            }
+        }
+
+        // Perform natural language search (simulated)
+        async function performNaturalLanguageSearch(query) {
+            try {
+                // In a real implementation, this would use NLP APIs like OpenAI, Google Cloud Natural Language, etc.
+                const response = await fetch(`${API_BASE}/faqs/search?q=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Search failed: ${response.status}`);
+                }
+                
+                const faqs = await response.json();
+
+                // If no results, still return a valid response
+                if (!faqs || faqs.length === 0) {
+                    return {
+                        mode: 'natural',
+                        query,
+                        aiAnalysis: `No FAQs found for "${query}". Try different keywords or browse our FAQ categories.`,
+                        confidence: 0.5,
+                        faqs: []
+                    };
+                }
+
+                // Simulate AI analysis
+                const aiAnalysis = generateAIResponse(query, faqs);
+                
+                return {
+                    mode: 'natural',
+                    query,
+                    aiAnalysis,
+                    confidence: Math.random() * 0.3 + 0.7, // 70-100%
+                    faqs: faqs.slice(0, 5) // Top 5 results
+                };
+            } catch (error) {
+                console.error('Natural language search error:', error);
+                throw error;
+            }
+        }
+
+        // Perform semantic search (simulated)
+        async function performSemanticSearch(query) {
+            try {
+                // In a real implementation, this would use vector embeddings and semantic similarity
+                const response = await fetch(`${API_BASE}/faqs/search?q=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Search failed: ${response.status}`);
+                }
+                
+                let faqs = await response.json();
+
+                // If no results, return empty response
+                if (!faqs || faqs.length === 0) {
+                    return {
+                        mode: 'semantic',
+                        query,
+                        aiAnalysis: `No semantic matches found for "${query}". Try rephrasing your question or using different keywords.`,
+                        confidence: 0.5,
+                        faqs: []
+                    };
+                }
+
+                // Simulate semantic ranking
+                faqs = faqs.map(faq => ({
+                    ...faq,
+                    semanticScore: Math.random() * 0.4 + 0.6,
+                    relevanceReason: generateRelevanceReason(query, faq)
+                })).sort((a, b) => b.semanticScore - a.semanticScore);
+
+                const aiAnalysis = generateAIResponse(query, faqs, 'semantic');
+
+                return {
+                    mode: 'semantic',
+                    query,
+                    aiAnalysis,
+                    confidence: Math.random() * 0.2 + 0.8, // 80-100%
+                    faqs: faqs.slice(0, 5)
+                };
+            } catch (error) {
+                console.error('Semantic search error:', error);
+                throw error;
+            }
+        }
+
+        // Perform contextual search (simulated)
+        async function performContextualSearch(query) {
+            try {
+                // In a real implementation, this would use user behavior, preferences, and context
+                const response = await fetch(`${API_BASE}/faqs/search?q=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Search failed: ${response.status}`);
+                }
+                
+                let faqs = await response.json();
+
+                // If no results, return empty response
+                if (!faqs || faqs.length === 0) {
+                    return {
+                        mode: 'contextual',
+                        query,
+                        aiAnalysis: `No contextual results found for "${query}". Browse our FAQ categories or try a different search term.`,
+                        confidence: 0.5,
+                        faqs: []
+                    };
+                }
+
+                // Simulate contextual personalization
+                faqs = faqs.map(faq => ({
+                    ...faq,
+                    contextualScore: Math.random() * 0.3 + 0.7,
+                    personalizedReason: generatePersonalizationReason(faq)
+                })).sort((a, b) => b.contextualScore - a.contextualScore);
+
+                const aiAnalysis = generateAIResponse(query, faqs, 'contextual');
+
+                return {
+                    mode: 'contextual',
+                    query,
+                    aiAnalysis,
+                    confidence: Math.random() * 0.25 + 0.75, // 75-100%
+                    faqs: faqs.slice(0, 6)
+                };
+            } catch (error) {
+                console.error('Contextual search error:', error);
+                throw error;
+            }
+        }
+
+        // Generate AI response (simulated)
+        function generateAIResponse(query, faqs, mode = 'natural') {
+            const responses = {
+                battery: "The Dymesty AI Glasses offer exceptional battery life with up to 48 hours of continuous use. The battery is optimized for translation tasks and can handle all-day usage scenarios.",
+                translation: "Our real-time translation feature supports 100+ languages with high accuracy. It uses advanced AI processing to handle context, idioms, and technical terminology effectively.",
+                privacy: "Privacy is a core feature - the glasses have no cameras and process voice data locally when possible. We use end-to-end encryption for any cloud processing required.",
+                weight: "At just 35 grams, these are among the lightest smart glasses available. The titanium frame provides durability while maintaining comfort for extended wear.",
+                compatibility: "The glasses work with both iOS and Android devices via Bluetooth. They're compatible with most smartphones released in the last 5 years."
+            };
+
+            // Simple keyword matching for demo
+            const keywords = query.toLowerCase();
+            for (const [key, response] of Object.entries(responses)) {
+                if (keywords.includes(key)) {
+                    return response;
+                }
+            }
+
+            // Default response
+            return `Based on your question about "${query}", I've found ${faqs.length} relevant FAQs that address your concerns. The information covers various aspects of Dymesty AI Glasses functionality, features, and usage scenarios.`;
+        }
+
+        // Generate relevance reason
+        function generateRelevanceReason(query, faq) {
+            const reasons = [
+                "Semantic similarity to your query",
+                "Contains related technical concepts",
+                "Addresses similar user concerns",
+                "Contextually relevant information",
+                "High user engagement on this topic"
+            ];
+            return reasons[Math.floor(Math.random() * reasons.length)];
+        }
+
+        // Generate personalization reason
+        function generatePersonalizationReason(faq) {
+            const reasons = [
+                "Based on your interests",
+                "Popular among similar users",
+                "Matches your usage patterns",
+                "Recently updated content",
+                "Highly rated by users"
+            ];
+            return reasons[Math.floor(Math.random() * reasons.length)];
+        }
+
+        // Display AI response
+        function displayAIResponse(query, results) {
+            const aiResponse = document.getElementById('aiResponse');
+            const confidence = Math.round(results.confidence * 100);
+
+            aiResponse.innerHTML = `
+                <h3><i class="fas fa-robot"></i> AI Analysis</h3>
+                <div class="ai-response-content">
+                    ${results.aiAnalysis}
+                </div>
+                <div class="confidence-score">
+                    <i class="fas fa-chart-line"></i> Confidence Score: ${confidence}%
+                </div>
+            `;
+
+            aiResponse.style.display = 'block';
+        }
+
+        // Display search results
+        function displaySearchResults(faqs) {
+            const resultsList = document.getElementById('resultsList');
+            const relatedResults = document.getElementById('relatedResults');
+
+            if (!faqs || faqs.length === 0) {
+                relatedResults.style.display = 'none';
+                return;
+            }
+
+            resultsList.innerHTML = '';
+            faqs.forEach((faq, index) => {
+                const relevanceScore = faq.semanticScore ? Math.round(faq.semanticScore * 100) : Math.round(Math.random() * 30 + 70);
+                
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                item.innerHTML = `
+                    <div class="result-header" onclick="toggleResult('${faq.id}')">
+                        <div>
+                            <div class="result-question">${faq.question}</div>
+                            ${faq.relevanceReason ? `<div style="font-size: 0.85em; color: #666; margin-top: 5px;">${faq.relevanceReason}</div>` : ''}
+                        </div>
+                        <div class="result-relevance">${relevanceScore}%</div>
+                    </div>
+                    <div id="result-${faq.id}" class="result-preview" style="display: none;">
+                        ${faq.answer}
+                    </div>
+                    <div class="result-meta">
+                        <div>
+                            <i class="fas fa-eye"></i> ${Math.floor(Math.random() * 1000 + 100)} views
+                        </div>
+                        <div>
+                            <i class="fas fa-thumbs-up"></i> ${Math.floor(Math.random() * 50 + 10)} helpful
+                        </div>
+                    </div>
+                `;
+                resultsList.appendChild(item);
+            });
+
+            relatedResults.style.display = 'block';
+        }
+
+        // Toggle result expansion
+        function toggleResult(faqId) {
+            const result = document.getElementById(`result-${faqId}`);
+            if (result.style.display === 'none') {
+                result.style.display = 'block';
+            } else {
+                result.style.display = 'none';
+            }
+        }
+
+        // Search recommendation
+        function searchRecommendation(query) {
+            document.getElementById('aiSearchInput').value = query;
+            performAISearch();
+        }
+
+        // Add to search history
+        function addToSearchHistory(query) {
+            searchHistory.unshift({
+                query,
+                timestamp: new Date().toISOString(),
+                mode: currentSearchMode
+            });
+            
+            // Keep only last 10 searches
+            searchHistory = searchHistory.slice(0, 10);
+            localStorage.setItem('dymesty_search_history', JSON.stringify(searchHistory));
+            
+            loadRecentSearches();
+        }
+
+        // Load recent searches
+        function loadRecentSearches() {
+            const recentSearches = document.getElementById('recentSearches');
+            if (searchHistory.length === 0) {
+                recentSearches.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">No recent searches</div>';
+                return;
+            }
+
+            recentSearches.innerHTML = searchHistory.slice(0, 5).map(search => `
+                <div class="trend-item" style="cursor: pointer;" onclick="searchRecommendation('${search.query}')">
+                    <span class="trend-query">${search.query.substring(0, 30)}${search.query.length > 30 ? '...' : ''}</span>
+                    <span class="trend-count">${search.mode}</span>
+                </div>
+            `).join('');
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showSearchInfo(show) {
+            const searchInfo = document.getElementById('searchInfo');
+            if (show) {
+                searchInfo.classList.add('show');
+            } else {
+                searchInfo.classList.remove('show');
+            }
+        }
+
+        function hideWelcomeMessage() {
+            document.getElementById('welcomeMessage').style.display = 'none';
+        }
+
+        function showError(message) {
+            // Simple error display - in a real app, you'd want a proper error UI
+            alert(message);
+        }
+    </script>
+</body>
+</html>

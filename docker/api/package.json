@@ -1,0 +1,24 @@
+{
+  "name": "dymesty-faq-dam-api",
+  "version": "1.0.0",
+  "description": "API for Dymesty AI Glasses FAQ Data Asset Management",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": ["dymesty", "faq", "dam", "api"],
+  "author": "Dymesty Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "compression": "^1.7.4",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

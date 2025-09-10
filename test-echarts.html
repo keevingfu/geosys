@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECharts Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        #testChart {
+            width: 600px;
+            height: 400px;
+            border: 1px solid #ccc;
+            margin: 20px auto;
+        }
+        .status {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="status">
+        <h1>ECharts Test Page</h1>
+        <p id="status">Initializing...</p>
+    </div>
+    <div id="testChart"></div>
+
+    <script>
+        // Test basic ECharts functionality
+        function testECharts() {
+            const statusEl = document.getElementById('status');
+            
+            // Check if ECharts is loaded
+            if (typeof echarts === 'undefined') {
+                statusEl.innerHTML = '<span style="color: red;">❌ ECharts is NOT loaded!</span>';
+                return;
+            }
+            
+            statusEl.innerHTML = '<span style="color: green;">✓ ECharts is loaded!</span>';
+            
+            // Test chart initialization
+            const chartDom = document.getElementById('testChart');
+            console.log('Chart container:', chartDom);
+            console.log('Container dimensions:', chartDom.offsetWidth, 'x', chartDom.offsetHeight);
+            
+            try {
+                const myChart = echarts.init(chartDom);
+                
+                // Simple test chart
+                const option = {
+                    title: {
+                        text: 'ECharts Graph Test'
+                    },
+                    tooltip: {},
+                    series: [{
+                        type: 'graph',
+                        layout: 'force',
+                        data: [
+                            {id: 'node1', name: 'Node 1', x: 100, y: 100, symbolSize: 50},
+                            {id: 'node2', name: 'Node 2', x: 200, y: 200, symbolSize: 50},
+                            {id: 'node3', name: 'Node 3', x: 300, y: 150, symbolSize: 50}
+                        ],
+                        edges: [
+                            {source: 'node1', target: 'node2'},
+                            {source: 'node2', target: 'node3'},
+                            {source: 'node3', target: 'node1'}
+                        ],
+                        roam: true,
+                        force: {
+                            repulsion: 100,
+                            edgeLength: 100
+                        }
+                    }]
+                };
+                
+                myChart.setOption(option);
+                statusEl.innerHTML += '<br><span style="color: green;">✓ Chart initialized successfully!</span>';
+                
+            } catch (error) {
+                statusEl.innerHTML += '<br><span style="color: red;">❌ Chart initialization failed: ' + error.message + '</span>';
+                console.error('Chart error:', error);
+            }
+        }
+        
+        // Test when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', testECharts);
+        } else {
+            testECharts();
+        }
+    </script>
+</body>
+</html>

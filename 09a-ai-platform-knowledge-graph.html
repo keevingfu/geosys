@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Platform Knowledge Graph - Dymesty</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --success: #4facfe;
+            --warning: #fa709a;
+            --danger: #f5576c;
+            --bg-dark: #0f0f1e;
+            --bg-card: #1a1a2e;
+            --bg-hover: #252540;
+            --text-primary: #ffffff;
+            --text-secondary: #a8b2d1;
+            --border: #2a3f5f;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            position: relative;
+            z-index: 1;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            position: relative;
+            z-index: 1;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Controls Section */
+        .controls-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .controls-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .controls-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+        }
+
+        .controls-header i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .control-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .control-btn:hover::before {
+            left: 100%;
+        }
+
+        .control-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .control-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Graph Container */
+        .graph-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .graph-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .graph-title h2 {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+        }
+
+        .graph-title i {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .graph-stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .stat-item i {
+            color: var(--primary);
+        }
+
+        .stat-item span {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        #knowledgeGraph {
+            width: 100%;
+            height: 800px;
+            border-radius: 10px;
+            background: var(--bg-dark);
+            position: relative;
+        }
+
+        /* Legend Section */
+        .legend-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .legend-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .legend-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+        }
+
+        .legend-header i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-hover);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .legend-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 3px 10px var(--shadow);
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px var(--shadow);
+        }
+
+        .legend-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Info Cards */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px var(--shadow);
+        }
+
+        .info-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .info-card h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary);
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .graph-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .graph-stats {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            #knowledgeGraph {
+                height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>AI Platform Knowledge Graph</h1>
+        <p>Comprehensive visualization of Dymesty AI Glasses optimization strategy across AI platforms including ChatGPT, Perplexity, Claude, and more</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Info Cards -->
+        <div class="info-cards">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <div class="info-card-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI-Driven Strategy</h3>
+                </div>
+                <p>Our knowledge graph represents the interconnected strategy for optimizing Dymesty AI Glasses visibility across major AI platforms, focusing on real-time translation, privacy features, and lightweight design.</p>
+            </div>
+            <div class="info-card">
+                <div class="info-card-header">
+                    <div class="info-card-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3>Connected Intelligence</h3>
+                </div>
+                <p>Explore how content, keywords, schema markup, and competitor analysis work together to create a comprehensive AI platform optimization strategy for our titanium smart glasses.</p>
+            </div>
+            <div class="info-card">
+                <div class="info-card-header">
+                    <div class="info-card-icon" style="background: linear-gradient(135deg, #fa709a, #fee140);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Performance Metrics</h3>
+                </div>
+                <p>Track the relationships between different optimization elements and their impact on AI platform visibility, with real-time updates and performance indicators.</p>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls-section">
+            <div class="controls-header">
+                <i class="fas fa-sliders-h"></i>
+                <h2>Graph Controls</h2>
+            </div>
+            <div class="controls-grid">
+                <div class="control-group">
+                    <span class="control-label">Layout Mode</span>
+                    <div class="control-buttons">
+                        <button class="control-btn active" onclick="changeLayout('force')">
+                            <i class="fas fa-project-diagram"></i> Force
+                        </button>
+                        <button class="control-btn" onclick="changeLayout('circular')">
+                            <i class="fas fa-circle-notch"></i> Circular
+                        </button>
+                        <button class="control-btn" onclick="changeLayout('radial')">
+                            <i class="fas fa-sun"></i> Radial
+                        </button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <span class="control-label">Focus Filter</span>
+                    <div class="control-buttons">
+                        <button class="control-btn active" onclick="filterByCategory('all')">
+                            <i class="fas fa-globe"></i> All Nodes
+                        </button>
+                        <button class="control-btn" onclick="filterByCategory('strategy')">
+                            <i class="fas fa-chess"></i> Strategy
+                        </button>
+                        <button class="control-btn" onclick="filterByCategory('keywords')">
+                            <i class="fas fa-key"></i> Keywords
+                        </button>
+                        <button class="control-btn" onclick="filterByCategory('content')">
+                            <i class="fas fa-file-alt"></i> Content
+                        </button>
+                        <button class="control-btn" onclick="filterByCategory('platforms')">
+                            <i class="fas fa-robot"></i> Platforms
+                        </button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <span class="control-label">Visualization Options</span>
+                    <div class="control-buttons">
+                        <button class="control-btn" onclick="toggleLabels()">
+                            <i class="fas fa-tag"></i> Toggle Labels
+                        </button>
+                        <button class="control-btn" onclick="resetZoom()">
+                            <i class="fas fa-compress"></i> Reset Zoom
+                        </button>
+                        <button class="control-btn" onclick="exportGraph()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graph Container -->
+        <div class="graph-container">
+            <div class="graph-header">
+                <div class="graph-title">
+                    <i class="fas fa-project-diagram"></i>
+                    <h2>Interactive Knowledge Network</h2>
+                </div>
+                <div class="graph-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-circle-nodes"></i>
+                        <span id="nodeCount">0</span> Nodes
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-link"></i>
+                        <span id="edgeCount">0</span> Connections
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-layer-group"></i>
+                        <span id="categoryCount">0</span> Categories
+                    </div>
+                </div>
+            </div>
+            <div id="knowledgeGraph">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading Knowledge Graph...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend Section -->
+        <div class="legend-section">
+            <div class="legend-header">
+                <i class="fas fa-palette"></i>
+                <h2>Node Categories</h2>
+            </div>
+            <div class="legend-grid" id="legendGrid">
+                <!-- Legend items will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ECharts Library -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    
+    <script>
+        // Check authentication
+        const authToken = localStorage.getItem('authToken');
+        const sessionExpiry = localStorage.getItem('sessionExpiry');
+        const currentTime = new Date().getTime();
+
+        if (!authToken || !sessionExpiry || currentTime > parseInt(sessionExpiry)) {
+            window.location.href = 'login.html';
+        }
+
+        // Global variables
+        let myChart = null;
+        let currentLayout = 'force';
+        let showLabels = true;
+        let allNodes = [];
+        let allEdges = [];
+        let filteredNodes = [];
+        let filteredEdges = [];
+
+        // Define comprehensive node data
+        const graphData = {
+            nodes: [
+                // Core Strategy Node
+                { id: 'core', name: 'Dymesty AI Platform Strategy', category: 0, symbolSize: 120, value: 50 },
+                
+                // Main Strategy Pillars (Category 1)
+                { id: 'content-strategy', name: 'Content Strategy', category: 1, symbolSize: 90, value: 40 },
+                { id: 'keyword-strategy', name: 'Keyword Strategy', category: 1, symbolSize: 90, value: 40 },
+                { id: 'schema-strategy', name: 'Schema Markup', category: 1, symbolSize: 90, value: 40 },
+                { id: 'platform-strategy', name: 'Platform Optimization', category: 1, symbolSize: 90, value: 40 },
+                { id: 'competitor-strategy', name: 'Competitor Analysis', category: 1, symbolSize: 90, value: 40 },
+                
+                // Keywords (Category 2)
+                { id: 'kw-translation', name: 'Real-time Translation', category: 2, symbolSize: 70, value: 30 },
+                { id: 'kw-privacy', name: 'No-Camera Privacy', category: 2, symbolSize: 70, value: 30 },
+                { id: 'kw-lightweight', name: '35g Lightweight', category: 2, symbolSize: 70, value: 30 },
+                { id: 'kw-battery', name: '48-hour Battery', category: 2, symbolSize: 70, value: 30 },
+                { id: 'kw-titanium', name: 'Titanium Frame', category: 2, symbolSize: 70, value: 30 },
+                { id: 'kw-ai-assistant', name: 'AI Meeting Assistant', category: 2, symbolSize: 70, value: 30 },
+                
+                // Content Types (Category 3)
+                { id: 'ct-product', name: 'Product Pages', category: 3, symbolSize: 60, value: 25 },
+                { id: 'ct-features', name: 'Feature Articles', category: 3, symbolSize: 60, value: 25 },
+                { id: 'ct-tutorials', name: 'Tutorial Content', category: 3, symbolSize: 60, value: 25 },
+                { id: 'ct-comparisons', name: 'Comparison Guides', category: 3, symbolSize: 60, value: 25 },
+                { id: 'ct-reviews', name: 'User Reviews', category: 3, symbolSize: 60, value: 25 },
+                { id: 'ct-faqs', name: 'FAQ Content', category: 3, symbolSize: 60, value: 25 },
+                
+                // Schema Types (Category 4)
+                { id: 'schema-product', name: 'Product Schema', category: 4, symbolSize: 55, value: 20 },
+                { id: 'schema-organization', name: 'Organization Schema', category: 4, symbolSize: 55, value: 20 },
+                { id: 'schema-faq', name: 'FAQ Schema', category: 4, symbolSize: 55, value: 20 },
+                { id: 'schema-howto', name: 'HowTo Schema', category: 4, symbolSize: 55, value: 20 },
+                { id: 'schema-review', name: 'Review Schema', category: 4, symbolSize: 55, value: 20 },
+                
+                // AI Platforms (Category 5)
+                { id: 'platform-chatgpt', name: 'ChatGPT', category: 5, symbolSize: 65, value: 28 },
+                { id: 'platform-perplexity', name: 'Perplexity', category: 5, symbolSize: 65, value: 28 },
+                { id: 'platform-claude', name: 'Claude', category: 5, symbolSize: 65, value: 28 },
+                { id: 'platform-gemini', name: 'Google Gemini', category: 5, symbolSize: 65, value: 28 },
+                { id: 'platform-you', name: 'You.com', category: 5, symbolSize: 60, value: 25 },
+                { id: 'platform-bing', name: 'Bing Chat', category: 5, symbolSize: 60, value: 25 },
+                
+                // Competitors (Category 6)
+                { id: 'comp-rayban', name: 'Ray-Ban Meta', category: 6, symbolSize: 50, value: 15 },
+                { id: 'comp-xreal', name: 'XREAL AR', category: 6, symbolSize: 50, value: 15 },
+                { id: 'comp-solos', name: 'Solos AirGo', category: 6, symbolSize: 50, value: 15 },
+                { id: 'comp-huawei', name: 'Huawei Eyewear', category: 6, symbolSize: 50, value: 15 },
+                
+                // User Personas (Category 7)
+                { id: 'persona-professional', name: 'Business Professional', category: 7, symbolSize: 55, value: 22 },
+                { id: 'persona-traveler', name: 'International Traveler', category: 7, symbolSize: 55, value: 22 },
+                { id: 'persona-developer', name: 'Tech Developer', category: 7, symbolSize: 55, value: 22 },
+                { id: 'persona-privacy', name: 'Privacy Advocate', category: 7, symbolSize: 55, value: 22 }
+            ],
+            edges: [
+                // Core connections
+                { source: 'core', target: 'content-strategy', value: 10 },
+                { source: 'core', target: 'keyword-strategy', value: 10 },
+                { source: 'core', target: 'schema-strategy', value: 10 },
+                { source: 'core', target: 'platform-strategy', value: 10 },
+                { source: 'core', target: 'competitor-strategy', value: 10 },
+                
+                // Keyword Strategy connections
+                { source: 'keyword-strategy', target: 'kw-translation', value: 8 },
+                { source: 'keyword-strategy', target: 'kw-privacy', value: 8 },
+                { source: 'keyword-strategy', target: 'kw-lightweight', value: 8 },
+                { source: 'keyword-strategy', target: 'kw-battery', value: 8 },
+                { source: 'keyword-strategy', target: 'kw-titanium', value: 7 },
+                { source: 'keyword-strategy', target: 'kw-ai-assistant', value: 8 },
+                
+                // Content Strategy connections
+                { source: 'content-strategy', target: 'ct-product', value: 8 },
+                { source: 'content-strategy', target: 'ct-features', value: 8 },
+                { source: 'content-strategy', target: 'ct-tutorials', value: 7 },
+                { source: 'content-strategy', target: 'ct-comparisons', value: 7 },
+                { source: 'content-strategy', target: 'ct-reviews', value: 7 },
+                { source: 'content-strategy', target: 'ct-faqs', value: 7 },
+                
+                // Schema Strategy connections
+                { source: 'schema-strategy', target: 'schema-product', value: 9 },
+                { source: 'schema-strategy', target: 'schema-organization', value: 7 },
+                { source: 'schema-strategy', target: 'schema-faq', value: 7 },
+                { source: 'schema-strategy', target: 'schema-howto', value: 6 },
+                { source: 'schema-strategy', target: 'schema-review', value: 6 },
+                
+                // Platform Strategy connections
+                { source: 'platform-strategy', target: 'platform-chatgpt', value: 8 },
+                { source: 'platform-strategy', target: 'platform-perplexity', value: 8 },
+                { source: 'platform-strategy', target: 'platform-claude', value: 8 },
+                { source: 'platform-strategy', target: 'platform-gemini', value: 8 },
+                { source: 'platform-strategy', target: 'platform-you', value: 7 },
+                { source: 'platform-strategy', target: 'platform-bing', value: 7 },
+                
+                // Competitor Strategy connections
+                { source: 'competitor-strategy', target: 'comp-rayban', value: 6 },
+                { source: 'competitor-strategy', target: 'comp-xreal', value: 6 },
+                { source: 'competitor-strategy', target: 'comp-solos', value: 5 },
+                { source: 'competitor-strategy', target: 'comp-huawei', value: 5 },
+                
+                // Cross-connections: Keywords to Content
+                { source: 'kw-translation', target: 'ct-features', value: 5 },
+                { source: 'kw-privacy', target: 'ct-features', value: 5 },
+                { source: 'kw-lightweight', target: 'ct-product', value: 5 },
+                { source: 'kw-battery', target: 'ct-product', value: 5 },
+                { source: 'kw-ai-assistant', target: 'ct-tutorials', value: 5 },
+                
+                // Cross-connections: Content to Schema
+                { source: 'ct-product', target: 'schema-product', value: 6 },
+                { source: 'ct-faqs', target: 'schema-faq', value: 6 },
+                { source: 'ct-tutorials', target: 'schema-howto', value: 5 },
+                { source: 'ct-reviews', target: 'schema-review', value: 5 },
+                
+                // Cross-connections: Platforms to Keywords
+                { source: 'platform-chatgpt', target: 'kw-ai-assistant', value: 4 },
+                { source: 'platform-perplexity', target: 'kw-translation', value: 4 },
+                { source: 'platform-claude', target: 'kw-privacy', value: 4 },
+                
+                // Persona connections
+                { source: 'persona-professional', target: 'kw-ai-assistant', value: 5 },
+                { source: 'persona-traveler', target: 'kw-translation', value: 5 },
+                { source: 'persona-developer', target: 'ct-tutorials', value: 4 },
+                { source: 'persona-privacy', target: 'kw-privacy', value: 5 },
+                
+                // Persona to content
+                { source: 'persona-professional', target: 'ct-features', value: 4 },
+                { source: 'persona-traveler', target: 'ct-comparisons', value: 4 },
+                { source: 'persona-developer', target: 'schema-howto', value: 3 },
+                { source: 'persona-privacy', target: 'ct-faqs', value: 4 }
+            ]
+        };
+
+        // Category definitions
+        const categories = [
+            { name: 'Core Strategy', color: '#667eea', icon: 'fa-brain' },
+            { name: 'Strategy Pillars', color: '#764ba2', icon: 'fa-chess' },
+            { name: 'Keywords', color: '#fa709a', icon: 'fa-key' },
+            { name: 'Content Types', color: '#4facfe', icon: 'fa-file-alt' },
+            { name: 'Schema Markup', color: '#43e97b', icon: 'fa-code' },
+            { name: 'AI Platforms', color: '#f093fb', icon: 'fa-robot' },
+            { name: 'Competitors', color: '#fee140', icon: 'fa-trophy' },
+            { name: 'User Personas', color: '#30cfd0', icon: 'fa-users' }
+        ];
+
+        // Initialize the graph
+        function initializeGraph() {
+            const chartDom = document.getElementById('knowledgeGraph');
+            if (!chartDom) {
+                console.error('Chart container not found');
+                return;
+            }
+
+            // Hide loading
+            document.querySelector('.loading').style.display = 'none';
+
+            // Initialize ECharts instance
+            myChart = echarts.init(chartDom, null, {
+                renderer: 'canvas'
+            });
+
+            // Prepare data
+            allNodes = graphData.nodes.map(node => ({
+                ...node,
+                itemStyle: {
+                    color: categories[node.category].color,
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                    shadowBlur: 10,
+                    shadowColor: 'rgba(0, 0, 0, 0.3)'
+                },
+                label: {
+                    show: showLabels,
+                    position: 'bottom',
+                    color: '#a8b2d1',
+                    fontSize: 11,
+                    fontWeight: 500
+                },
+                emphasis: {
+                    itemStyle: {
+                        borderWidth: 3,
+                        shadowBlur: 25,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    },
+                    label: {
+                        show: true,
+                        fontSize: 14,
+                        fontWeight: 600
+                    }
+                }
+            }));
+
+            allEdges = graphData.edges.map(edge => ({
+                ...edge,
+                lineStyle: {
+                    color: 'source',
+                    opacity: 0.6,
+                    curveness: 0.2,
+                    width: Math.sqrt(edge.value) * 0.5
+                },
+                emphasis: {
+                    lineStyle: {
+                        width: Math.sqrt(edge.value) + 2,
+                        opacity: 1
+                    }
+                }
+            }));
+
+            // Update stats
+            updateStats();
+            
+            // Create legend
+            createLegend();
+            
+            // Render the graph
+            renderGraph();
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                if (myChart) {
+                    myChart.resize();
+                }
+            });
+        }
+
+        // Render the graph
+        function renderGraph() {
+            if (!myChart) return;
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(26, 26, 46, 0.95)',
+                    borderColor: '#2a3f5f',
+                    borderWidth: 1,
+                    textStyle: {
+                        color: '#fff'
+                    },
+                    formatter: function(params) {
+                        if (params.dataType === 'node') {
+                            const category = categories[params.data.category];
+                            return `
+                                <div style="padding: 10px;">
+                                    <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">${params.name}</div>
+                                    <div style="color: ${category.color}; margin-bottom: 5px;">
+                                        <i class="fas ${category.icon}"></i> ${category.name}
+                                    </div>
+                                    <div style="color: #a8b2d1;">Connections: ${params.data.value || 0}</div>
+                                </div>
+                            `;
+                        } else if (params.dataType === 'edge') {
+                            return `${params.data.source} → ${params.data.target}<br/>Strength: ${params.data.value}`;
+                        }
+                    }
+                },
+                animationDuration: 1500,
+                animationEasingUpdate: 'cubicInOut',
+                series: [{
+                    type: 'graph',
+                    layout: currentLayout,
+                    data: filteredNodes.length > 0 ? filteredNodes : allNodes,
+                    edges: filteredEdges.length > 0 ? filteredEdges : allEdges,
+                    roam: true,
+                    draggable: true,
+                    focusNodeAdjacency: true,
+                    force: {
+                        repulsion: 500,
+                        gravity: 0.1,
+                        edgeLength: [80, 200],
+                        layoutAnimation: true
+                    },
+                    circular: {
+                        rotateLabel: true
+                    }
+                }]
+            };
+
+            myChart.setOption(option);
+        }
+
+        // Change layout
+        function changeLayout(layout) {
+            currentLayout = layout;
+            
+            // Update button states
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            if (!myChart) return;
+
+            if (layout === 'radial') {
+                // Calculate radial positions
+                const centerX = myChart.getWidth() / 2;
+                const centerY = myChart.getHeight() / 2;
+                const nodes = filteredNodes.length > 0 ? filteredNodes : allNodes;
+                
+                // Group nodes by category
+                const nodesByCategory = {};
+                nodes.forEach(node => {
+                    if (!nodesByCategory[node.category]) {
+                        nodesByCategory[node.category] = [];
+                    }
+                    nodesByCategory[node.category].push(node);
+                });
+                
+                // Position nodes in concentric circles
+                Object.keys(nodesByCategory).forEach((category, catIndex) => {
+                    const categoryNodes = nodesByCategory[category];
+                    const radius = 100 + catIndex * 80;
+                    
+                    categoryNodes.forEach((node, index) => {
+                        const angle = (2 * Math.PI * index) / categoryNodes.length;
+                        node.x = centerX + radius * Math.cos(angle);
+                        node.y = centerY + radius * Math.sin(angle);
+                        node.fixed = true;
+                    });
+                });
+                
+                myChart.setOption({
+                    series: [{
+                        layout: 'none',
+                        data: nodes
+                    }]
+                });
+            } else {
+                // Clear fixed positions
+                const nodes = filteredNodes.length > 0 ? filteredNodes : allNodes;
+                nodes.forEach(node => {
+                    delete node.x;
+                    delete node.y;
+                    delete node.fixed;
+                });
+                
+                myChart.setOption({
+                    series: [{
+                        layout: layout,
+                        force: layout === 'force' ? {
+                            repulsion: 500,
+                            gravity: 0.1,
+                            edgeLength: [80, 200],
+                            layoutAnimation: true
+                        } : null,
+                        circular: layout === 'circular' ? {
+                            rotateLabel: true
+                        } : null
+                    }]
+                });
+            }
+        }
+
+        // Filter by category
+        function filterByCategory(filter) {
+            // Update button states
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            if (filter === 'all') {
+                filteredNodes = [];
+                filteredEdges = [];
+            } else {
+                const categoryMap = {
+                    'strategy': [1],
+                    'keywords': [2],
+                    'content': [3],
+                    'platforms': [5]
+                };
+                
+                const targetCategories = categoryMap[filter] || [];
+                
+                // Include core node and filtered categories
+                filteredNodes = allNodes.filter(node => 
+                    node.category === 0 || targetCategories.includes(node.category)
+                );
+                
+                const nodeIds = new Set(filteredNodes.map(n => n.id));
+                filteredEdges = allEdges.filter(edge => 
+                    nodeIds.has(edge.source) && nodeIds.has(edge.target)
+                );
+            }
+
+            renderGraph();
+        }
+
+        // Toggle labels
+        function toggleLabels() {
+            showLabels = !showLabels;
+            
+            const nodes = filteredNodes.length > 0 ? filteredNodes : allNodes;
+            nodes.forEach(node => {
+                node.label.show = showLabels;
+            });
+            
+            myChart.setOption({
+                series: [{
+                    data: nodes
+                }]
+            });
+        }
+
+        // Reset zoom
+        function resetZoom() {
+            if (myChart) {
+                myChart.dispatchAction({
+                    type: 'restore'
+                });
+            }
+        }
+
+        // Export graph
+        function exportGraph() {
+            if (myChart) {
+                const url = myChart.getDataURL({
+                    type: 'png',
+                    pixelRatio: 2,
+                    backgroundColor: '#0f0f1e'
+                });
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'dymesty-ai-platform-knowledge-graph.png';
+                a.click();
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const nodes = filteredNodes.length > 0 ? filteredNodes : allNodes;
+            const edges = filteredEdges.length > 0 ? filteredEdges : allEdges;
+            
+            document.getElementById('nodeCount').textContent = nodes.length;
+            document.getElementById('edgeCount').textContent = edges.length;
+            document.getElementById('categoryCount').textContent = categories.length;
+        }
+
+        // Create legend
+        function createLegend() {
+            const legendGrid = document.getElementById('legendGrid');
+            legendGrid.innerHTML = '';
+            
+            categories.forEach(category => {
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                legendItem.innerHTML = `
+                    <div class="legend-color" style="background: ${category.color}"></div>
+                    <span class="legend-label">${category.name}</span>
+                `;
+                legendGrid.appendChild(legendItem);
+            });
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', function() {
+            // Show loading state
+            document.querySelector('.loading').style.display = 'block';
+            
+            // Initialize after a short delay to ensure everything is loaded
+            setTimeout(function() {
+                if (typeof echarts !== 'undefined') {
+                    initializeGraph();
+                } else {
+                    console.error('ECharts library not loaded');
+                    document.querySelector('.loading').innerHTML = `
+                        <p style="color: #ff6b6b;">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Failed to load visualization library. Please refresh the page.
+                        </p>
+                    `;
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

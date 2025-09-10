@@ -931,10 +931,57 @@
             </div>
 
             <div id="batchTab" style="display: none;">
-                <div class="import-zone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+                <div class="import-zone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onclick="selectFile()">
+                    <input type="file" id="fileInput" accept=".csv,.txt" style="display: none;" onchange="handleFileSelect(event)">
                     <div class="import-icon">📁</div>
-                    <p style="font-size: 16px; margin-bottom: 8px;">Drag CSV/Excel files here</p>
+                    <p style="font-size: 16px; margin-bottom: 8px;">Drag CSV/Text files here</p>
                     <p style="font-size: 14px; color: var(--text-secondary);">Or click to select files</p>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">Format: One question per line</p>
+                </div>
+                <div id="importPreview" style="margin-top: 16px; display: none;">
+                    <h4 style="margin-bottom: 8px;">Preview:</h4>
+                    <div id="previewContent" style="max-height: 200px; overflow-y: auto; background: var(--hover-bg); padding: 12px; border-radius: 6px; font-size: 14px;"></div>
+                    <button class="btn btn-primary" style="margin-top: 12px;" onclick="confirmImport()">Import All Questions</button>
+                </div>
+            </div>
+            
+            <div id="apiTab" style="display: none;">
+                <div style="padding: 20px; background: var(--hover-bg); border-radius: 8px;">
+                    <h4 style="margin-bottom: 12px;">API Integration</h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 16px;">Connect to AI platforms for automatic question collection</p>
+                    <div style="display: grid; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span>API Endpoint:</span>
+                            <input type="text" class="filter-select" style="flex: 1;" placeholder="https://api.example.com/questions" id="apiEndpoint">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span>API Key:</span>
+                            <input type="password" class="filter-select" style="flex: 1;" placeholder="Your API key" id="apiKey">
+                        </div>
+                        <button class="btn btn-primary" onclick="testAPIConnection()">Test Connection</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="rulesTab" style="display: none;">
+                <div style="padding: 20px; background: var(--hover-bg); border-radius: 8px;">
+                    <h4 style="margin-bottom: 12px;">Collection Rules</h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 16px;">Define rules for automatic question filtering and categorization</p>
+                    <div style="display: grid; gap: 16px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 8px;">Minimum Question Length:</label>
+                            <input type="number" class="filter-select" value="10" id="minLength">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 8px;">Keywords to Include:</label>
+                            <input type="text" class="filter-select" placeholder="e.g., Dymesty, AI glasses, translation" id="includeKeywords">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 8px;">Keywords to Exclude:</label>
+                            <input type="text" class="filter-select" placeholder="e.g., competitor names" id="excludeKeywords">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveRules()">Save Rules</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1204,21 +1251,47 @@
         let selectedQuestions = new Set();
         let currentTab = 'manual';
         let liveUpdateInterval;
+        let totalQuestionsCollected = 0;
+        let targetGoal = 1000;
+        let questionIdCounter = 1;
+        let aiPlatforms = {
+            'chatgpt': { name: 'ChatGPT', count: 0, icon: '🤖' },
+            'perplexity': { name: 'Perplexity', count: 0, icon: '🔍' },
+            'claude': { name: 'Claude', count: 0, icon: '🧠' },
+            'gemini': { name: 'Gemini', count: 0, icon: '💎' },
+            'bing': { name: 'Bing Chat', count: 0, icon: '🔎' },
+            'you': { name: 'You.com', count: 0, icon: '🌐' }
+        };
 
         // Initialize when page loads
         window.onload = function() {
             initializeSystem();
             startLiveUpdates();
             updateProgress();
+            updateChannelCards();
+            loadStoredQuestions();
         };
 
         // System initialization
         function initializeSystem() {
             // Load saved questions
-            const saved = localStorage.getItem('geoCollectedQuestions');
+            const saved = localStorage.getItem('dymestyCollectedQuestions');
             if (saved) {
                 collectedQuestions = JSON.parse(saved);
+                totalQuestionsCollected = collectedQuestions.length;
             }
+            
+            // Load saved platform stats
+            const savedPlatforms = localStorage.getItem('dymestyPlatformStats');
+            if (savedPlatforms) {
+                const stats = JSON.parse(savedPlatforms);
+                Object.keys(stats).forEach(key => {
+                    if (aiPlatforms[key]) {
+                        aiPlatforms[key].count = stats[key].count;
+                    }
+                });
+            }
+            
             updateStatistics();
         }
 
@@ -1267,10 +1340,12 @@
         }
 
         // Add question to real-time stream
-        function addQuestionToStream(text, source) {
+        function addQuestionToStream(text, source, preApproved = false) {
             const streamContainer = document.getElementById('questionStream');
             const questionItem = document.createElement('div');
+            const questionId = `q-${questionIdCounter++}`;
             questionItem.className = 'question-item';
+            questionItem.id = questionId;
             questionItem.style.animation = 'slideIn 0.5s';
             
             // Determine quality level
@@ -1278,8 +1353,10 @@
             const qualityText = quality === 'high' ? 'High Quality' : 'Medium';
             const qualityClass = quality === 'high' ? 'quality-high' : 'quality-medium';
             
+            // Add checkbox for batch selection
             questionItem.innerHTML = `
-                <div class="question-content">
+                <input type="checkbox" class="question-checkbox" onchange="toggleSelection('${questionId}')" style="margin-right: 12px;">
+                <div class="question-content" style="flex: 1;">
                     <div class="question-text">${text}</div>
                     <div class="question-meta">
                         <span class="meta-tag">
@@ -1294,13 +1371,26 @@
                     </div>
                 </div>
                 <div class="question-actions">
-                    <button class="btn btn-ghost btn-sm" onclick="editQuestion(this)">Edit</button>
-                    <button class="btn btn-primary btn-sm" onclick="approveQuestion(this)">Approve</button>
+                    <button class="btn btn-ghost btn-sm" onclick="editQuestion('${questionId}')">Edit</button>
+                    <button class="btn btn-primary btn-sm" onclick="approveQuestion('${questionId}')" ${preApproved ? 'disabled' : ''}>${preApproved ? 'Approved' : 'Approve'}</button>
                 </div>
             `;
             
             // Add to top
             streamContainer.insertBefore(questionItem, streamContainer.firstChild);
+            
+            // Auto-approve if needed
+            if (preApproved) {
+                const questionData = {
+                    id: questionId,
+                    text: text,
+                    source: source,
+                    quality: qualityText,
+                    timestamp: new Date().toISOString()
+                };
+                collectedQuestions.push(questionData);
+                localStorage.setItem('dymestyCollectedQuestions', JSON.stringify(collectedQuestions));
+            }
             
             // Update statistics
             updateStatistics();
@@ -1332,23 +1422,29 @@
             // Show corresponding content
             document.getElementById('manualTab').style.display = tab === 'manual' ? 'block' : 'none';
             document.getElementById('batchTab').style.display = tab === 'batch' ? 'block' : 'none';
+            document.getElementById('apiTab').style.display = tab === 'api' ? 'block' : 'none';
+            document.getElementById('rulesTab').style.display = tab === 'rules' ? 'block' : 'none';
         }
 
         // Approve question
-        function approveQuestion(btn) {
-            const item = btn.closest('.question-item');
+        function approveQuestion(questionId) {
+            const item = document.getElementById(questionId);
+            const btn = item.querySelector('.btn-primary');
             const text = item.querySelector('.question-text').textContent;
             
             // Add to collected list
-            collectedQuestions.push({
+            const questionData = {
+                id: questionId,
                 text: text,
-                source: item.querySelector('.meta-tag span:last-child').textContent,
+                source: item.querySelector('.meta-tag span:nth-child(2)').textContent,
                 quality: item.querySelector('.quality-badge').textContent,
                 timestamp: new Date().toISOString()
-            });
+            };
+            
+            collectedQuestions.push(questionData);
             
             // Save to local storage
-            localStorage.setItem('geoCollectedQuestions', JSON.stringify(collectedQuestions));
+            localStorage.setItem('dymestyCollectedQuestions', JSON.stringify(collectedQuestions));
             
             // Visual feedback
             item.style.background = '#f6ffed';
@@ -1458,12 +1554,414 @@
             showNotification('Data exported successfully', 'success');
         }
 
+        // Toggle question selection for batch operations
+        function toggleSelection(questionId) {
+            const checkbox = document.querySelector(`#${questionId} .question-checkbox`);
+            if (checkbox.checked) {
+                selectedQuestions.add(questionId);
+            } else {
+                selectedQuestions.delete(questionId);
+            }
+            updateBatchActions();
+        }
+        
+        // Update batch actions bar
+        function updateBatchActions() {
+            const batchActions = document.getElementById('batchActions');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (selectedQuestions.size > 0) {
+                batchActions.classList.add('show');
+                selectedCount.textContent = selectedQuestions.size;
+            } else {
+                batchActions.classList.remove('show');
+            }
+        }
+        
+        // Handle file selection
+        function selectFile() {
+            document.getElementById('fileInput').click();
+        }
+        
+        // Handle file drop
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+        
+        // Handle file selection
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                readFile(file);
+            }
+        }
+        
+        // Read and preview file
+        function readFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n').filter(line => line.trim().length > 0);
+                
+                // Show preview
+                const previewDiv = document.getElementById('importPreview');
+                const previewContent = document.getElementById('previewContent');
+                previewDiv.style.display = 'block';
+                
+                // Store for import
+                window.pendingImport = lines;
+                
+                // Display preview (first 10 lines)
+                previewContent.innerHTML = lines.slice(0, 10).map((line, i) => 
+                    `${i + 1}. ${line}`
+                ).join('<br>');
+                
+                if (lines.length > 10) {
+                    previewContent.innerHTML += `<br>... and ${lines.length - 10} more questions`;
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Confirm import
+        function confirmImport() {
+            if (window.pendingImport) {
+                let imported = 0;
+                window.pendingImport.forEach(question => {
+                    if (question.trim().length >= 10) { // Minimum length check
+                        addQuestionToStream(question.trim(), 'Bulk Import', true);
+                        imported++;
+                    }
+                });
+                
+                showNotification(`Imported ${imported} questions successfully`, 'success');
+                
+                // Clear preview
+                document.getElementById('importPreview').style.display = 'none';
+                document.getElementById('fileInput').value = '';
+                window.pendingImport = null;
+            }
+        }
+        
+        // Test API connection
+        function testAPIConnection() {
+            const endpoint = document.getElementById('apiEndpoint').value;
+            const apiKey = document.getElementById('apiKey').value;
+            
+            if (!endpoint || !apiKey) {
+                showNotification('Please enter both API endpoint and key', 'warning');
+                return;
+            }
+            
+            showNotification('Testing API connection...', 'info');
+            
+            // Simulate API test
+            setTimeout(() => {
+                showNotification('API connection successful! Auto-collection enabled.', 'success');
+                // Store API credentials
+                localStorage.setItem('dymestyAPIEndpoint', endpoint);
+                localStorage.setItem('dymestyAPIKey', apiKey);
+            }, 1500);
+        }
+        
+        // Save collection rules
+        function saveRules() {
+            const rules = {
+                minLength: parseInt(document.getElementById('minLength').value) || 10,
+                includeKeywords: document.getElementById('includeKeywords').value.split(',').map(k => k.trim()).filter(k => k),
+                excludeKeywords: document.getElementById('excludeKeywords').value.split(',').map(k => k.trim()).filter(k => k)
+            };
+            
+            localStorage.setItem('dymestyCollectionRules', JSON.stringify(rules));
+            showNotification('Collection rules saved successfully', 'success');
+        }
+        
+        // Apply filters
+        function applyFilters() {
+            const sourceFilter = document.getElementById('sourceFilter').value;
+            const qualityFilter = document.getElementById('qualityFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            
+            const questions = document.querySelectorAll('.question-item');
+            questions.forEach(q => {
+                let show = true;
+                
+                if (sourceFilter) {
+                    const source = q.querySelector('.meta-tag span:nth-child(2)').textContent.toLowerCase();
+                    if (!source.includes(sourceFilter)) show = false;
+                }
+                
+                if (qualityFilter && show) {
+                    const quality = q.querySelector('.quality-badge').textContent.toLowerCase();
+                    if (!quality.includes(qualityFilter)) show = false;
+                }
+                
+                q.style.display = show ? 'flex' : 'none';
+            });
+        }
+        
+        // Add filter event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('sourceFilter').addEventListener('change', applyFilters);
+            document.getElementById('qualityFilter').addEventListener('change', applyFilters);
+            document.getElementById('typeFilter').addEventListener('change', applyFilters);
+        });
+        
+        // Scroll to AI panel
+        function scrollToAI() {
+            document.querySelector('.ai-panel').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Toggle filters visibility
+        function toggleFilters() {
+            const toolbar = document.querySelector('.toolbar');
+            toolbar.style.display = toolbar.style.display === 'none' ? 'flex' : 'none';
+        }
+        
+        // Show statistics modal
+        function showStats() {
+            const totalQuestions = collectedQuestions.length;
+            const highQuality = collectedQuestions.filter(q => q.quality === 'High Quality').length;
+            const sources = {};
+            collectedQuestions.forEach(q => {
+                sources[q.source] = (sources[q.source] || 0) + 1;
+            });
+            
+            let statsHTML = `
+                <h3>Collection Statistics</h3>
+                <p>Total Questions: ${totalQuestions}</p>
+                <p>High Quality: ${highQuality} (${totalQuestions > 0 ? ((highQuality/totalQuestions)*100).toFixed(0) : 0}%)</p>
+                <h4>By Source:</h4>
+            `;
+            
+            Object.entries(sources).forEach(([source, count]) => {
+                statsHTML += `<p>${source}: ${count}</p>`;
+            });
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 24px;
+                border-radius: 8px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+                z-index: 1000;
+            `;
+            modal.innerHTML = statsHTML + '<button class="btn btn-primary" onclick="this.parentElement.remove()">Close</button>';
+            document.body.appendChild(modal);
+        }
+        
+        // Show settings modal
+        function showSettings() {
+            showNotification('Settings panel coming soon!', 'info');
+        }
+        
         // Clean up when page unloads
         window.onbeforeunload = function() {
             if (liveUpdateInterval) {
                 clearInterval(liveUpdateInterval);
             }
         };
+
+        // Add new functions for channel management
+        function updateChannelCards() {
+            const channelGrid = document.querySelector('.channel-grid');
+            channelGrid.innerHTML = '';
+            
+            Object.entries(aiPlatforms).forEach(([key, platform]) => {
+                const card = document.createElement('div');
+                card.className = 'channel-card';
+                card.innerHTML = `
+                    <div class="channel-header">
+                        <span class="channel-icon">${platform.icon}</span>
+                        <span class="channel-status" style="background: #52c41a;">Active</span>
+                    </div>
+                    <h4 class="channel-name">${platform.name}</h4>
+                    <div class="channel-stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="${key}-count">${platform.count}</span>
+                            <span class="stat-label">Questions</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="${key}-trend">${Math.floor(Math.random() * 20 + 5)}%</span>
+                            <span class="stat-label">Growth</span>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 12px;">
+                        <button class="btn btn-ghost btn-sm" onclick="collectFromPlatform('${key}')">
+                            <span>📥</span>
+                            <span>Collect</span>
+                        </button>
+                    </div>
+                `;
+                channelGrid.appendChild(card);
+            });
+        }
+        
+        // Load stored questions into the stream
+        function loadStoredQuestions() {
+            const streamContainer = document.getElementById('questionStream');
+            if (!streamContainer) return;
+            
+            // Show last 10 questions
+            const recentQuestions = collectedQuestions.slice(-10).reverse();
+            if (recentQuestions.length > 0) {
+                recentQuestions.forEach(q => {
+                    const questionItem = document.createElement('div');
+                    questionItem.className = 'question-item';
+                    questionItem.innerHTML = `
+                        <div class="question-content">
+                            <div class="question-text">${q.text}</div>
+                            <div class="question-meta">
+                                <span class="meta-tag">
+                                    <span>📍</span>
+                                    <span>${q.source}</span>
+                                </span>
+                                <span class="meta-tag">
+                                    <span>⏰</span>
+                                    <span>${new Date(q.timestamp).toLocaleTimeString()}</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="quality-section">
+                            <span class="quality-badge ${q.quality === 'High Quality' ? 'quality-high' : 'quality-medium'}">${q.quality}</span>
+                            <div class="action-buttons">
+                                <button class="btn btn-ghost btn-sm" onclick="editStoredQuestion('${q.id}')">Edit</button>
+                                <button class="btn btn-success btn-sm" disabled>Approved</button>
+                            </div>
+                        </div>
+                    `;
+                    streamContainer.appendChild(questionItem);
+                });
+            }
+        }
+        
+        // Collect questions from specific platform
+        function collectFromPlatform(platform) {
+            showNotification(`Collecting questions from ${aiPlatforms[platform].name}...`, 'info');
+            
+            // Simulate collecting questions
+            setTimeout(() => {
+                const sampleQuestions = {
+                    'chatgpt': [
+                        "How does Dymesty AI Glasses handle real-time translation?",
+                        "What languages are supported by Dymesty glasses?",
+                        "Can I use Dymesty glasses without internet connection?"
+                    ],
+                    'perplexity': [
+                        "What's the battery life of Dymesty AI Glasses?",
+                        "How accurate is the translation feature?",
+                        "Does Dymesty support dialect translation?"
+                    ],
+                    'claude': [
+                        "How does Dymesty ensure privacy without cameras?",
+                        "What's the weight of Dymesty titanium glasses?",
+                        "Can Dymesty glasses connect to multiple devices?"
+                    ],
+                    'gemini': [
+                        "What's the price of Dymesty AI Glasses?",
+                        "How does Dymesty compare to Ray-Ban Meta?",
+                        "Is Dymesty compatible with prescription lenses?"
+                    ],
+                    'bing': [
+                        "Where can I buy Dymesty AI Glasses?",
+                        "Does Dymesty have warranty coverage?",
+                        "What's included in the Dymesty package?"
+                    ],
+                    'you': [
+                        "How to set up Dymesty AI Glasses?",
+                        "Can Dymesty glasses record conversations?",
+                        "What's the return policy for Dymesty?"
+                    ]
+                };
+                
+                const questions = sampleQuestions[platform] || [];
+                questions.forEach(q => {
+                    addQuestionToStream(q, aiPlatforms[platform].name);
+                });
+                
+                // Update platform stats
+                aiPlatforms[platform].count += questions.length;
+                document.getElementById(`${platform}-count`).textContent = aiPlatforms[platform].count;
+                
+                // Save platform stats
+                localStorage.setItem('dymestyPlatformStats', JSON.stringify(aiPlatforms));
+                
+                showNotification(`Collected ${questions.length} questions from ${aiPlatforms[platform].name}`, 'success');
+            }, 1500);
+        }
+        
+        // Edit question function
+        function editQuestion(questionId) {
+            const item = document.getElementById(questionId);
+            const btn = item.querySelector('.btn-ghost');
+            const textElement = item.querySelector('.question-text');
+            const originalText = textElement.textContent;
+            
+            // Convert to editable input
+            textElement.innerHTML = `<input type="text" value="${originalText}" style="width: 100%; padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px;">`;
+            const input = textElement.querySelector('input');
+            input.focus();
+            
+            // Change button to save
+            btn.textContent = 'Save';
+            btn.onclick = function() {
+                const newText = input.value.trim();
+                if (newText) {
+                    textElement.textContent = newText;
+                    btn.textContent = 'Edit';
+                    btn.onclick = function() { editQuestion(questionId); };
+                    
+                    // Update stored question if already approved
+                    const approvedQuestion = collectedQuestions.find(q => q.id === questionId);
+                    if (approvedQuestion) {
+                        approvedQuestion.text = newText;
+                        localStorage.setItem('dymestyCollectedQuestions', JSON.stringify(collectedQuestions));
+                    }
+                    
+                    showNotification('Question updated', 'success');
+                }
+            };
+            
+            // Handle Enter key
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    btn.click();
+                }
+            });
+        }
+        
+        // Load more questions
+        function loadMore() {
+            showNotification('Loading more questions...', 'info');
+            
+            // Simulate loading more questions
+            setTimeout(() => {
+                const moreQuestions = [
+                    "How does Dymesty handle multiple languages in one conversation?",
+                    "Can I customize the voice output of Dymesty glasses?",
+                    "What's the maximum range for Bluetooth connection?"
+                ];
+                
+                moreQuestions.forEach(q => {
+                    addQuestionToStream(q, 'Archive');
+                });
+                
+                showNotification('Loaded 3 more questions', 'success');
+            }, 1000);
+        }
+
+        // Edit stored question
+        function editStoredQuestion(id) {
+            const q = collectedQuestions.find(question => question.id === id);
+            if (q) {
+                showNotification('Edit functionality for stored questions coming soon!', 'info');
+            }
+        }
     </script>
 </body>
 </html>

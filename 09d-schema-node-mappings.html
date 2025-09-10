@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schema-to-Node Mappings - SweetNight GEO</title>
+    <title>Schema-to-Node Mappings - Dymesty</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -367,7 +367,7 @@
                     <tbody>
                         <tr>
                             <td><span class="schema-badge">FAQPage#Q01</span></td>
-                            <td><span class="node-badge">Sleep Position Node</span></td>
+                            <td><span class="node-badge">Translation Features Node</span></td>
                             <td>
                                 High (90%)
                                 <div class="strength-indicator">
@@ -377,7 +377,7 @@
                         </tr>
                         <tr>
                             <td><span class="schema-badge">FAQPage#Q02</span></td>
-                            <td><span class="node-badge">Firmness Keywords</span></td>
+                            <td><span class="node-badge">Privacy Features Keywords</span></td>
                             <td>
                                 High (85%)
                                 <div class="strength-indicator">
@@ -387,7 +387,7 @@
                         </tr>
                         <tr>
                             <td><span class="schema-badge">FAQPage#Q03</span></td>
-                            <td><span class="node-badge">Pressure Relief Keywords</span></td>
+                            <td><span class="node-badge">Lightweight Design Keywords</span></td>
                             <td>
                                 High (80%)
                                 <div class="strength-indicator">
@@ -397,7 +397,7 @@
                         </tr>
                         <tr>
                             <td><span class="schema-badge">FAQPage#Q04</span></td>
-                            <td><span class="node-badge">Cooling Technology</span></td>
+                            <td><span class="node-badge">Battery Life Technology</span></td>
                             <td>
                                 Medium (75%)
                                 <div class="strength-indicator">
@@ -495,7 +495,7 @@
                         </tr>
                         <tr>
                             <td><span class="schema-badge">HowTo.supply</span></td>
-                            <td><span class="node-badge">Certification Keywords</span></td>
+                            <td><span class="node-badge">AI Technology Keywords</span></td>
                             <td>
                                 Medium (70%)
                                 <div class="strength-indicator">
@@ -664,13 +664,20 @@
                     textStyle: { color: '#a8b2d1' },
                     bottom: 10
                 },
+                animationDuration: 1500,
                 series: [{
                     type: 'graph',
-                    layout: 'none',
+                    layout: 'force',
                     data: nodes,
                     edges: edges,
                     roam: true,
                     focusNodeAdjacency: true,
+                    force: {
+                        repulsion: 1000,
+                        gravity: 0.1,
+                        edgeLength: 200,
+                        layoutAnimation: true
+                    },
                     itemStyle: {
                         borderColor: '#fff',
                         borderWidth: 2,
@@ -679,9 +686,9 @@
                     },
                     label: {
                         show: true,
-                        position: 'inside',
-                        color: '#fff',
-                        fontSize: 10,
+                        position: 'bottom',
+                        color: '#a8b2d1',
+                        fontSize: 11,
                         fontWeight: 'bold'
                     },
                     lineStyle: {
@@ -692,7 +699,8 @@
                         focus: 'adjacency',
                         label: {
                             show: true,
-                            fontSize: 14
+                            fontSize: 14,
+                            color: '#fff'
                         },
                         lineStyle: {
                             width: 8,
@@ -955,27 +963,27 @@
                             name: 'P1 Priority Schemas',
                             itemStyle: { color: '#fa709a' },
                             children: [
-                                { name: 'FAQPage - Sleep Position', value: 25, itemStyle: { color: '#fa709a' } },
-                                { name: 'FAQPage - Firmness', value: 20, itemStyle: { color: '#f78da7' } },
-                                { name: 'Product - Commercial', value: 20, itemStyle: { color: '#f498b5' } },
-                                { name: 'FAQPage - Cooling', value: 15, itemStyle: { color: '#f1a4c3' } }
+                                { name: 'FAQPage - Translation Features', value: 25, itemStyle: { color: '#fa709a' } },
+                                { name: 'FAQPage - Privacy Protection', value: 20, itemStyle: { color: '#f78da7' } },
+                                { name: 'Product - AI Glasses Specs', value: 20, itemStyle: { color: '#f498b5' } },
+                                { name: 'FAQPage - Battery Life', value: 15, itemStyle: { color: '#f1a4c3' } }
                             ]
                         },
                         {
                             name: 'P2 Priority Schemas',
                             itemStyle: { color: '#4facfe' },
                             children: [
-                                { name: 'HowTo - Setup Guides', value: 10, itemStyle: { color: '#4facfe' } },
-                                { name: 'QAPage - Community', value: 8, itemStyle: { color: '#6bb7fe' } },
-                                { name: 'Product - Reviews', value: 7, itemStyle: { color: '#87c2fe' } }
+                                { name: 'HowTo - AI Glasses Setup', value: 10, itemStyle: { color: '#4facfe' } },
+                                { name: 'QAPage - Developer Community', value: 8, itemStyle: { color: '#6bb7fe' } },
+                                { name: 'Product - User Reviews', value: 7, itemStyle: { color: '#87c2fe' } }
                             ]
                         },
                         {
                             name: 'P3 Priority Schemas',
                             itemStyle: { color: '#43e97b' },
                             children: [
-                                { name: 'HowTo - Maintenance', value: 3, itemStyle: { color: '#43e97b' } },
-                                { name: 'QAPage - Expert Q&A', value: 2, itemStyle: { color: '#65ec95' } }
+                                { name: 'HowTo - Device Care', value: 3, itemStyle: { color: '#43e97b' } },
+                                { name: 'QAPage - Technical Support', value: 2, itemStyle: { color: '#65ec95' } }
                             ]
                         }
                     ],
@@ -1025,15 +1033,24 @@
         }
 
         // Initialize all charts
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
+        window.onload = function() {
+            console.log('Window loaded, initializing charts...');
+            if (typeof echarts === 'undefined') {
+                console.error('ECharts not loaded!');
+                return;
+            }
+            
+            try {
                 initMappingDiagram();
                 initConnectionMatrix();
                 initImpactAnalysis();
                 initPerformanceCorrelation();
                 initPriorityMapping();
-            }, 500);
-        });
+                console.log('All charts initialized successfully');
+            } catch (error) {
+                console.error('Error initializing charts:', error);
+            }
+        };
 
         // Handle resize
         window.addEventListener('resize', () => {

@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: dymesty-postgres
+    environment:
+      POSTGRES_USER: dymesty_admin
+      POSTGRES_PASSWORD: DymestyAI2025!
+      POSTGRES_DB: dymestydam
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - dymesty-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dymesty_admin -d dymestydam"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: dymesty-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@dymesty.com
+      PGADMIN_DEFAULT_PASSWORD: DymestyAdmin2025!
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5051:80"
+    depends_on:
+      - postgres
+    networks:
+      - dymesty-network
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    container_name: dymesty-api
+    environment:
+      DATABASE_URL: postgresql://dymesty_admin:DymestyAI2025!@postgres:5432/dymestydam
+      NODE_ENV: production
+      API_PORT: 3000
+    ports:
+      - "4000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dymesty-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    name: dymesty_postgres_data
+
+networks:
+  dymesty-network:
+    name: dymesty_dam_network
+    driver: bridge
