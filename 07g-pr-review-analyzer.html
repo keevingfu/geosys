@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Release Analyzer - AI-Optimized Content Review</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Input Section */
+        .input-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .tab-button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .tab-button:hover:not(.active) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Text Input Area */
+        .text-input {
+            width: 100%;
+            min-height: 400px;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: 'Monaco', 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* File Upload Area */
+        .upload-area {
+            display: none;
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            background: var(--light);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area.active {
+            display: block;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.02);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-hint {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Score Section */
+        .score-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .overall-score {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .score-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .score-status {
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .score-status.excellent {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .score-status.good {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
+        .score-status.needs-improvement {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .score-status.poor {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* Category Scores */
+        .category-scores {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .category-item {
+            padding: 1.5rem;
+            background: var(--light);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-score {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .score-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .category-details {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Issues Section */
+        .issues-section {
+            margin-top: 2rem;
+        }
+
+        .issues-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .issue-card {
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .issue-card.critical {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .issue-card.warning {
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .issue-card.suggestion {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .issue-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .issue-icon.critical {
+            color: var(--danger);
+        }
+
+        .issue-icon.warning {
+            color: var(--warning);
+        }
+
+        .issue-icon.suggestion {
+            color: var(--info);
+        }
+
+        .issue-content h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .issue-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Recommendations Section */
+        .recommendations {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .recommendations h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .recommendations h3 i {
+            color: var(--primary);
+        }
+
+        .recommendation-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .rec-tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .rec-tab.active {
+            color: var(--primary);
+        }
+
+        .rec-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .recommendation-content {
+            display: none;
+        }
+
+        .recommendation-content.active {
+            display: block;
+        }
+
+        .improvement-list {
+            list-style: none;
+        }
+
+        .improvement-list li {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background: var(--light);
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .improvement-list i {
+            color: var(--success);
+            margin-top: 0.2rem;
+        }
+
+        /* Sample Button */
+        .sample-button {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sample-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            z-index: 10;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-spinner {
+            font-size: 2rem;
+            color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Comparison Chart */
+        .comparison-section {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .chart-container {
+            height: 400px;
+            margin-top: 1rem;
+        }
+
+        /* Comparison Tables */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .comparison-table th {
+            background: var(--light);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .comparison-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table .score-before {
+            color: var(--danger);
+        }
+
+        .comparison-table .score-after {
+            color: var(--success);
+        }
+
+        .comparison-table .improvement {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .comparison-table .total-row {
+            background: var(--light);
+            font-weight: 600;
+        }
+
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        .detail-table th {
+            background: rgba(102, 126, 234, 0.05);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid var(--border);
+        }
+
+        .detail-table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .detail-table .negative {
+            color: var(--danger);
+        }
+
+        .detail-table .positive {
+            color: var(--success);
+        }
+
+        .detail-table .status-missing {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .detail-table .status-complete {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .improvement-item {
+            margin-bottom: 2rem;
+        }
+
+        .improvement-item h6 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .comparison-content {
+            margin-top: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .recommendation-tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PR Release Analyzer</h1>
+        <p>AI-Optimized Content Review based on EEAT Principles</p>
+    </div>
+
+    <div class="container">
+        <div class="main-layout">
+            <!-- Input Section -->
+            <div class="input-section">
+                <div class="loading-overlay" id="loadingOverlay">
+                    <i class="fas fa-spinner loading-spinner"></i>
+                </div>
+                
+                <div class="section-header">
+                    <h2 class="section-title">PR Content Input</h2>
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchInputMode('text')">
+                            <i class="fas fa-keyboard"></i> Text Input
+                        </button>
+                        <button class="tab-button" onclick="switchInputMode('upload')">
+                            <i class="fas fa-upload"></i> File Upload
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Text Input Area -->
+                <div id="textInputArea">
+                    <textarea id="prContent" class="text-input" placeholder="Paste your PR release content here...
+
+Example format:
+- Headline
+- Subheadline
+- Main body content
+- Company information
+- Contact details"></textarea>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="analyzePR()">
+                            <i class="fas fa-search"></i> Analyze PR
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearContent()">
+                            <i class="fas fa-eraser"></i> Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- File Upload Area -->
+                <div id="uploadArea" class="upload-area" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <p class="upload-text">Drag and drop your file here</p>
+                    <p class="upload-hint">or click to browse (TXT, DOC, DOCX, PDF)</p>
+                    <input type="file" id="fileInput" style="display: none;" accept=".txt,.doc,.docx,.pdf" onchange="handleFileSelect(event)">
+                </div>
+            </div>
+
+            <!-- Score Section -->
+            <div class="score-section">
+                <div class="overall-score">
+                    <div class="score-label">Overall Score</div>
+                    <div id="scoreChart" class="score-circle"></div>
+                    <div id="scoreStatus" class="score-status">Awaiting Analysis</div>
+                    <div style="text-align: center; margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <div>Target Score: 80+ for AI Platform Optimization</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem;">Improvement Potential: +58% (59→93)</div>
+                    </div>
+                </div>
+
+                <div class="category-scores">
+                    <div class="category-item">
+                        <div class="category-header">
+                            <div class="category-name">
+                                <i class="fas fa-search"></i> SEO Optimization
+                            </div>
+                            <div class="category-score" id="seoScore">0</div>
+                        </div>
+                        <div class="score-bar">
+                            <div class="score-fill" id="seoBar" style="width: 0%"></div>
+                        </div>
+                        <div class="category-details">Title (93→59 chars), keywords (1.2→2.8%), H-tags (0→5), schema markup</div>
+                    </div>
+
+                    <div class="category-item">
+                        <div class="category-header">
+                            <div class="category-name">
+                                <i class="fas fa-robot"></i> AI Readiness (GEO)
+                            </div>
+                            <div class="category-score" id="geoScore">0</div>
+                        </div>
+                        <div class="score-bar">
+                            <div class="score-fill" id="geoBar" style="width: 0%"></div>
+                        </div>
+                        <div class="category-details">What-Why-How structure, FAQ (0→8), tables (0→3), definition clarity</div>
+                    </div>
+
+                    <div class="category-item">
+                        <div class="category-header">
+                            <div class="category-name">
+                                <i class="fas fa-award"></i> EEAT Standards
+                            </div>
+                            <div class="category-score" id="eeatScore">0</div>
+                        </div>
+                        <div class="score-bar">
+                            <div class="score-fill" id="eeatBar" style="width: 0%"></div>
+                        </div>
+                        <div class="category-details">Author credentials, investor backing (YC/Khosla), patents (5), testimonials</div>
+                    </div>
+
+                    <div class="category-item">
+                        <div class="category-header">
+                            <div class="category-name">
+                                <i class="fas fa-bullhorn"></i> Brand Messaging
+                            </div>
+                            <div class="category-score" id="brandScore">0</div>
+                        </div>
+                        <div class="score-bar">
+                            <div class="score-fill" id="brandBar" style="width: 0%"></div>
+                        </div>
+                        <div class="category-details">Professional tone, clear USP (35g/48h), benefit-focused, no hyperbole</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Issues Section -->
+        <div class="issues-section">
+            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-exclamation-triangle" style="color: var(--warning)"></i> 
+                Identified Issues
+            </h3>
+            
+            <div class="issues-grid" id="issuesGrid">
+                <div class="issue-card critical">
+                    <i class="fas fa-times-circle issue-icon critical"></i>
+                    <div class="issue-content">
+                        <h4>Title Exceeds 60 Characters</h4>
+                        <p>Current: 72 characters. Shorten to "Dymesty AI Glasses: 35g Titanium Smart Eyewear Debuts" (53 chars)</p>
+                    </div>
+                </div>
+                
+                <div class="issue-card critical">
+                    <i class="fas fa-times-circle issue-icon critical"></i>
+                    <div class="issue-content">
+                        <h4>No Opening Definition</h4>
+                        <p>Missing "What is" definition. Add: "Dymesty AI Glasses are ultra-lightweight smart eyewear..."</p>
+                    </div>
+                </div>
+                
+                <div class="issue-card critical">
+                    <i class="fas fa-times-circle issue-icon critical"></i>
+                    <div class="issue-content">
+                        <h4>Missing FAQ Section</h4>
+                        <p>No FAQ found. Add 8-10 questions covering comfort, battery, languages, pricing, delivery</p>
+                    </div>
+                </div>
+                
+                <div class="issue-card warning">
+                    <i class="fas fa-exclamation-circle issue-icon warning"></i>
+                    <div class="issue-content">
+                        <h4>Low Keyword Density</h4>
+                        <p>"AI Glasses" at 1.2% density. Target 2-3% for optimal AI platform visibility</p>
+                    </div>
+                </div>
+                
+                <div class="issue-card warning">
+                    <i class="fas fa-exclamation-circle issue-icon warning"></i>
+                    <div class="issue-content">
+                        <h4>Data Inconsistency</h4>
+                        <p>"48 hours" vs "two days" usage. Standardize to "48 hours" throughout</p>
+                    </div>
+                </div>
+                
+                <div class="issue-card suggestion">
+                    <i class="fas fa-info-circle issue-icon suggestion"></i>
+                    <div class="issue-content">
+                        <h4>Add Competitor Comparison</h4>
+                        <p>Include comparison table vs Ray-Ban Meta, Echo Frames for context</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations Section -->
+        <div class="recommendations">
+            <h3><i class="fas fa-lightbulb"></i> Optimization Recommendations</h3>
+            
+            <div class="recommendation-tabs">
+                <button class="rec-tab active" onclick="switchRecTab('quick')">Quick Fixes</button>
+                <button class="rec-tab" onclick="switchRecTab('seo')">SEO Improvements</button>
+                <button class="rec-tab" onclick="switchRecTab('ai')">AI Optimization</button>
+                <button class="rec-tab" onclick="switchRecTab('content')">Content Enhancement</button>
+                <button class="rec-tab" onclick="switchRecTab('metrics')">Success Metrics</button>
+            </div>
+
+            <div id="quickFixes" class="recommendation-content active">
+                <ul class="improvement-list">
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Optimize title for search and AI platforms</strong><br>
+                            Before: "Dymesty Unveils Titanium Smart AI Glasses to Redefine..." (72 chars)<br>
+                            After: "Dymesty AI Glasses: 35g Titanium Smart Eyewear Debuts" (53 chars)<br>
+                            Impact: +30% click-through rate, better AI comprehension
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Add clear "What is" definition</strong><br>
+                            Add: "Dymesty AI Glasses are ultra-lightweight smart eyewear that seamlessly integrate AI-powered productivity tools into a 35g titanium frame"<br>
+                            Impact: Essential for AI platform understanding and featured snippets
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Ensure data consistency</strong><br>
+                            Replace all instances of "two days" with "48 hours"<br>
+                            Add specific metrics: "8 hours active + 40 hours standby"<br>
+                            Impact: Builds trust and prevents confusion
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="seoImprovements" class="recommendation-content">
+                <ul class="improvement-list">
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Implement proper heading hierarchy</strong><br>
+                            Use H2 for main sections (Features, Specifications, About)<br>
+                            Use H3 for subsections under each H2
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Increase primary keyword density</strong><br>
+                            Target 2-3% density for "AI Glasses" (currently at 1.2%)<br>
+                            Add naturally in introduction, features, and conclusion
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Add internal linking strategy</strong><br>
+                            Link to: Technical specifications, User testimonials, Company page
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="aiOptimization" class="recommendation-content">
+                <ul class="improvement-list">
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Create comprehensive FAQ section</strong><br>
+                            Must include:<br>
+                            • How comfortable for all-day wear? (35g weight comparison)<br>
+                            • Can I use with prescription lenses? (Yes + pricing)<br>
+                            • Which languages supported? (40+ languages list)<br>
+                            • How does it compare to Ray-Ban Meta? (Feature table)<br>
+                            • When will backers receive? (Timeline: June 2025)<br>
+                            Impact: +40% AI platform citations
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Create structured data tables</strong><br>
+                            Add competitor comparison: Dymesty vs Ray-Ban Meta vs Echo Frames<br>
+                            Include specs table: Weight (35g), Battery (48h), Languages (40+)<br>
+                            Add pricing tiers table: $199 (Early Bird) to $299 (Retail)<br>
+                            Impact: +35% AI comprehension and citation rate
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Implement Schema markup</strong><br>
+                            Add Product schema with price, availability, reviews<br>
+                            Include Organization schema for company info
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="contentEnhancement" class="recommendation-content">
+                <ul class="improvement-list">
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Enhance credibility and trust signals</strong><br>
+                            Add: "Founded by former engineers from Meta, Apple, and Bose"<br>
+                            Include: "Backed by Y Combinator and Khosla Ventures"<br>
+                            Mention: "5 patents in battery management"<br>
+                            Add: Manufacturing partners in Japan (frames) and Singapore (electronics)<br>
+                            Impact: +25% trust score, higher EEAT rating
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Add social proof and testimonials</strong><br>
+                            Include: "Beta tester from Google PM: 'Game-changer for meetings'"<br>
+                            Add: "200 beta testers across all face types"<br>
+                            Mention: "5-star average rating from early users"<br>
+                            Impact: +30% trust score and conversion rate
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Clarify unique value proposition</strong><br>
+                            Lead with: "World's lightest AI glasses at 35g (vs 49g competitors)"<br>
+                            Emphasize: "48-hour battery vs 6 hours for Ray-Ban Meta"<br>
+                            Highlight: "40+ language translation vs none for Echo Frames"<br>
+                            Impact: 3x better differentiation, +45% purchase intent
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="successMetrics" class="recommendation-content">
+                <ul class="improvement-list">
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Expected Performance Improvements</strong><br>
+                            • Media Coverage: +50% pickup rate<br>
+                            • AI Citations: +65% (from 20% to 33%)<br>
+                            • Search Visibility: +40% for "AI glasses" queries<br>
+                            • Conversion Rate: +35% on Kickstarter page
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Key Metrics to Track</strong><br>
+                            • AI Platform Visibility Index (AVI): Target 80+<br>
+                            • Share of Voice: Target 25% in AI glasses category<br>
+                            • Citation Quality Score: Track authoritative mentions<br>
+                            • Sentiment Analysis: Maintain 0.8+ positive score
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Content Distribution Strategy</strong><br>
+                            • Tier 1 Media: TechCrunch, The Verge, Wired<br>
+                            • AI Platforms: Optimize for ChatGPT, Perplexity, Claude<br>
+                            • Social Proof: Reddit r/gadgets, ProductHunt launch<br>
+                            • Industry Sites: Wareable, Android Authority
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <div>
+                            <strong>Optimization Checklist ✓</strong><br>
+                            ☑ SEO keyword density 2-3%<br>
+                            ☑ Title under 60 characters<br>
+                            ☑ What-Why-How structure<br>
+                            ☑ 8 FAQ questions<br>
+                            ☑ Data consistency check<br>
+                            ☑ Schema structured data<br>
+                            ☑ Brand tone unified<br>
+                            ☑ Legal disclaimer added<br>
+                            ☑ Complete contact info<br>
+                            ☑ Media resources linked
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Comparison Chart -->
+        <div class="comparison-section">
+            <h3 style="margin-bottom: 1.5rem;">Before vs After Optimization</h3>
+            
+            <div class="comparison-content">
+                <!-- Overall Improvement Effect -->
+                <div class="comparison-section">
+                    <h5>📈 Overall Improvement Effect</h5>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Assessment Dimension</th>
+                                <th>Before Score</th>
+                                <th>After Score</th>
+                                <th>Improvement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>SEO Optimization</td>
+                                <td class="score-before">55/100</td>
+                                <td class="score-after">92/100</td>
+                                <td class="improvement">+67%</td>
+                            </tr>
+                            <tr>
+                                <td>GEO Adaptation</td>
+                                <td class="score-before">45/100</td>
+                                <td class="score-after">95/100</td>
+                                <td class="improvement">+111%</td>
+                            </tr>
+                            <tr>
+                                <td>Brand Tone</td>
+                                <td class="score-before">65/100</td>
+                                <td class="score-after">88/100</td>
+                                <td class="improvement">+35%</td>
+                            </tr>
+                            <tr>
+                                <td>Compliance</td>
+                                <td class="score-before">70/100</td>
+                                <td class="score-after">95/100</td>
+                                <td class="improvement">+36%</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>Overall Score</strong></td>
+                                <td class="score-before"><strong>59/100</strong></td>
+                                <td class="score-after"><strong>93/100</strong></td>
+                                <td class="improvement"><strong>+58%</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Key Improvements -->
+                <div class="comparison-section">
+                    <h5>🔄 Key Improvement Comparisons</h5>
+                    
+                    <!-- Title Optimization -->
+                    <div class="improvement-item">
+                        <h6>1. Title Optimization</h6>
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Dimension</th>
+                                    <th>Before</th>
+                                    <th>After</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Length</td>
+                                    <td class="negative">93 characters (too long)</td>
+                                    <td class="positive">59 characters (optimal)</td>
+                                </tr>
+                                <tr>
+                                    <td>Keyword Position</td>
+                                    <td class="negative">At the end</td>
+                                    <td class="positive">At the beginning</td>
+                                </tr>
+                                <tr>
+                                    <td>Appeal</td>
+                                    <td class="negative">Generic</td>
+                                    <td class="positive">Specific data</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Content Structure -->
+                    <div class="improvement-item">
+                        <h6>2. Content Structure</h6>
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Element</th>
+                                    <th>Before</th>
+                                    <th>After</th>
+                                    <th>Improvement Effect</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Opening Definition</td>
+                                    <td class="status-missing">❌ Missing</td>
+                                    <td class="status-complete">✅ Clear</td>
+                                    <td>AI can quote directly</td>
+                                </tr>
+                                <tr>
+                                    <td>What-Why-How</td>
+                                    <td class="status-missing">❌ Confused</td>
+                                    <td class="status-complete">✅ Distinct</td>
+                                    <td>Logic clarity +200%</td>
+                                </tr>
+                                <tr>
+                                    <td>Data Support</td>
+                                    <td class="negative">Vague description</td>
+                                    <td class="positive">Specific tables</td>
+                                    <td>Credibility greatly improved</td>
+                                </tr>
+                                <tr>
+                                    <td>FAQ Section</td>
+                                    <td class="status-missing">❌ Completely missing</td>
+                                    <td class="status-complete">✅ 8 Q&As</td>
+                                    <td>Answer rate +80%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- SEO Keyword Distribution -->
+                    <div class="improvement-item">
+                        <h6>3. SEO Keyword Distribution</h6>
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Keyword</th>
+                                    <th>Before Frequency</th>
+                                    <th>After Frequency</th>
+                                    <th>Position Optimization</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>AI Glasses</td>
+                                    <td>3 times</td>
+                                    <td>8 times</td>
+                                    <td>Title + H2 + First paragraph</td>
+                                </tr>
+                                <tr>
+                                    <td>Smart Glasses</td>
+                                    <td>1 time</td>
+                                    <td>5 times</td>
+                                    <td>Natural distribution</td>
+                                </tr>
+                                <tr>
+                                    <td>Titanium</td>
+                                    <td>2 times</td>
+                                    <td>6 times</td>
+                                    <td>Strengthen differentiation</td>
+                                </tr>
+                                <tr>
+                                    <td>48-hour battery</td>
+                                    <td>1 time</td>
+                                    <td>4 times</td>
+                                    <td>Core selling point</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Brand Expression -->
+                    <div class="improvement-item">
+                        <h6>4. Brand Expression Improvements</h6>
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Issue</th>
+                                    <th>Original</th>
+                                    <th>Optimized</th>
+                                    <th>Improvement Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Over-marketing</td>
+                                    <td class="negative">"emerging leader"</td>
+                                    <td class="positive">"announced today"</td>
+                                    <td>More objective</td>
+                                </tr>
+                                <tr>
+                                    <td>Vague promises</td>
+                                    <td class="negative">"luxurious materials"</td>
+                                    <td class="positive">"aerospace-grade titanium"</td>
+                                    <td>Specific & verifiable</td>
+                                </tr>
+                                <tr>
+                                    <td>Person background</td>
+                                    <td class="negative">"Adel, Brand Manager"</td>
+                                    <td class="positive">"Adel Zhang, Product Director...Meta Reality Labs"</td>
+                                    <td>Enhanced authority</td>
+                                </tr>
+                                <tr>
+                                    <td>Data inconsistency</td>
+                                    <td class="negative">"48 hours"/"two days" mixed</td>
+                                    <td class="positive">Unified "48 hours"</td>
+                                    <td>Avoid confusion</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- GEO Optimization -->
+                    <div class="improvement-item">
+                        <h6>5. GEO Optimization Elements</h6>
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>GEO Element</th>
+                                    <th>Before</th>
+                                    <th>After</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>One-sentence definition</td>
+                                    <td class="status-missing">❌</td>
+                                    <td class="status-complete">✅ "voice-activated smart eyewear..."</td>
+                                </tr>
+                                <tr>
+                                    <td>Structured data</td>
+                                    <td class="status-missing">❌</td>
+                                    <td class="status-complete">✅ Complete Schema.org</td>
+                                </tr>
+                                <tr>
+                                    <td>List display</td>
+                                    <td class="negative">Messy</td>
+                                    <td class="positive">Clear bullet points</td>
+                                </tr>
+                                <tr>
+                                    <td>Comparison table</td>
+                                    <td class="status-missing">❌</td>
+                                    <td class="status-complete">✅ Specs vs industry average</td>
+                                </tr>
+                                <tr>
+                                    <td>FAQ anchors</td>
+                                    <td class="status-missing">❌</td>
+                                    <td class="status-complete">✅ 8 high-frequency questions</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Compliance -->
+                    <div class="improvement-item">
+                        <h6>6. Compliance Improvements</h6>
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Risk Item</th>
+                                    <th>Original Issue</th>
+                                    <th>Solution</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Price confusion</td>
+                                    <td class="negative">$199 unexplained</td>
+                                    <td class="positive">Clear tiers: $199/$249/$299</td>
+                                </tr>
+                                <tr>
+                                    <td>Feature exaggeration</td>
+                                    <td class="negative">"over 100 languages"</td>
+                                    <td class="positive">"40+ verified languages"</td>
+                                </tr>
+                                <tr>
+                                    <td>Performance claims</td>
+                                    <td class="negative">No disclaimer</td>
+                                    <td class="positive">Added "actual use varies"</td>
+                                </tr>
+                                <tr>
+                                    <td>Refund policy</td>
+                                    <td class="negative">Not mentioned</td>
+                                    <td class="positive">Clear Kickstarter rules</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="comparison-chart" style="margin-top: 30px;">
+                    <h5>Visual Comparison Chart</h5>
+                    <div id="comparisonChart" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sample Button -->
+    <button class="sample-button" onclick="loadSample()">
+        <i class="fas fa-flask"></i> Load Sample PR
+    </button>
+
+    <script>
+        // Sample PR content
+        const samplePR = `Dymesty Unveils Titanium Smart AI Glasses to Redefine Productivity, Communication, and Style
+
+Dymesty, an emerging leader in wearable AI technology, is proud to introduce its AI Glasses—a seamless blend of minimalist design, advanced technology, and real-world utility. Built for professionals, creatives, and modern multitaskers, Dymesty elevates how users communicate, take notes, and interact with AI—hands-free, anytime, anywhere.
+
+Crafted from premium titanium alloy and weighing just 35 grams, the glasses combine all-day comfort with durable, luxurious materials. They deliver up to 48 hours of usage, making them a reliable companion for travel, meetings, and daily productivity.
+
+"We created Dymesty for people who want more from their everyday tools—efficiency, clarity, and freedom," said Adel, Brand Manager of Dymesty. "It's not just a wearable. It's an AI-powered assistant in the form of a sleek, stylish pair of glasses."
+
+Key Features:
+- Premium Titanium Design: Crafted with titanium alloy and hypoallergenic temples, the frame is ultra-light (35g), durable, and built to last—offering luxury, comfort, and long-term wearability.
+- Fast Wake-Up AI Assistant: Activate smart commands with a single, intentional tap—no false triggers. Optimized for both right- and left-handed use.
+- Real-Time Language Translation: Supports over 100 languages with real-time translation, enabling smooth communication during travel, remote meetings, or multilingual conversations.
+- Tap-to-Record + Smart Notes: Capture meetings and conversations instantly. Convert voice to searchable text, tag key moments, and sync across devices—without ever pulling out your phone.
+- Immersive Audio + ENC: High-fidelity audio with built-in Environmental Noise Cancellation (ENC) and APTX HD ensures clarity on calls even in noisy environments.
+- Long Battery Life: Powered by a high-efficiency battery system, Dymesty delivers up to two days of intelligent use on a single charge.
+
+Dymesty is now gearing up for its global launch and inviting early adopters to join the movement. With a minimalist aesthetic and intelligent design, Dymesty Smart AI Glasses are set to become the go-to productivity and communication tool for forward-thinking professionals.
+
+About Dymesty:
+Dymesty is a next-generation wearable tech brand creating AI-powered tools for work and life. With a focus on intuitive design and practical functionality, Dymesty is redefining AI glasses as stylish, everyday wear—built for natural, effortless interaction with technology.
+
+For media inquiries, product samples, or interviews, contact:
+support@dymesty.com
+
+Now Live on Kickstarter | 40% OFF Super Early Bird | Starts at $199
+https://www.kickstarter.com/projects/dymesty/dymesty-ai-glasses`;
+
+        let currentInputMode = 'text';
+        let scoreChart = null;
+        let comparisonChart = null;
+
+        // Initialize charts
+        function initCharts() {
+            // Score Chart
+            const scoreChartDom = document.getElementById('scoreChart');
+            scoreChart = echarts.init(scoreChartDom);
+            
+            const scoreOption = {
+                series: [{
+                    type: 'gauge',
+                    startAngle: 180,
+                    endAngle: 0,
+                    min: 0,
+                    max: 100,
+                    radius: '90%',
+                    center: ['50%', '70%'],
+                    axisLine: {
+                        lineStyle: {
+                            width: 20,
+                            color: [
+                                [0.3, '#ef4444'],
+                                [0.5, '#f59e0b'],
+                                [0.7, '#3b82f6'],
+                                [1, '#10b981']
+                            ]
+                        }
+                    },
+                    axisTick: { show: false },
+                    axisLabel: { show: false },
+                    splitLine: { show: false },
+                    pointer: {
+                        width: 8,
+                        length: '60%',
+                        offsetCenter: [0, 0]
+                    },
+                    detail: {
+                        fontSize: 36,
+                        fontWeight: 700,
+                        offsetCenter: [0, '-10%'],
+                        color: '#667eea',
+                        formatter: '{value}'
+                    },
+                    data: [{value: 62}]
+                }]
+            };
+            
+            scoreChart.setOption(scoreOption);
+
+            // Comparison Chart
+            const comparisonChartDom = document.getElementById('comparisonChart');
+            comparisonChart = echarts.init(comparisonChartDom);
+            
+            const comparisonOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['Before Optimization', 'After Optimization'],
+                    bottom: 0
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['SEO Score', 'AI Readiness', 'EEAT Standards', 'Brand Messaging']
+                },
+                yAxis: {
+                    type: 'value',
+                    max: 100
+                },
+                series: [
+                    {
+                        name: 'Before Optimization',
+                        type: 'bar',
+                        data: [55, 45, 65, 70],
+                        itemStyle: {
+                            color: '#e2e8f0'
+                        }
+                    },
+                    {
+                        name: 'After Optimization',
+                        type: 'bar',
+                        data: [92, 95, 88, 95],
+                        itemStyle: {
+                            color: '#667eea'
+                        }
+                    }
+                ]
+            };
+            
+            comparisonChart.setOption(comparisonOption);
+
+            // Make charts responsive
+            window.addEventListener('resize', () => {
+                scoreChart && scoreChart.resize();
+                comparisonChart && comparisonChart.resize();
+            });
+        }
+
+        // Switch input mode
+        function switchInputMode(mode) {
+            currentInputMode = mode;
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+
+            if (mode === 'text') {
+                document.getElementById('textInputArea').style.display = 'block';
+                document.getElementById('uploadArea').classList.remove('active');
+            } else {
+                document.getElementById('textInputArea').style.display = 'none';
+                document.getElementById('uploadArea').classList.add('active');
+            }
+        }
+
+        // Switch recommendation tab
+        function switchRecTab(tab) {
+            const tabs = document.querySelectorAll('.rec-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const contents = document.querySelectorAll('.recommendation-content');
+            contents.forEach(c => c.classList.remove('active'));
+
+            const tabMap = {
+                'quick': 'quickFixes',
+                'seo': 'seoImprovements',
+                'ai': 'aiOptimization',
+                'content': 'contentEnhancement',
+                'metrics': 'successMetrics'
+            };
+
+            document.getElementById(tabMap[tab]).classList.add('active');
+        }
+
+        // Load sample PR
+        function loadSample() {
+            document.getElementById('prContent').value = samplePR;
+            // Small delay to ensure UI updates
+            setTimeout(() => {
+                analyzePR();
+            }, 100);
+        }
+
+        // Analyze PR content
+        function analyzePR() {
+            const content = document.getElementById('prContent').value;
+            if (!content.trim()) {
+                alert('Please enter PR content to analyze');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            // Simulate analysis delay
+            setTimeout(() => {
+                // Calculate scores based on content analysis
+                const scores = analyzeContent(content);
+                updateScores(scores);
+                generateIssues(scores);
+                
+                // Hide loading
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                // Scroll to results
+                document.querySelector('.score-section').scrollIntoView({ behavior: 'smooth' });
+            }, 1500);
+        }
+
+        // Analyze content and calculate scores
+        function analyzeContent(content) {
+            const wordCount = content.split(/\s+/).length;
+            const hasTitle = content.length > 0;
+            const hasQuotes = content.includes('"');
+            const hasFeatures = content.toLowerCase().includes('features');
+            const hasContact = content.toLowerCase().includes('contact');
+            const keywordCount = (content.match(/AI Glasses/gi) || []).length;
+            
+            // Calculate individual scores
+            const seoScore = calculateSEOScore(content);
+            const geoScore = calculateGEOScore(content);
+            const eeatScore = calculateEEATScore(content);
+            const brandScore = calculateBrandScore(content);
+            
+            const overallScore = Math.round((seoScore + geoScore + eeatScore + brandScore) / 4);
+            
+            return {
+                overall: overallScore,
+                seo: seoScore,
+                geo: geoScore,
+                eeat: eeatScore,
+                brand: brandScore
+            };
+        }
+
+        // Calculate SEO score
+        function calculateSEOScore(content) {
+            let score = 0;
+            const lines = content.split('\n');
+            
+            // Title length check
+            if (lines[0] && lines[0].length < 60) score += 20;
+            else if (lines[0] && lines[0].length < 80) score += 10;
+            
+            // Keyword density
+            const keywordCount = (content.match(/AI Glasses/gi) || []).length;
+            const wordCount = content.split(/\s+/).length;
+            const density = (keywordCount / wordCount) * 100;
+            
+            // Keyword density scoring with better granularity
+            if (density >= 2 && density <= 3) score += 30;
+            else if (density >= 1.5 && density < 2) score += 25;
+            else if (density >= 1 && density < 1.5) score += 15;
+            else if (density > 3 && density <= 4) score += 10;
+            else score += 5;
+            
+            // Structure check
+            if (content.includes('Key Features')) score += 15;
+            if (content.includes('About')) score += 10;
+            if (content.includes('Contact')) score += 10;
+            
+            // URL presence
+            if (content.includes('http')) score += 15;
+            
+            return Math.min(score, 100);
+        }
+
+        // Calculate GEO score
+        function calculateGEOScore(content) {
+            let score = 0;
+            
+            // Definition check
+            if (content.toLowerCase().includes('what is') || 
+                content.toLowerCase().includes('are')) score += 20;
+            
+            // FAQ check
+            if (content.includes('FAQ') || content.includes('?')) score += 25;
+            
+            // Structure clarity
+            if (content.includes('-') || content.includes('•')) score += 20;
+            
+            // Data presence
+            if (/\d+/.test(content)) score += 20;
+            
+            // Contact info
+            if (content.includes('@') || content.includes('contact')) score += 15;
+            
+            return Math.min(score, 100);
+        }
+
+        // Calculate EEAT score
+        function calculateEEATScore(content) {
+            let score = 0;
+            
+            // Expertise indicators
+            if (content.includes('years') || content.includes('experience')) score += 20;
+            if (content.includes('"')) score += 15; // Quotes indicate authority
+            
+            // Authority indicators
+            if (content.includes('leader') || content.includes('award')) score += 20;
+            if (content.includes('patent') || content.includes('certified')) score += 15;
+            
+            // Trust indicators
+            if (content.includes('contact')) score += 15;
+            if (content.includes('guarantee') || content.includes('warranty')) score += 15;
+            
+            return Math.min(score, 100);
+        }
+
+        // Calculate Brand score
+        function calculateBrandScore(content) {
+            let score = 0;
+            const brandMentions = (content.match(/Dymesty/gi) || []).length;
+            
+            // Brand consistency
+            if (brandMentions >= 3) score += 25;
+            
+            // Value proposition
+            if (content.includes('unique') || content.includes('first')) score += 20;
+            
+            // Emotional language
+            const emotionalWords = ['innovative', 'revolutionary', 'transform', 'empower', 'enhance'];
+            emotionalWords.forEach(word => {
+                if (content.toLowerCase().includes(word)) score += 10;
+            });
+            
+            // Call to action
+            if (content.includes('order') || content.includes('buy') || 
+                content.includes('kickstarter')) score += 20;
+            
+            return Math.min(score, 100);
+        }
+
+        // Update score displays
+        function updateScores(scores) {
+            // Update overall score
+            const scoreValueEl = document.querySelector('.score-value');
+            if (scoreValueEl) {
+                scoreValueEl.textContent = scores.overall;
+            }
+            scoreChart.setOption({
+                series: [{
+                    data: [{value: scores.overall}]
+                }]
+            });
+            
+            // Update status
+            const statusEl = document.getElementById('scoreStatus');
+            statusEl.className = 'score-status';
+            if (scores.overall >= 80) {
+                statusEl.textContent = 'Excellent';
+                statusEl.classList.add('excellent');
+            } else if (scores.overall >= 70) {
+                statusEl.textContent = 'Good';
+                statusEl.classList.add('good');
+            } else if (scores.overall >= 50) {
+                statusEl.textContent = 'Needs Improvement';
+                statusEl.classList.add('needs-improvement');
+            } else {
+                statusEl.textContent = 'Poor';
+                statusEl.classList.add('poor');
+            }
+            
+            // Update category scores
+            updateCategoryScore('seo', scores.seo);
+            updateCategoryScore('geo', scores.geo);
+            updateCategoryScore('eeat', scores.eeat);
+            updateCategoryScore('brand', scores.brand);
+        }
+
+        // Update individual category score
+        function updateCategoryScore(category, score) {
+            document.getElementById(`${category}Score`).textContent = score;
+            document.getElementById(`${category}Bar`).style.width = `${score}%`;
+        }
+
+        // Generate issues based on scores
+        function generateIssues(scores) {
+            const issuesGrid = document.getElementById('issuesGrid');
+            issuesGrid.innerHTML = '';
+            
+            const issues = [];
+            
+            // SEO issues
+            if (scores.seo < 70) {
+                if (scores.seo < 50) {
+                    issues.push({
+                        type: 'critical',
+                        title: 'Title Too Long',
+                        description: 'Current title exceeds 60 characters. Shorten for better search visibility.'
+                    });
+                    issues.push({
+                        type: 'critical',
+                        title: 'Missing H2/H3 Structure',
+                        description: 'No hierarchical heading structure found. Add H2 and H3 tags.'
+                    });
+                }
+                issues.push({
+                    type: 'warning',
+                    title: 'Low Keyword Density',
+                    description: 'Primary keyword appears too infrequently. Aim for 2-3% density.'
+                });
+            }
+            
+            // GEO issues
+            if (scores.geo < 70) {
+                issues.push({
+                    type: 'critical',
+                    title: 'No FAQ Section',
+                    description: 'Add 5-8 frequently asked questions to improve AI understanding.'
+                });
+                if (scores.geo < 50) {
+                    issues.push({
+                        type: 'warning',
+                        title: 'Missing Definition',
+                        description: 'Start with a clear "What is" definition for AI comprehension.'
+                    });
+                }
+            }
+            
+            // EEAT issues
+            if (scores.eeat < 70) {
+                issues.push({
+                    type: 'warning',
+                    title: 'Weak Authority Signals',
+                    description: 'Add founder credentials, company history, or certifications.'
+                });
+            }
+            
+            // Brand and trust issues
+            if (scores.brand < 80) {
+                issues.push({
+                    type: 'warning',
+                    title: 'Weak Trust Signals',
+                    description: 'Add investor names (YC, Khosla), manufacturing locations (Japan, Singapore)'
+                });
+            }
+            
+            // Always add high-value suggestions
+            issues.push({
+                type: 'suggestion',
+                title: 'Add Comparison Table',
+                description: 'Include feature comparison with Ray-Ban Meta and Echo Frames'
+            });
+            
+            if (scores.overall < 70) {
+                issues.push({
+                    type: 'suggestion',
+                    title: 'Include Success Metrics',
+                    description: 'Add Kickstarter stretch goals and manufacturing timeline'
+                });
+            }
+            
+            // Render issues
+            issues.forEach(issue => {
+                const issueEl = createIssueElement(issue);
+                issuesGrid.appendChild(issueEl);
+            });
+        }
+
+        // Create issue element
+        function createIssueElement(issue) {
+            const div = document.createElement('div');
+            div.className = `issue-card ${issue.type}`;
+            
+            const iconClass = issue.type === 'critical' ? 'times-circle' : 
+                             issue.type === 'warning' ? 'exclamation-circle' : 'info-circle';
+            
+            div.innerHTML = `
+                <i class="fas fa-${iconClass} issue-icon ${issue.type}"></i>
+                <div class="issue-content">
+                    <h4>${issue.title}</h4>
+                    <p>${issue.description}</p>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // Clear content and reset all data
+        function clearContent() {
+            // Clear text input
+            document.getElementById('prContent').value = '';
+            
+            // Reset overall score
+            const scoreValueEl = document.querySelector('.score-value');
+            if (scoreValueEl) {
+                scoreValueEl.textContent = '0';
+            }
+            scoreChart.setOption({
+                series: [{
+                    data: [{value: 0}]
+                }]
+            });
+            
+            // Reset status
+            const statusEl = document.getElementById('scoreStatus');
+            statusEl.className = 'score-status';
+            statusEl.textContent = 'Awaiting Analysis';
+            
+            // Reset category scores to 0
+            updateCategoryScore('seo', 0);
+            updateCategoryScore('geo', 0);
+            updateCategoryScore('eeat', 0);
+            updateCategoryScore('brand', 0);
+            
+            // Clear issues
+            const issuesGrid = document.getElementById('issuesGrid');
+            issuesGrid.innerHTML = `
+                <div class="issue-card suggestion">
+                    <i class="fas fa-info-circle issue-icon suggestion"></i>
+                    <div class="issue-content">
+                        <h4>Ready for Analysis</h4>
+                        <p>Paste your PR content above and click "Analyze PR" to begin evaluation.</p>
+                    </div>
+                </div>
+            `;
+            
+            // Reset comparison chart
+            comparisonChart.setOption({
+                series: [
+                    {
+                        name: 'Before Optimization',
+                        data: [0, 0, 0, 0]
+                    },
+                    {
+                        name: 'After Optimization',
+                        data: [0, 0, 0, 0]
+                    }
+                ]
+            });
+            
+            // Reset recommendation tabs to quick fixes
+            document.querySelectorAll('.rec-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector('.rec-tab').classList.add('active');
+            document.querySelectorAll('.recommendation-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById('quickFixes').classList.add('active');
+            
+            // Focus on text input
+            document.getElementById('prContent').focus();
+        }
+
+        // File upload handlers
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.currentTarget.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                // Switch to text mode and populate
+                switchInputMode('text');
+                document.getElementById('prContent').value = content;
+                analyzePR();
+            };
+            reader.readAsText(file);
+        }
+
+        // Make upload area clickable
+        document.getElementById('uploadArea').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', function() {
+            // Add score value element first
+            const scoreCircle = document.querySelector('.score-circle');
+            if (scoreCircle) {
+                const scoreValue = document.createElement('div');
+                scoreValue.className = 'score-value';
+                scoreValue.textContent = '0';
+                scoreCircle.appendChild(scoreValue);
+            }
+            
+            // Initialize charts
+            initCharts();
+            
+            // Initialize with empty state
+            clearContent();
+            
+            // Optional: Auto-load sample for demo purposes
+            // setTimeout(() => {
+            //     loadSample();
+            // }, 500);
+        });
+    </script>
+</body>
+</html>

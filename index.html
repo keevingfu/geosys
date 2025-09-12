@@ -6,6 +6,7 @@
     <title>Dymesty AI Glasses - Content Intelligence Center</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="js/api.js"></script>
     <script>
         // Authentication check
         (function() {
@@ -497,7 +498,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" onclick="loadPage('01a-geo-platform-Intr.html')">
+                            <a href="#" class="nav-link" onclick="loadPage('01b-platform-features.html')">
                                 <i class="fas fa-glasses"></i>
                                 <span>Product Features</span>
                             </a>
@@ -670,6 +671,12 @@
                                 <span>Advanced PR Analytics</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadPage('07g-pr-review-analyzer.html')">
+                                <i class="fas fa-check-double"></i>
+                                <span>PR Release Analyzer</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
 
@@ -680,12 +687,6 @@
                         <span>Monitoring</span>
                     </a>
                     <ul class="nav-submenu">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" onclick="loadPage('welcome')">
-                                <i class="fas fa-tachometer-alt"></i>
-                                <span>Monitoring Dashboard</span>
-                            </a>
-                        </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" onclick="loadPage('08a-realtime-monitoring.html')">
                                 <i class="fas fa-bolt"></i>
@@ -963,7 +964,12 @@
             // Display current user
             const currentUser = localStorage.getItem('currentUser');
             if (currentUser) {
-                document.getElementById('currentUserDisplay').textContent = currentUser;
+                try {
+                    const userObj = JSON.parse(currentUser);
+                    document.getElementById('currentUserDisplay').textContent = userObj.username || userObj.email;
+                } catch (e) {
+                    document.getElementById('currentUserDisplay').textContent = currentUser;
+                }
             }
             
             // Expand the first menu and load default page
