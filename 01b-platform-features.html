@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Features Overview - Dymesty AI Glasses Content Intelligence Center</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 1rem 2rem;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .nav-tab:hover {
+            color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .nav-tab i {
+            margin-right: 0.5rem;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card h2 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card h2 i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        }
+
+        /* Feature Box */
+        .feature-box {
+            padding: 1.5rem;
+            background: var(--light);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+        }
+
+        .feature-box:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .feature-box h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .feature-box p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Module Category */
+        .module-category {
+            margin-bottom: 2rem;
+        }
+
+        .module-category h3 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .module-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .module-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 1rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .module-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .module-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .module-content h4 {
+            color: var(--text-primary);
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .module-content p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Process Flow */
+        .process-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .process-step {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            position: relative;
+        }
+
+        .process-step::after {
+            content: '';
+            position: absolute;
+            top: 35px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary) 0%, var(--primary) 50%, transparent 50%);
+            background-size: 10px 2px;
+            background-repeat: repeat-x;
+        }
+
+        .process-step:last-child::after {
+            display: none;
+        }
+
+        .process-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .process-step h4 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .process-step p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Charts */
+        .chart-container {
+            height: 400px;
+            margin-top: 2rem;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+
+        .badge-primary {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .nav-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .nav-tab {
+                flex: 0 0 auto;
+                padding: 0.75rem 1.5rem;
+            }
+            
+            .process-flow {
+                flex-direction: column;
+            }
+            
+            .process-step::after {
+                display: none;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dymesty AI Glasses Content Intelligence Center</h1>
+        <p>Comprehensive Platform Features & Capabilities Overview</p>
+    </div>
+
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('overview')">
+                <i class="fas fa-globe"></i>Platform Overview
+            </button>
+            <button class="nav-tab" onclick="switchTab('business-flow')">
+                <i class="fas fa-project-diagram"></i>Business Flow
+            </button>
+            <button class="nav-tab" onclick="switchTab('data-flow')">
+                <i class="fas fa-database"></i>Data Flow
+            </button>
+            <button class="nav-tab" onclick="switchTab('modules')">
+                <i class="fas fa-th-large"></i>Module Hierarchy
+            </button>
+            <button class="nav-tab" onclick="switchTab('architecture')">
+                <i class="fas fa-sitemap"></i>Architecture
+            </button>
+        </div>
+
+        <!-- Tab Contents -->
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="card">
+                <h2><i class="fas fa-info-circle"></i>Platform Overview</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">6</div>
+                        <div class="stat-label">AI Platforms Supported</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">30+</div>
+                        <div class="stat-label">Functional Modules</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">10</div>
+                        <div class="stat-label">Module Categories</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Real-time Monitoring</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="feature-box">
+                        <h3>AI Platform Optimization</h3>
+                        <p>Optimize content presence across ChatGPT, Perplexity, Claude, Gemini, You.com, and Bing Chat for maximum visibility and engagement.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Content Intelligence</h3>
+                        <p>Advanced content management system with AI-specific optimization features, structured data management, and multi-platform orchestration.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Real-time Analytics</h3>
+                        <p>Comprehensive monitoring and analytics dashboard tracking brand performance, visibility metrics, and user engagement across all AI platforms.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Strategic Insights</h3>
+                        <p>Data-driven recommendations and optimization strategies based on AI platform behavior analysis and competitive intelligence.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-star"></i>Key Features</h2>
+                <div class="grid grid-3">
+                    <div class="feature-box">
+                        <h3>Content Creation Studio</h3>
+                        <p>Create and optimize content specifically for AI platform consumption with built-in best practices.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Knowledge Graph Visualization</h3>
+                        <p>Visualize how AI platforms understand and connect your brand information.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>PR Media Scoring</h3>
+                        <p>Evaluate and optimize PR content for maximum AI platform friendliness.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Competitor Analysis</h3>
+                        <p>Track and analyze competitor performance across AI platforms.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>User Journey Tracking</h3>
+                        <p>Understand how users interact with your brand through AI platforms.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Multi-channel Orchestration</h3>
+                        <p>Coordinate content publishing strategies across different AI platforms.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Flow Tab -->
+        <div id="business-flow" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-project-diagram"></i>Business Process Flow</h2>
+                
+                <div class="process-flow">
+                    <div class="process-step">
+                        <div class="process-icon"><i class="fas fa-diagnoses"></i></div>
+                        <h4>Diagnose</h4>
+                        <p>Analyze current AI platform presence and identify opportunities</p>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-icon"><i class="fas fa-chess"></i></div>
+                        <h4>Strategize</h4>
+                        <p>Develop optimization strategies based on diagnostic insights</p>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-icon"><i class="fas fa-edit"></i></div>
+                        <h4>Create</h4>
+                        <p>Generate AI-optimized content and structured data</p>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-icon"><i class="fas fa-share-alt"></i></div>
+                        <h4>Orchestrate</h4>
+                        <p>Deploy content across multiple AI platforms</p>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-icon"><i class="fas fa-chart-line"></i></div>
+                        <h4>Monitor</h4>
+                        <p>Track performance and gather insights</p>
+                    </div>
+                </div>
+
+                <div id="businessFlowChart" class="chart-container"></div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-tasks"></i>Core Business Activities</h2>
+                <div class="grid grid-2">
+                    <div class="feature-box">
+                        <h3>1. Content Strategy Development</h3>
+                        <p>Analyze AI platform requirements, identify content gaps, and develop targeted content strategies for each platform.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>2. Content Production & Optimization</h3>
+                        <p>Create high-quality content optimized for AI comprehension, including FAQ development, knowledge base articles, and structured data.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>3. Multi-Platform Distribution</h3>
+                        <p>Coordinate content distribution across AI platforms, ensuring consistent messaging while adapting to platform-specific requirements.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>4. Performance Analysis</h3>
+                        <p>Monitor visibility metrics, analyze user queries, track citations, and measure overall brand presence across AI platforms.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Flow Tab -->
+        <div id="data-flow" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-database"></i>Data Flow Architecture</h2>
+                <div id="dataFlowChart" class="chart-container"></div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-stream"></i>Data Pipeline Components</h2>
+                <div class="grid grid-3">
+                    <div class="feature-box">
+                        <h3>Data Collection</h3>
+                        <p>Gather data from AI platforms, user interactions, competitive intelligence, and internal content systems.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Data Processing</h3>
+                        <p>Clean, normalize, and enrich data for analysis. Apply NLP and machine learning for insight extraction.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Data Storage</h3>
+                        <p>PostgreSQL database with specialized schemas for content, analytics, AI platform data, and user management.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Analytics Engine</h3>
+                        <p>Real-time analytics processing for visibility scores, performance metrics, and trend analysis.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Visualization Layer</h3>
+                        <p>Interactive dashboards and reports using ECharts for data visualization and insights presentation.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>API Integration</h3>
+                        <p>RESTful APIs for data exchange with external systems and AI platform integrations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modules Tab -->
+        <div id="modules" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-th-large"></i>Module Hierarchy</h2>
+                <div id="moduleHierarchyChart" class="chart-container"></div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-layer-group"></i>Detailed Module Categories</h2>
+                
+                <div class="module-category">
+                    <h3><span class="badge badge-primary">01</span> Platform Introduction</h3>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-info"></i></div>
+                            <div class="module-content">
+                                <h4>01a - Platform Introduction</h4>
+                                <p>Overview of AI platform optimization capabilities and value proposition</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-category">
+                    <h3><span class="badge badge-primary">02</span> Diagnostics & Strategy</h3>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-stethoscope"></i></div>
+                            <div class="module-content">
+                                <h4>02a - Channel Diagnostic</h4>
+                                <p>Analyze performance and opportunities across AI platforms</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-chess-knight"></i></div>
+                            <div class="module-content">
+                                <h4>02b - Strategy Development</h4>
+                                <p>Create optimization strategies based on diagnostic results</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-category">
+                    <h3><span class="badge badge-primary">03</span> Content Management</h3>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-book"></i></div>
+                            <div class="module-content">
+                                <h4>03a - Content Library</h4>
+                                <p>Content management best practices showcase</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-question-circle"></i></div>
+                            <div class="module-content">
+                                <h4>03a - Question Collector</h4>
+                                <p>Collect common user questions from AI platforms</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-pen-fancy"></i></div>
+                            <div class="module-content">
+                                <h4>03b - Asset Creation Studio</h4>
+                                <p>Create and edit AI-optimized content</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-folder-open"></i></div>
+                            <div class="module-content">
+                                <h4>03c - Asset Library Management</h4>
+                                <p>Manage all content resources and media files</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-category">
+                    <h3><span class="badge badge-primary">04</span> Content Orchestration</h3>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-network-wired"></i></div>
+                            <div class="module-content">
+                                <h4>04a - Orchestration Center</h4>
+                                <p>Coordinate content publishing across AI platforms</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-category">
+                    <h3><span class="badge badge-primary">05</span> Channel Configuration</h3>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-cog"></i></div>
+                            <div class="module-content">
+                                <h4>05a - Config Manager</h4>
+                                <p>Manage AI platform API configurations and settings</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-category">
+                    <h3><span class="badge badge-primary">06</span> User Journey</h3>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-route"></i></div>
+                            <div class="module-content">
+                                <h4>06a - Journey Tracker</h4>
+                                <p>Analyze user interaction paths on AI platforms</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-category">
+                    <h3><span class="badge badge-success">07</span> PR & Media Optimization</h3>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-star-half-alt"></i></div>
+                            <div class="module-content">
+                                <h4>07a - PR Media Scoring</h4>
+                                <p>Evaluate media content AI platform friendliness</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-bullhorn"></i></div>
+                            <div class="module-content">
+                                <h4>07b - PR Optimization</h4>
+                                <p>Optimize PR articles for AI platform visibility</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-key"></i></div>
+                            <div class="module-content">
+                                <h4>07c - Keyword Strategy</h4>
+                                <p>Competitive keyword strategy analysis</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-code"></i></div>
+                            <div class="module-content">
+                                <h4>07d - JSON-LD Strategy</h4>
+                                <p>Structured data management for AI understanding</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-binoculars"></i></div>
+                            <div class="module-content">
+                                <h4>07e - Competitor Analysis</h4>
+                                <p>Analyze competitor AI platform performance</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-rocket"></i></div>
+                            <div class="module-content">
+                                <h4>07f - Advanced PR Optimization</h4>
+                                <p>Complex optimization strategies and tools</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-category">
+                    <h3><span class="badge badge-success">08</span> Monitoring & Analytics</h3>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            <div class="module-content">
+                                <h4>08a - Real-time Monitoring</h4>
+                                <p>Live AI platform performance tracking</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-award"></i></div>
+                            <div class="module-content">
+                                <h4>08b - Brand Performance</h4>
+                                <p>Overall brand performance analysis</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-eye"></i></div>
+                            <div class="module-content">
+                                <h4>08c - Visibility Analytics</h4>
+                                <p>Content exposure tracking</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-brain"></i></div>
+                            <div class="module-content">
+                                <h4>08d - Perception Analytics</h4>
+                                <p>AI understanding and presentation analysis</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-quote-left"></i></div>
+                            <div class="module-content">
+                                <h4>08e - Citations Analytics</h4>
+                                <p>Track AI platform brand citations</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-comments"></i></div>
+                            <div class="module-content">
+                                <h4>08f - Questions Analytics</h4>
+                                <p>Analyze user queries through AI</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-search"></i></div>
+                            <div class="module-content">
+                                <h4>08g - SEO Performance</h4>
+                                <p>Traditional vs AI SEO comparison</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fab fa-reddit"></i></div>
+                            <div class="module-content">
+                                <h4>08h - Social Media Monitor</h4>
+                                <p>Reddit and YouTube monitoring</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-chart-bar"></i></div>
+                            <div class="module-content">
+                                <h4>08i - Reddit Dashboard</h4>
+                                <p>Detailed Reddit performance analysis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-category">
+                    <h3><span class="badge badge-warning">09</span> Advanced Features</h3>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-project-diagram"></i></div>
+                            <div class="module-content">
+                                <h4>09a - Knowledge Graph</h4>
+                                <p>Visualize brand knowledge relationships in AI</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-link"></i></div>
+                            <div class="module-content">
+                                <h4>09b - JSON-LD Connection</h4>
+                                <p>Manage structured data AI associations</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="module-content">
+                                <h4>09c - Performance Metrics</h4>
+                                <p>Real-time KPI display</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-sitemap"></i></div>
+                            <div class="module-content">
+                                <h4>09d - Schema Mappings</h4>
+                                <p>Knowledge graph node relationship management</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-category">
+                    <h3><span class="badge badge-warning">10</span> System Management</h3>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-users-cog"></i></div>
+                            <div class="module-content">
+                                <h4>10a - User Management</h4>
+                                <p>System users and permissions</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-bell"></i></div>
+                            <div class="module-content">
+                                <h4>10b - Notification Center</h4>
+                                <p>System notifications and alerts</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-tools"></i></div>
+                            <div class="module-content">
+                                <h4>10c - Data Tools</h4>
+                                <p>Import/export and processing utilities</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-file-code"></i></div>
+                            <div class="module-content">
+                                <h4>10d - API Documentation</h4>
+                                <p>System API interface docs</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-sliders-h"></i></div>
+                            <div class="module-content">
+                                <h4>10e - System Settings</h4>
+                                <p>Global configuration management</p>
+                            </div>
+                        </div>
+                        <div class="module-item">
+                            <div class="module-icon"><i class="fas fa-life-ring"></i></div>
+                            <div class="module-content">
+                                <h4>10f - Help & Support</h4>
+                                <p>User documentation and support</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture Tab -->
+        <div id="architecture" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-sitemap"></i>System Architecture</h2>
+                <div id="architectureChart" class="chart-container"></div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-cubes"></i>Technical Stack</h2>
+                <div class="grid grid-3">
+                    <div class="feature-box">
+                        <h3>Frontend</h3>
+                        <p>Vanilla JavaScript, HTML5, CSS3, ECharts 5.4.3 for visualizations, Font Awesome icons</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Backend</h3>
+                        <p>Node.js, Express.js, JWT authentication, RESTful APIs, Express middleware</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Database</h3>
+                        <p>PostgreSQL with specialized schemas for content, analytics, auth, and AI platforms</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Containerization</h3>
+                        <p>Docker containers for API, database, and Nginx web server</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Security</h3>
+                        <p>JWT tokens, role-based access control, rate limiting, CORS, Helmet.js</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Deployment</h3>
+                        <p>Docker Compose for orchestration, GitHub auto-sync, CI/CD pipeline ready</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-shield-alt"></i>Security Features</h2>
+                <div class="grid grid-2">
+                    <div class="feature-box">
+                        <h3>Authentication & Authorization</h3>
+                        <p>JWT-based authentication with role-based access control (admin, editor, user roles)</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>API Security</h3>
+                        <p>Rate limiting, CORS protection, Helmet.js headers, input validation, SQL injection prevention</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Data Protection</h3>
+                        <p>Encrypted passwords, secure session management, audit logging, data sanitization</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Infrastructure Security</h3>
+                        <p>Docker container isolation, environment variable management, secure credential storage</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Switching Function
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Remove active class from all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+            
+            // Initialize charts when switching to relevant tabs
+            if (tabName === 'business-flow') {
+                initBusinessFlowChart();
+            } else if (tabName === 'data-flow') {
+                initDataFlowChart();
+            } else if (tabName === 'modules') {
+                initModuleHierarchyChart();
+            } else if (tabName === 'architecture') {
+                initArchitectureChart();
+            }
+        }
+
+        // Business Flow Chart
+        function initBusinessFlowChart() {
+            const chart = echarts.init(document.getElementById('businessFlowChart'));
+            
+            const option = {
+                title: {
+                    text: 'End-to-End Business Process',
+                    left: 'center',
+                    top: 20
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}'
+                },
+                series: [{
+                    type: 'sankey',
+                    layout: 'none',
+                    emphasis: {
+                        focus: 'adjacency'
+                    },
+                    data: [
+                        {name: 'Business Goals'},
+                        {name: 'AI Platform Analysis'},
+                        {name: 'Content Strategy'},
+                        {name: 'Content Creation'},
+                        {name: 'Quality Assurance'},
+                        {name: 'Platform Distribution'},
+                        {name: 'Performance Monitoring'},
+                        {name: 'Optimization Insights'},
+                        {name: 'Business Impact'}
+                    ],
+                    links: [
+                        {source: 'Business Goals', target: 'AI Platform Analysis', value: 10},
+                        {source: 'AI Platform Analysis', target: 'Content Strategy', value: 10},
+                        {source: 'Content Strategy', target: 'Content Creation', value: 10},
+                        {source: 'Content Creation', target: 'Quality Assurance', value: 10},
+                        {source: 'Quality Assurance', target: 'Platform Distribution', value: 10},
+                        {source: 'Platform Distribution', target: 'Performance Monitoring', value: 10},
+                        {source: 'Performance Monitoring', target: 'Optimization Insights', value: 10},
+                        {source: 'Optimization Insights', target: 'Business Impact', value: 10},
+                        {source: 'Business Impact', target: 'Business Goals', value: 5},
+                        {source: 'Optimization Insights', target: 'Content Strategy', value: 5}
+                    ],
+                    nodeGap: 30,
+                    lineStyle: {
+                        color: 'gradient',
+                        curveness: 0.5
+                    },
+                    itemStyle: {
+                        color: '#667eea',
+                        borderColor: '#667eea'
+                    }
+                }]
+            };
+            
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // Data Flow Chart
+        function initDataFlowChart() {
+            const chart = echarts.init(document.getElementById('dataFlowChart'));
+            
+            const option = {
+                title: {
+                    text: 'Data Flow Architecture',
+                    left: 'center',
+                    top: 20
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c}'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    top: 60
+                },
+                series: [{
+                    name: 'Data Flow',
+                    type: 'funnel',
+                    left: '20%',
+                    width: '60%',
+                    label: {
+                        position: 'inside',
+                        fontSize: 14,
+                        color: '#fff'
+                    },
+                    itemStyle: {
+                        opacity: 0.9
+                    },
+                    emphasis: {
+                        label: {
+                            fontSize: 18
+                        }
+                    },
+                    data: [
+                        {value: 100, name: 'Data Sources', itemStyle: {color: '#667eea'}},
+                        {value: 80, name: 'Data Collection', itemStyle: {color: '#764ba2'}},
+                        {value: 60, name: 'Data Processing', itemStyle: {color: '#f093fb'}},
+                        {value: 40, name: 'Analytics Engine', itemStyle: {color: '#4facfe'}},
+                        {value: 20, name: 'Insights & Actions', itemStyle: {color: '#10b981'}}
+                    ].sort(function (a, b) { return a.value - b.value; })
+                }]
+            };
+            
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // Module Hierarchy Chart
+        function initModuleHierarchyChart() {
+            const chart = echarts.init(document.getElementById('moduleHierarchyChart'));
+            
+            const option = {
+                title: {
+                    text: 'Module Hierarchy Structure',
+                    left: 'center',
+                    top: 20
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}'
+                },
+                series: [{
+                    type: 'tree',
+                    data: [{
+                        name: 'Dymesty Platform',
+                        children: [
+                            {
+                                name: '01 - Introduction',
+                                children: [
+                                    {name: 'Platform Overview'}
+                                ]
+                            },
+                            {
+                                name: '02 - Diagnostics',
+                                children: [
+                                    {name: 'Channel Diagnostic'},
+                                    {name: 'Strategy Development'}
+                                ]
+                            },
+                            {
+                                name: '03 - Content',
+                                children: [
+                                    {name: 'Content Library'},
+                                    {name: 'Question Collector'},
+                                    {name: 'Asset Creation'},
+                                    {name: 'Library Management'}
+                                ]
+                            },
+                            {
+                                name: '04 - Orchestration',
+                                children: [
+                                    {name: 'Orchestration Center'}
+                                ]
+                            },
+                            {
+                                name: '05 - Configuration',
+                                children: [
+                                    {name: 'Config Manager'}
+                                ]
+                            },
+                            {
+                                name: '06 - User Journey',
+                                children: [
+                                    {name: 'Journey Tracker'}
+                                ]
+                            },
+                            {
+                                name: '07 - PR & Media',
+                                children: [
+                                    {name: 'Media Scoring'},
+                                    {name: 'PR Optimization'},
+                                    {name: 'Keyword Strategy'},
+                                    {name: 'JSON-LD Strategy'},
+                                    {name: 'Competitor Analysis'},
+                                    {name: 'Advanced Optimization'}
+                                ]
+                            },
+                            {
+                                name: '08 - Analytics',
+                                children: [
+                                    {name: 'Real-time Monitor'},
+                                    {name: 'Brand Performance'},
+                                    {name: 'Visibility Analytics'},
+                                    {name: 'Perception Analytics'},
+                                    {name: 'Citations Analytics'},
+                                    {name: 'Questions Analytics'},
+                                    {name: 'SEO Performance'},
+                                    {name: 'Social Monitor'},
+                                    {name: 'Reddit Dashboard'}
+                                ]
+                            },
+                            {
+                                name: '09 - Advanced',
+                                children: [
+                                    {name: 'Knowledge Graph'},
+                                    {name: 'JSON-LD Connection'},
+                                    {name: 'Performance Metrics'},
+                                    {name: 'Schema Mappings'}
+                                ]
+                            },
+                            {
+                                name: '10 - System',
+                                children: [
+                                    {name: 'User Management'},
+                                    {name: 'Notifications'},
+                                    {name: 'Data Tools'},
+                                    {name: 'API Docs'},
+                                    {name: 'Settings'},
+                                    {name: 'Help & Support'}
+                                ]
+                            }
+                        ]
+                    }],
+                    top: '10%',
+                    left: '10%',
+                    bottom: '5%',
+                    right: '15%',
+                    symbolSize: 12,
+                    orient: 'TB',
+                    label: {
+                        position: 'right',
+                        verticalAlign: 'middle',
+                        align: 'left',
+                        fontSize: 12
+                    },
+                    leaves: {
+                        label: {
+                            position: 'bottom',
+                            verticalAlign: 'middle',
+                            align: 'center'
+                        }
+                    },
+                    expandAndCollapse: true,
+                    animationDuration: 550,
+                    animationDurationUpdate: 750,
+                    lineStyle: {
+                        color: '#ccc',
+                        width: 1.5
+                    },
+                    itemStyle: {
+                        color: '#667eea',
+                        borderColor: '#667eea'
+                    }
+                }]
+            };
+            
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // Architecture Chart
+        function initArchitectureChart() {
+            const chart = echarts.init(document.getElementById('architectureChart'));
+            
+            const option = {
+                title: {
+                    text: 'System Architecture Layers',
+                    left: 'center',
+                    top: 20
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['Frontend', 'API Layer', 'Business Logic', 'Data Layer', 'Infrastructure'],
+                    bottom: 20
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Presentation', 'Services', 'Processing', 'Storage', 'Platform']
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Components'
+                },
+                series: [
+                    {
+                        name: 'Frontend',
+                        type: 'bar',
+                        stack: 'Architecture',
+                        data: [5, 0, 0, 0, 0],
+                        itemStyle: { color: '#667eea' }
+                    },
+                    {
+                        name: 'API Layer',
+                        type: 'bar',
+                        stack: 'Architecture',
+                        data: [0, 4, 0, 0, 0],
+                        itemStyle: { color: '#764ba2' }
+                    },
+                    {
+                        name: 'Business Logic',
+                        type: 'bar',
+                        stack: 'Architecture',
+                        data: [0, 0, 6, 0, 0],
+                        itemStyle: { color: '#f093fb' }
+                    },
+                    {
+                        name: 'Data Layer',
+                        type: 'bar',
+                        stack: 'Architecture',
+                        data: [0, 0, 0, 4, 0],
+                        itemStyle: { color: '#4facfe' }
+                    },
+                    {
+                        name: 'Infrastructure',
+                        type: 'bar',
+                        stack: 'Architecture',
+                        data: [0, 0, 0, 0, 3],
+                        itemStyle: { color: '#10b981' }
+                    }
+                ]
+            };
+            
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // Initialize first chart on load
+        window.addEventListener('DOMContentLoaded', () => {
+            // Charts will be initialized when their tabs are clicked
+        });
+    </script>
+</body>
+</html>

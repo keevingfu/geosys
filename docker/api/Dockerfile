@@ -18,5 +18,5 @@ USER nodejs
 # Expose port
 EXPOSE 3000
 
-# Start the application
-CMD ["node", "index.js"]
+# Start the application (use secure version)
+CMD ["node", "index-secure.js"]

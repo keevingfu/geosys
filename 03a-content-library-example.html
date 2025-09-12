@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Library - Dymesty AI Glasses</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/api.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .content-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .content-card .meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .content-card .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status.published {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .content-card .summary {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .content-card .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination span {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-book"></i> Content Library</h1>
+            <p>Manage your Dymesty AI Glasses content across all platforms</p>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Status</label>
+                <select id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="published">Published</option>
+                    <option value="draft">Draft</option>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="archived">Archived</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Type</label>
+                <select id="typeFilter">
+                    <option value="">All Types</option>
+                    <option value="article">Article</option>
+                    <option value="faq">FAQ</option>
+                    <option value="guide">Guide</option>
+                    <option value="announcement">Announcement</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Search</label>
+                <input type="text" id="searchInput" placeholder="Search content...">
+            </div>
+            <div class="filter-group" style="align-self: flex-end;">
+                <button class="btn-primary" onclick="applyFilters()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+
+        <div id="errorContainer"></div>
+        <div id="loadingContainer" class="loading" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i> Loading content...
+        </div>
+        <div id="contentContainer" class="content-grid"></div>
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="fas fa-inbox"></i>
+            <h3>No content found</h3>
+            <p>Try adjusting your filters or create new content</p>
+        </div>
+        <div id="pagination" class="pagination"></div>
+    </div>
+
+    <!-- Content Modal -->
+    <div id="contentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentFilters = {
+            status: '',
+            type: '',
+            search: ''
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check authentication
+            if (!api.isAuthenticated()) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            loadContent();
+            
+            // Add enter key listener to search
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    applyFilters();
+                }
+            });
+        });
+
+        // Load content from API
+        async function loadContent() {
+            const errorContainer = document.getElementById('errorContainer');
+            const loadingContainer = document.getElementById('loadingContainer');
+            const contentContainer = document.getElementById('contentContainer');
+            const emptyState = document.getElementById('emptyState');
+            const pagination = document.getElementById('pagination');
+            
+            // Show loading state
+            loadingContainer.style.display = 'block';
+            contentContainer.innerHTML = '';
+            emptyState.style.display = 'none';
+            errorContainer.innerHTML = '';
+            
+            try {
+                // Build query parameters
+                const params = {
+                    page: currentPage,
+                    limit: 12,
+                    ...currentFilters
+                };
+                
+                // Remove empty parameters
+                Object.keys(params).forEach(key => {
+                    if (params[key] === '') delete params[key];
+                });
+                
+                // Fetch content from API
+                const response = await api.getContent(params);
+                
+                // Hide loading
+                loadingContainer.style.display = 'none';
+                
+                // Check if empty
+                if (response.items.length === 0) {
+                    emptyState.style.display = 'block';
+                    pagination.innerHTML = '';
+                    return;
+                }
+                
+                // Render content cards
+                response.items.forEach(item => {
+                    contentContainer.appendChild(createContentCard(item));
+                });
+                
+                // Update pagination
+                totalPages = response.pagination.totalPages;
+                renderPagination();
+                
+            } catch (error) {
+                // Hide loading
+                loadingContainer.style.display = 'none';
+                
+                // Show error
+                errorContainer.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Error loading content: ${error.message}
+                    </div>
+                `;
+                
+                // For demo purposes, show mock data if API fails
+                if (error.message.includes('fetch')) {
+                    showMockData();
+                }
+            }
+        }
+
+        // Create content card element
+        function createContentCard(item) {
+            const card = document.createElement('div');
+            card.className = 'content-card';
+            
+            // Format date
+            const date = new Date(item.created_at || Date.now()).toLocaleDateString();
+            
+            // Truncate content for summary
+            const summary = item.summary || item.content?.substring(0, 150) + '...';
+            
+            card.innerHTML = `
+                <h3>${item.title}</h3>
+                <div class="meta">
+                    <span><i class="fas fa-calendar"></i> ${date}</span>
+                    <span class="status ${item.status}">${item.status.toUpperCase()}</span>
+                </div>
+                <p class="summary">${summary}</p>
+                <div class="actions">
+                    <button class="btn-action" onclick="viewContent(${item.id})">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="btn-action" onclick="editContent(${item.id})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn-action" onclick="shareContent(${item.id})">
+                        <i class="fas fa-share"></i> Share
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Apply filters
+        function applyFilters() {
+            currentFilters = {
+                status: document.getElementById('statusFilter').value,
+                type: document.getElementById('typeFilter').value,
+                search: document.getElementById('searchInput').value
+            };
+            currentPage = 1;
+            loadContent();
+        }
+
+        // Pagination
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            pagination.innerHTML = `
+                <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span>Page ${currentPage} of ${totalPages}</span>
+                <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+        }
+
+        function goToPage(page) {
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            loadContent();
+        }
+
+        // Content actions
+        async function viewContent(id) {
+            try {
+                const content = await api.getContentById(id);
+                showContentModal(content);
+            } catch (error) {
+                alert('Error loading content: ' + error.message);
+            }
+        }
+
+        function editContent(id) {
+            // Redirect to edit page
+            window.location.href = `03b-asset-creation-studio.html?edit=${id}`;
+        }
+
+        function shareContent(id) {
+            // Show share modal
+            alert('Share functionality coming soon!');
+        }
+
+        // Modal functions
+        function showContentModal(content) {
+            const modal = document.getElementById('contentModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = content.title;
+            modalBody.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <strong>Type:</strong> ${content.type}<br>
+                    <strong>Status:</strong> ${content.status}<br>
+                    <strong>Created:</strong> ${new Date(content.created_at).toLocaleString()}
+                </div>
+                <div style="white-space: pre-wrap; line-height: 1.6;">
+                    ${content.content}
+                </div>
+                ${content.tags && content.tags.length > 0 ? `
+                    <div style="margin-top: 20px;">
+                        <strong>Tags:</strong> ${content.tags.map(tag => `<span style="background: #e0e0e0; padding: 4px 8px; border-radius: 4px; margin-right: 5px;">${tag}</span>`).join('')}
+                    </div>
+                ` : ''}
+            `;
+            
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('contentModal').classList.remove('show');
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('contentModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        // Mock data fallback
+        function showMockData() {
+            const contentContainer = document.getElementById('contentContainer');
+            const mockData = [
+                {
+                    id: 1,
+                    title: 'Getting Started with Dymesty AI Glasses',
+                    content: 'Complete guide to setting up your Dymesty AI Glasses...',
+                    type: 'guide',
+                    status: 'published',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    title: 'Real-Time Translation Features',
+                    content: 'Learn about the powerful translation capabilities...',
+                    type: 'article',
+                    status: 'published',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 3,
+                    title: 'Privacy and Security FAQ',
+                    content: 'Common questions about privacy features...',
+                    type: 'faq',
+                    status: 'published',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 4,
+                    title: 'Firmware Update 2.0 Released',
+                    content: 'Exciting new features in the latest update...',
+                    type: 'announcement',
+                    status: 'published',
+                    created_at: new Date().toISOString()
+                }
+            ];
+            
+            mockData.forEach(item => {
+                contentContainer.appendChild(createContentCard(item));
+            });
+        }
+    </script>
+</body>
+</html>

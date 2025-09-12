@@ -418,12 +418,10 @@
     </div>
 
     <script>
-        // Default credentials (use backend validation in production)
-        const VALID_CREDENTIALS = [
-            { username: 'demo@dymesty.com', password: 'demo123' },
-            { username: 'admin', password: 'admin123' },
-            { username: 'user', password: 'user123' }
-        ];
+        // API configuration
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:4000' 
+            : '/api';
 
         // Check if already logged in
         window.addEventListener('DOMContentLoaded', () => {
@@ -505,22 +503,43 @@
             buttonText.style.display = 'none';
             loadingIcon.style.display = 'inline-block';
             
-            // Simulate async validation
+            // Hardcoded authentication - no backend required
+            const validCredentials = {
+                'admin@dymesty.com': 'Admin@123!',
+                'demo@dymesty.com': 'Demo@123!',
+                'editor@dymesty.com': 'Demo@123!'
+            };
+            
+            // Simulate network delay
             setTimeout(() => {
-                // Validate credentials
-                const isValid = VALID_CREDENTIALS.some(
-                    cred => cred.username === username && cred.password === password
-                );
-                
-                if (isValid) {
-                    // Generate auth token
-                    const authToken = btoa(`${username}:${Date.now()}`);
-                    const sessionExpiry = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 hours
+                if (validCredentials[username] && validCredentials[username] === password) {
+                    // Create a mock user object
+                    const user = {
+                        id: 1,
+                        email: username,
+                        username: username.split('@')[0],
+                        role: username === 'admin@dymesty.com' ? 'admin' : (username === 'editor@dymesty.com' ? 'editor' : 'user')
+                    };
+                    
+                    // Create a mock JWT token (for demo purposes only)
+                    const mockToken = btoa(JSON.stringify({
+                        header: { alg: 'HS256', typ: 'JWT' },
+                        payload: { 
+                            id: user.id, 
+                            email: user.email, 
+                            role: user.role,
+                            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours from now
+                        },
+                        signature: 'mock-signature'
+                    }));
                     
                     // Save authentication info
-                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('authToken', mockToken);
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    
+                    // Set session expiry (24 hours from now)
+                    const sessionExpiry = Date.now() + (24 * 60 * 60 * 1000);
                     localStorage.setItem('sessionExpiry', sessionExpiry.toString());
-                    localStorage.setItem('currentUser', username);
                     
                     // Remember username
                     if (rememberMe) {
@@ -535,13 +554,13 @@
                         window.location.href = 'index.html';
                     }, 1000);
                 } else {
-                    // Show error message
+                    // Invalid credentials
                     showAlert('Invalid username or password');
                     button.classList.remove('loading');
                     buttonText.style.display = 'inline';
                     loadingIcon.style.display = 'none';
                 }
-            }, 1000);
+            }, 800); // Simulate network delay
         }
 
         // Clear error state
