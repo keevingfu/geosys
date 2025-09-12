@@ -1015,7 +1015,13 @@
                 },
                 series: [{
                     type: 'scatter',
-                    data: schemaItems,
+                    data: schemaItems.map(item => ({
+                        value: [item.effort, item.impact],
+                        name: item.name,
+                        size: item.size,
+                        impact: item.impact,
+                        effort: item.effort
+                    })),
                     symbolSize: function(data) {
                         return data.size / 2;
                     },
